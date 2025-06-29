@@ -1,0 +1,11 @@
+{
+    "api": {
+        "HOSTNAME": "172.24.52.30",
+        "HOSTNAME_WS": "172.24.52.30",
+        "HOSTNAME_API_EDP_HO": "172.24.16.133",
+        "PORT_LOGIN":7320,
+        "PORT_ADMINISTRASI":7321,
+        "PORT_LISTENER":7322,
+        "PORT_API_EDP_HO": 8124
+    }
+}
