@@ -1,0 +1,13 @@
+/* ImageZoom.module.css */
+.imageContainer {
+    overflow: hidden; /* To contain the zoomed image within its bounds */
+    display: inline-block; /* Or block, depending on your layout */
+  }
+  
+  .zoomable {
+    transition: transform 0.3s ease-in-out; /* Smooth transition for the zoom effect */
+  }
+  
+  .imageContainer:hover .zoomable {
+    transform: scale(1.5); /* Adjust the zoom level as needed */
+  }
