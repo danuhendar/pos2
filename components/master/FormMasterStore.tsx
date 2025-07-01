@@ -20,12 +20,12 @@ import ModalComponent from "../modal/ModalComponent";
 import InputTextType from "../form/InputTypeText";
 import IconXCircle from "../Icon/IconXCircle";
 import IconSave from "../Icon/IconSave";
-interface FormMasterDataProps {
+interface FormMasterStoreProps {
     url: string,
     command: string,
     IDReport: string,
 }
-const FormMasterData: React.FC<FormMasterDataProps> = ({ url, command, IDReport }) => {
+const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDReport }) => {
     const [data_rows, setData_rows] = useState([]);
     const [data_columns, setData_columns] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -374,29 +374,27 @@ const FormMasterData: React.FC<FormMasterDataProps> = ({ url, command, IDReport 
                         :
                         ''
                     }
-                    {/* <DataTables in_content_selected_rows={[]} in_is_checkboxSelection={false} in_column_hidden={{ id: false, ID_REPORT: false }} jenis_laporan={t('Report') + ' ' + IDReport.split('Report').join('')} data_rows={data_rows} data_columns={data_columns} isLoading={loading} progressbar={progressbar} field_auto_sorting={'LAST_REPORT'} type_sorting={'desc'} iscolumns_grouping={true} arr_columnGroupingModel={columnGroupingModel} isHiddenID={false} timelapsed={get_dateTimeDiff_second(new Date(ClosedWS), new Date(LastResponse))} in_class={"max-w-full w-full bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded-2xl border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none"} data_row_height={52} isDisableBorder={true} in_csvOptions={false} in_printOptions={false} sizeBorderRadius={3} row_per_page={[5, 10, 25, 50, 100]} in_showQuickFilter={true} in_handleRowClick={clickTable} in_prosentase_progress={DataProsentase} in_rows_spanning={false} /> */}
-                
-                <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
-                    <div className="p-2">
-                        <div className="mb-5">
-                            <InputTextType in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBranch} in_value={IN_BRANCH} />
-                            <InputTextType in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputStore} in_value={IN_STORE} />
-                            <InputTextType in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
-                            <label>IS Active</label>
-                            <label className="relative w-12 h-6">
-                                <input checked={CheckedISActive} onChange={FormISActive} type="checkbox" className="absolute z-10 w-full h-full opacity-0 cursor-pointer custom_switch peer" id="custom_switch_checkbox1" />
-                                <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
-                            </label>
+                    <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                        <div className="p-2">
+                            <div className="mb-5">
+                                <InputTextType in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBranch} in_value={IN_BRANCH} />
+                                <InputTextType in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputStore} in_value={IN_STORE} />
+                                <InputTextType in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
+                                <label>IS Active</label>
+                                <label className="relative w-12 h-6">
+                                    <input checked={CheckedISActive} onChange={FormISActive} type="checkbox" className="absolute z-10 w-full h-full opacity-0 cursor-pointer custom_switch peer" id="custom_switch_checkbox1" />
+                                    <span className="bg-[#ebedf2] dark:bg-dark block h-full rounded-full before:absolute before:left-1 before:bg-white dark:before:bg-white-dark dark:peer-checked:before:bg-white before:bottom-1 before:w-4 before:h-4 before:rounded-full peer-checked:before:left-7 peer-checked:bg-primary before:transition-all before:duration-300"></span>
+                                </label>
+                            </div>
+                            <div className="flex items-center justify-end gap-3 mt-8">
+                                <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                <ButtonAdd in_classname={!isDark ? 'btn btn-primary rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_save"} isLoading={false} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Save'} HandleClick={InsData} />
+                            </div>
                         </div>
-                        <div className="flex items-center justify-end gap-3 mt-8">
-                            <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
-                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_save"} isLoading={false} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Save'} HandleClick={InsData} />
-                        </div>
-                    </div>
-                } />
+                    } />
                 </>
             } />
         </>
     )
 }
-export default FormMasterData;
+export default FormMasterStore;

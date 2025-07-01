@@ -289,7 +289,7 @@ const Header = () => {
                                                         //-- MENU --//
                                                         <>
                                                             <li className="text-xs">
-                                                                <Link href={`${IN_DATA[i].data[b].path.toString().toLowerCase()}`}>{t(IN_DATA[i].data[b].menu.toString().toUpperCase())}</Link>
+                                                                <Link href={`/apps${IN_DATA[i].data[b].path.toString().split('apps').join('').toLowerCase()}`}>{t(IN_DATA[i].data[b].menu.toString().toUpperCase())}</Link>
                                                             </li>
                                                         </>
                                                         :
