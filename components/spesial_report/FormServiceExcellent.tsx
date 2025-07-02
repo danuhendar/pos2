@@ -303,7 +303,7 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
                     return (
                         <a onClick={(event) => {
                             show_Detail_Log_EDC(cellValues,'BCA','ONLINE');
-                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Online!" className="text-center text-success hover:text-white-light hover:cursor-pointer underline underline-offset-4">{cellValues.value}</a>
+                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Online!" className="text-center underline text-success hover:text-white-light hover:cursor-pointer underline-offset-4">{cellValues.value}</a>
                     );
                 }
             },
@@ -312,7 +312,7 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
                     return (
                         <a onClick={(event) => {
                             show_Detail_Log_EDC(cellValues,'BCA','OFFLINE');
-                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Offline!" className="text-center text-danger hover:text-white-light hover:cursor-pointer underline underline-offset-4">{cellValues.value}</a>
+                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Offline!" className="text-center underline text-danger hover:text-white-light hover:cursor-pointer underline-offset-4">{cellValues.value}</a>
                     );
                 }
             },
@@ -332,7 +332,7 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
                     return (
                         <a onClick={(event) => {
                             show_Detail_Log_EDC(cellValues,'MANDIRI','ONLINE');
-                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Online!" className="text-center text-success hover:text-white-light hover:cursor-pointer underline underline-offset-4">{cellValues.value}</a>
+                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Online!" className="text-center underline text-success hover:text-white-light hover:cursor-pointer underline-offset-4">{cellValues.value}</a>
                     );
                 }
             },
@@ -341,7 +341,7 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
                     return (
                         <a onClick={(event) => {
                             show_Detail_Log_EDC(cellValues,'MANDIRI','OFFLINE');
-                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Offline!" className="text-center text-danger hover:text-white-light hover:cursor-pointer underline underline-offset-4">{cellValues.value}</a>
+                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Offline!" className="text-center underline text-danger hover:text-white-light hover:cursor-pointer underline-offset-4">{cellValues.value}</a>
                     );
                 }
             },
@@ -360,7 +360,7 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
                     return (
                         <a onClick={(event) => {
                             show_Detail_Log_EDC(cellValues,'MTI','ONLINE');
-                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Online!" className="text-center text-success hover:text-white-light hover:cursor-pointer underline underline-offset-4">{cellValues.value}</a>
+                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Online!" className="text-center underline text-success hover:text-white-light hover:cursor-pointer underline-offset-4">{cellValues.value}</a>
                     );
                 }
             },
@@ -369,7 +369,7 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
                     return (
                         <a onClick={(event) => {
                             show_Detail_Log_EDC(cellValues,'MTI','OFFLINE');
-                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Offline!" className="text-center text-danger hover:text-white-light hover:cursor-pointer underline underline-offset-4">{cellValues.value}</a>
+                    }} data-twe-toggle="tooltip" title="Klik untuk melihat detail log EDC Offline!" className="text-center underline text-danger hover:text-white-light hover:cursor-pointer underline-offset-4">{cellValues.value}</a>
                     );
                 }
             },
@@ -1154,19 +1154,19 @@ const FormServiceExcellent: React.FC<FormServiceExcellentProps> = ({url,command,
         <>
             <AntiScrapedShieldComponent in_content={
                 <>
-                    <div className="grid-cols-2 gap-3  md:grid-cols-2 mb-3 flex items-end justify-left">
+                    <div className="flex items-end grid-cols-2 gap-3 mb-3 md:grid-cols-2 justify-left">
                         <div className="mb-3 w-1/2 bg-white shadow-[4px_6px_10px_-3px_#bfc9d4] rounded-2xl border border-white-light dark:border-[#1b2e4b] dark:bg-[#191e3a] dark:shadow-none mt-10">
-                                <div className="p-2 flex items-center flex-col sm:flex-row">
-                                    <div className="flex-1 ltr:sm:pl-4 pr-4 rtl:sm:pr-1 text-center sm:text-left">
+                                <div className="flex flex-col items-center p-2 sm:flex-row">
+                                    <div className="flex-1 pr-4 text-center ltr:sm:pl-4 rtl:sm:pr-1 sm:text-left">
                                         <div className="mb-3">
-                                        <div className="flex item-center font-semibold">   
+                                        <div className="flex font-semibold item-center">   
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
                                             </svg>
-                                            <h2 className="text-dark mt-1 ml-1 text-center text-1xl dark:text-white-light">Form Filter</h2>
+                                            <h2 className="mt-1 ml-1 text-center text-dark text-1xl dark:text-white-light">Form Filter</h2>
                                         </div>
                                         </div>
-                                        <InputCheckBoxFilterType event={userSelectTipeFilter} />
+                                        {/* <InputCheckBoxFilterType event={userSelectTipeFilter} /> */}
                                         <DropDownBranch in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options5} isSearchable={true} isMulti={IsValMulti} event={userSelectKodeCabang} />
                                         <div className="grid grid-cols-2 gap-3">
                                             <div><DropDownStore in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={userSelectKodeToko} /></div>

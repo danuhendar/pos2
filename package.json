@@ -48,6 +48,7 @@
     "generate-unique-id": "^2.0.3",
     "highlight.js": "^11.7.0",
     "i18next": "^22.4.10",
+    "jsbarcode": "^3.12.1",
     "mantine-datatable": "^1.8.8",
     "next": "^15.2.0-canary.74",
     "ni18n": "^1.0.5",

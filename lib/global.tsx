@@ -13,7 +13,7 @@ import * as XLSX from 'xlsx';
 import * as Excel from 'exceljs';
 import FileSaver from 'file-saver';
 import { Gets } from './get';
-
+import JsBarcode from 'jsbarcode';
 export const GenerateUniqNumber = () =>{
     const uniq_number = parseFloat(Math.floor(new Date().valueOf() * Math.random()).toString().substring(0,6));
     return uniq_number;
@@ -1144,4 +1144,11 @@ export async function importJsonToExcel(outputPath:string, jsonData:any) {
 export function GetCommandPowershell(in_command:string,timeout_command:number){
     var awal = "%systemroot%\\system32\\WindowsPowerShell\\v1.0\\powershell.exe \"$scriptBlock={"+in_command+"};$timeout="+timeout_command+";$job = Start-Job -ScriptBlock $scriptBlock;if (Wait-Job -Job $job -Timeout $timeout){$result=Receive-Job -Job $job;Write-Host $result;}else{Stop-Job -Job $job;Remove-Job -Job $job;Write-Host ('Job timed out after',$timeout,'seconds');};exit;\"";
     return awal;
+}
+
+export function textToBase64Barcode(text:string){
+  //var JsBarcode = require('jsbarcode');
+  var canvas = document.createElement("canvas");
+  JsBarcode(canvas, text, {format: "CODE39"});
+  return canvas.toDataURL("image/png");
 }
