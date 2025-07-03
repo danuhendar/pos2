@@ -904,7 +904,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         </div>
                         {
                             data_rows_Kategori.length > 0 ?
-                            <ComponentsDatatablesAdvanced Datarow={data_rows_Kategori} DataColumns={data_columns_Kategori} />
+                            <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows_Kategori} DataColumns={data_columns_Kategori} />
                             :
                             ''
                         }
@@ -934,7 +934,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         </div>
                         {
                             data_rows.length > 0 ?
-                            <ComponentsDatatablesAdvanced Datarow={data_rows} DataColumns={data_columns} />
+                            <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
                             :
                             ''
                         }

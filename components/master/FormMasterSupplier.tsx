@@ -431,7 +431,7 @@ const FormMasterSupplier: React.FC<FormMasterSupplierProps> = ({ url, command, I
                     </div>
                     {
                         data_rows.length > 0 ?
-                        <ComponentsDatatablesAdvanced Datarow={data_rows} DataColumns={data_columns} />
+                        <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
                         :
                         ''
                     }

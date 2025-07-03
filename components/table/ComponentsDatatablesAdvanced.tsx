@@ -6,21 +6,25 @@ import { useTranslation } from 'react-i18next';
 
 interface ComponentsDatatablesAdvancedProps{
     Datarow:any,
-    DataColumns:any
+    DataColumns:any,
+    in_id:string,
+    in_column_sort:string
 }
-const ComponentsDatatablesAdvanced : React.FC<ComponentsDatatablesAdvancedProps> = ({Datarow,DataColumns}) =>{
+const ComponentsDatatablesAdvanced : React.FC<ComponentsDatatablesAdvancedProps> = ({Datarow,DataColumns,in_id,in_column_sort}) =>{
     const rowData = Datarow//[{"KODE_GERAI":"G001","CONTENT":"FRESH DAU SENGKALING 99","STATUS":"AKTIF","id":"87494840"},{"KODE_GERAI":"G4AF","CONTENT":"DANAU TOBA","STATUS":"AKTIF","id":"16249159"},{"KODE_GERAI":"GAA1","CONTENT":"TLOGOWARU TIMUR","STATUS":"AKTIF","id":"09159339"},{"KODE_GERAI":"GDS1","CONTENT":"TUMAPEL SINGOSARI","STATUS":"AKTIF","id":"39283431"},{"KODE_GERAI":"GEWQ","CONTENT":"BANDARA ABD. SALEH MALANG","STATUS":"AKTIF","id":"56667779"},{"KODE_GERAI":"GFDS","CONTENT":"DANAU TONDANO SAWOJAJAR","STATUS":"AKTIF","id":"61617089"},{"KODE_GERAI":"GH42","CONTENT":"SUHAT 01","STATUS":"AKTIF","id":"05214778"},{"KODE_GERAI":"GLMR","CONTENT":"DANAU KERINCI MALANG","STATUS":"AKTIF","id":"99395152"},{"KODE_GERAI":"GMMB","CONTENT":"BATU 1","STATUS":"AKTIF","id":"87485190"},{"KODE_GERAI":"GTRE","CONTENT":"PAKIS MALANG","STATUS":"AKTIF","id":"32628589"},{"KODE_GERAI":"GUKL","CONTENT":"TLOGOWARU BARAT","STATUS":"AKTIF","id":"90294211"}]
     const { t, i18n } = useTranslation();
     const [page, setPage] = useState(1);
     const PAGE_SIZES = [10, 20, 30, 50, 100];
     const [pageSize, setPageSize] = useState(PAGE_SIZES[0]);
-    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, 'id'));
+    const [initialRecords, setInitialRecords] = useState(sortBy(rowData, in_column_sort));
     const [recordsData, setRecordsData] = useState(initialRecords);
     const [search, setSearch] = useState('');
-    const [sortStatus, setSortStatus] = useState<DataTableSortStatus>({
-        columnAccessor: 'id',
+    const [sortStatus, setSortStatus] = useState<DataTableSortStatus>(
+        {
+        columnAccessor: in_column_sort,
         direction: 'asc',
-    });
+        }
+    );
 
     const [isMounted, setIsMounted] = useState(false);
     useEffect(() => {
@@ -63,7 +67,7 @@ const ComponentsDatatablesAdvanced : React.FC<ComponentsDatatablesAdvancedProps>
                     <input type="text" className="w-auto form-input rounded-3xl" placeholder={t("Search")} value={search} onChange={(e) => setSearch(e.target.value)} />
                 </div>
             </div>
-            <div className="datatables">
+            <div id={in_id} className="datatables">
                  {isMounted && (
                     <DataTable
                         noRecordsText="No results match your search query"
