@@ -4,6 +4,8 @@ import { DataGrid, GridColDef, GridColumnGroupingModel, GridEventListener, GridT
 import { ThemeProvider, createTheme, styled } from '@mui/material/styles';
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "@/store";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 const darkTheme = createTheme({
     palette: {
@@ -20,27 +22,24 @@ const lightTheme = createTheme({
 interface CardComponentProps{
     in_style_font_judul:any,
     in_icon:any,
-    in_nilai:any,
     in_style_card:string,
-    in_style_font_content:string,
+    in_content:any,
     in_judul:string
 }
 
-const CardComponent: React.FC<CardComponentProps> = ({in_style_font_judul,in_icon,in_nilai,in_style_card,in_style_font_content,in_judul}) => {
+const CardComponent: React.FC<CardComponentProps> = ({in_style_font_judul,in_icon,in_style_card,in_content,in_judul}) => {
 const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode); 
-    
+const { t, i18n } = useTranslation();
     return ( <>
             <div className={in_style_card}>
-                <div className="mb-3 flex items-center justify-between">
-                    <div className="flex item-center font-semibold">   
+                <div className="flex items-center justify-between mb-3">
+                    <div className="flex font-semibold item-center">   
                         {in_icon}
-                        <h2 className={in_style_font_judul}>{in_judul}</h2>
+                        <h2 className={in_style_font_judul}>&nbsp;{t(in_judul)}</h2>
                     </div>
                 
                 </div>
-                <div className="">
-                    <h2 className={in_style_font_content}>{in_nilai}</h2>
-                </div>
+                {in_content}
             </div>
         </>
     )

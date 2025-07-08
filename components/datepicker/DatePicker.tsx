@@ -15,9 +15,10 @@ interface DatePickerProps{
     isEnableTime:boolean,
     date_format:string,
     in_mode:any,
+    is_time_24hr:boolean,
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({in_classname_title,in_classname_content,in_classname_sub_content,event,name_component,isRtl,in_date,isEnableTime,date_format,in_mode}) => {
+const DatePicker: React.FC<DatePickerProps> = ({in_classname_title,in_classname_content,in_classname_sub_content,event,name_component,isRtl,in_date,isEnableTime,date_format,in_mode,is_time_24hr}) => {
     const { t, i18n } = useTranslation();
     return (
         <>
@@ -31,6 +32,7 @@ const DatePicker: React.FC<DatePickerProps> = ({in_classname_title,in_classname_
                             enableTime: isEnableTime,
                             dateFormat: date_format,
                             position: isRtl ? 'auto right' : 'auto left',
+                            time_24hr: is_time_24hr
                         }}
                         value={in_date}
                         className={in_classname_sub_content}
