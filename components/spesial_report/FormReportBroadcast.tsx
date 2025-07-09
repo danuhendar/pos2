@@ -363,7 +363,7 @@ const FormReportBroadcast: React.FC<FormReportBroadcastProps> = ({ url, command,
                                             <DatePicker in_mode={'single'} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg"} event={(date2) => setDate2(date2)} name_component={"Periode"} idComponent={"txt_periode"} isRtl={isRtl} in_date={date2} isEnableTime={false} date_format={"Y-m-d"} />
                                         </div>
                                         <div>
-                                            <InputTextType in_title={"Nik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg text-sm text-right bg-dark-light"} data_options={undefined} isDisabled={false} event={undefined} in_value={InputNikPemohon} />
+                                            <InputTextType   in_title={"Nik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg text-sm text-right bg-dark-light"} data_options={undefined} isDisabled={false} event={undefined} in_value={InputNikPemohon} />
                                         </div>
                                         <div>
                                             <DropDownBranch in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options5} isSearchable={true} isMulti={false} event={userSelectKodeCabang} />

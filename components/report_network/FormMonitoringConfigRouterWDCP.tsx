@@ -876,28 +876,28 @@ const FormMonitoringConfigWDCP: React.FC<FormMonitoringConfigWDCPProps> = ({url,
                                     <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userFormSelectTimeZone} name_component={"Time Zone Router"} idComponent={"cmb_timezone"} />
                                 </div>
                                 <div>
-                                    <InputTextType in_title={"IP Routing CDC"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPCDC} in_value={FormIp_Routing_CDC} />
+                                    <InputTextType   in_title={"IP Routing CDC"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPCDC} in_value={FormIp_Routing_CDC} />
                                 </div>
                             </div>
                         }
                         {station === 'RBWDCP' ? '' :
                             <div className="grid grid-cols-2 gap-1">
                                 <div>
-                                    <InputTextType in_title={"IP Routing VSAT"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPVSAT} in_value={Formip_routing_VSAT} />
+                                    <InputTextType   in_title={"IP Routing VSAT"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPVSAT} in_value={Formip_routing_VSAT} />
                                 </div>
                                 <div>
-                                    <InputTextType in_title={"IP Routing Dawuan"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPDawuan} in_value={FormIp_Routing_Dawuan} />
+                                    <InputTextType   in_title={"IP Routing Dawuan"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPDawuan} in_value={FormIp_Routing_Dawuan} />
                                 </div>
                                 <div>
-                                    <InputTextType in_title={"IP Routing CBN"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPCBN} in_value={FormIp_Routing_CBN} />
+                                    <InputTextType   in_title={"IP Routing CBN"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPCBN} in_value={FormIp_Routing_CBN} />
                                 </div>
                             </div>}
                         <div className="grid grid-cols-2 gap-1">
                             <div>
-                                <InputTextType in_title={"Server NTP 1"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputServerNTP1} in_value={FOrmServerNTP_1} />
+                                <InputTextType   in_title={"Server NTP 1"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputServerNTP1} in_value={FOrmServerNTP_1} />
                             </div>
                             <div>
-                                <InputTextType in_title={"Server NTP 2"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputServerNTP2} in_value={FOrmServerNTP_2} />
+                                <InputTextType   in_title={"Server NTP 2"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputServerNTP2} in_value={FOrmServerNTP_2} />
                             </div>
                         </div>
                         <div className="mt-3 flex items-center justify-end">

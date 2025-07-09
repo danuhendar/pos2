@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import { AddColumn, AddID, get_data_local_storage, get_format_tanggal_jam, GetToken} from "@/lib/global";
+import { AddColumn, AddID, get_data_local_storage, get_format_tanggal_jam, GetToken, removeItemByValue, removeItemOnceArray, validateNumber} from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -22,6 +22,8 @@ import { Textarea } from "@mantine/core";
 import TextAreaComponent from "../form/TextAreaComponent";
 import DatePicker from "../datepicker/DatePicker";
 import InputCheckBoxFilterType from "../form/InputCheckBoxFilterType";
+import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
+import IconTrash from "../Icon/IconTrash";
 interface FormTerimaBarangMasukProps {
     url: string,
     command: string,
@@ -64,13 +66,17 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
     const curdate = get_format_tanggal_jam().substring(0,16);
     const [date2, setDate2] = useState<any>(curdate);
     const [IN_NIK_PEMBUAT,setIN_NIK_PEMBUAT] = useState('')
+    const [IN_RESULT_SELECTED_MANUAL,setIN_RESULT_SELECTED_MANUAL] = useState('')
     const [IN_KODE_BARANG,setIN_KODE_BARANG] = useState('')
     const [IN_DESKRIPSI,setIN_DESKRIPSI] = useState('')
     const [IN_SATUAN,setIN_SATUAN] = useState('')
     const [IN_QTY,setIN_QTY] = useState('')
     const [IN_METODE,setIN_METODE] = useState('')
     const [IN_BARCODE,setIN_BARCODE] = useState('')
-
+    const [IN_RESULT_SCAN_KODE_BARANG,setIN_RESULT_SCAN_KODE_BARANG] = useState('')
+    const [IN_RESULT_SCAN_DESKRIPSI,setIN_RESULT_SCAN_DESKRIPSI] = useState('')
+    const [IN_RESULT_SCAN_SATUAN,setIN_RESULT_SCAN_SATUAN] = useState('')
+    const arr_input_item = []
 
     const MySwal = withReactContent(Swal);
     useEffect(() => {
@@ -91,23 +97,30 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
     const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_TUJUAN(val); GetMasterProdukByKodeProdukAndKodeGerai(val+"%") };
     const FormInputSupplier = (value: any) => {var val = value.value;setIN_ASAL(val);  };
     const FormInputNikPembuat = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NIK_PEMBUAT(val);  };
-    const FormInputItem = (value: any) => {var val = value.value;setIN_KODE_BARANG(val);  };
+    const FormInputItem = (value: any) => {var val = value.value;setIN_RESULT_SELECTED_MANUAL(val);   };
     const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_METODE(val);  };
     // const FormInputScanBarcode = (event: { target: { value: any; }; }) => {
     //     var val = event.target.value;setIN_BARCODE(val);  
         
     // };
+    const input1Ref = useRef(null);
     const input2Ref = useRef(null);
-    const FormInputScanBarcode = (event) => {
-        if (event.key === 'Enter') {
-            console.log('Enter pressed!');
-            // Lakukan sesuatu, seperti submit form atau panggil fungsi lainnya
-            var val = event.target.value;setIN_BARCODE(val);  
-            input2Ref.current.focus(); // Pindah ke input kedua
+    const KeyDown = (e: { key: string; }) => {
+        if (e.key === 'Enter') {
+            // Move focus to input 2
+            input2Ref.current.focus();
+            GetMasterProdukByBarcode();
         }
     };
-    const FormInputQty  = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_QTY(val);  };
-    
+    const FormInputScanBarcode = (event: { key: string; target: { value: any; }; }) => {
+        var val = event.target.value;
+        console.log(val)
+        setIN_BARCODE(val);
+    };
+    const FormInputQty  = (event: { target: { value: any; }; }) => {var val = event.target.value;const validate_number = validateNumber(val);setIN_QTY(validate_number);  };
+    const FormInputResultScanKodeBarang = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_KODE_BARANG(val);  };
+    const FormInputResultScanDeskripsi = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_DESKRIPSI(val);  };
+    const FormInputResultScanSatuan = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_SATUAN(val);  };
      
 
     const GetMasterProdukByKodeProdukAndKodeGerai = (in_kode_gerai:string) => {
@@ -123,7 +136,8 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
                 var data_body = res_data.data;
                 var arr_ = []
                 for(var i = 0;i<data_body.length;i++){
-                    const obj = {"label":data_body[i].CONTENT,"value":data_body[i].KODE_BARANG}
+                    const value_result = data_body[i].KODE_BARANG+"|"+data_body[i].CONTENT+"|"+data_body[i].SATUAN
+                    const obj = {"label":data_body[i].CONTENT+"-"+data_body[i].SATUAN,"value":value_result}
                     arr_.push(obj)
                 }
                 setoptionsItem(arr_)
@@ -262,42 +276,159 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
         });
     }
 
-    
-    const Def_Column_MutasiStok = () => {
-        var cols = [
-                // {
-                //     accessor: 'id',
-                //     title: 'ID',
-                //     sortable: true,
-                //     render: ({ id }) => (
-                //         <div className="flex items-center gap-2">
-                //             <div className="font-semibold">{id}</div>
-                //         </div>
-                //     ),
-                // },
+    const GetMasterProdukByBarcode = async () => {
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByBarcode`
+        let param = {"IN_BARCODE":IN_BARCODE,"IN_KODE_GERAI":IN_TUJUAN}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                if(data_body.length === 1)
                 {
-                    accessor: 'TANGGAL',
-                    title: 'DATE',
+                    setIN_RESULT_SCAN_KODE_BARANG(data_body[0].KODE_BARANG)
+                    setIN_RESULT_SCAN_DESKRIPSI(data_body[0].CONTENT)
+                    setIN_RESULT_SCAN_SATUAN(data_body[0].SATUAN)
+                    
+                }else if(data_body.length > 1){
+                     MySwal.fire({
+                        title: t("Data Item More Than 1, Check Item or Select Item Manually"),
+                        toast: true,
+                        position: isRtl ? 'top-start' : 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        showCloseButton: true,
+                        customClass: {
+                            popup: `color-warning`,
+                        },
+                    });
+                }else{
+                     MySwal.fire({
+                        title: t("Data Empty"),
+                        toast: true,
+                        position: isRtl ? 'top-start' : 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        showCloseButton: true,
+                        customClass: {
+                            popup: `color-warning`,
+                        },
+                    });
+                }
+              
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
+
+    const AddList = () => {
+        try{
+            const metode_input = IN_METODE
+            
+            if(metode_input === "1"){
+                //-- scan barcode --//
+                
+                const res_kode_barang = IN_RESULT_SCAN_KODE_BARANG
+                const res_satuan = IN_RESULT_SCAN_SATUAN
+                const res_deskripsi = IN_RESULT_SCAN_DESKRIPSI
+                const res_qty = IN_QTY
+                if(res_kode_barang !== ''){
+                    const obj = {"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty}
+                    arr_input_item.push(obj)
+                }else{
+
+                }
+                
+            }else{
+                //-- input manual --//
+                const result_selected_manual = IN_RESULT_SELECTED_MANUAL.split('|')
+                const res_kode_barang = result_selected_manual[0] 
+                const res_satuan = result_selected_manual[2]
+                const res_deskripsi = result_selected_manual[1]
+                const res_qty = IN_QTY
+                const obj = {"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty}
+                arr_input_item.push(obj)
+            }
+            console.log(JSON.stringify(arr_input_item))
+            const res_rows = AddID(arr_input_item)
+            setData_rows(res_rows);
+            const columns = Def_Column_Terima_Barang()
+            setData_columns(columns)
+        }catch(Ex){
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        }
+    }
+
+    const RemoveItem = (id:number) => {
+        let arr = removeItemOnceArray(data_rows,id)
+        console.log(arr)
+        setData_rows(arr);
+    }
+
+    const Def_Column_Terima_Barang = () => {
+        var cols = [
+                {
+                    accessor: 'id',
+                    title: 'ACTION',
                     sortable: true,
-                    render: ({ TANGGAL }) => (
-                        <div className="flex items-center gap-2">
-                            <div className="font-semibold">{TANGGAL}</div>
+                    render: ({  id }) => (
+                        <div className="flex flex-row gap-2">
+                            <div className="mt-1">
+                                <a onClick={() => {RemoveItem(id)}} data-twe-toggle="tooltip" title="Delete Data">
+                                    <span className="text-danger"><IconTrash  /></span>
+                                </a>
+                            </div>
                         </div>
                     ),
                 },
                 {
-                    accessor: 'GERAI',
-                    title: 'GERAI',
+                    accessor: 'id',
+                    title: 'ID',
                     sortable: true,
-                    render: ({ GERAI }) => (
+                    render: ({  id }) => (
                         <div className="flex items-center gap-2">
-                            <div className="font-semibold">{GERAI}</div>
+                            <div className="font-semibold">{id}</div>
                         </div>
                     ),
                 },
                 {
                     accessor: 'KODE_BARANG',
-                    title: 'CODE',
+                    title: 'CODE ITEM',
                     sortable: true,
                     render: ({ KODE_BARANG }) => (
                         <div className="flex items-center gap-2">
@@ -307,7 +438,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
                 },
                 {
                     accessor: 'DESKRIPSI',
-                    title: 'CONTENT',
+                    title: 'DESCRIPTION',
                     sortable: true,
                     render: ({ DESKRIPSI }) => (
                         <div className="flex items-center gap-2">
@@ -326,16 +457,6 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
                     ),
                 },
                 {
-                    accessor: 'JENIS',
-                    title: 'JENIS',
-                    sortable: true,
-                    render: ({ JENIS }) => (
-                        <div className="flex items-center gap-2">
-                            <div className={`badge badge-outline-${JENIS === 'BPB' || JENIS === 'RETUR SALES' || JENIS === 'VOID'  ? 'success' : 'danger'} `}>{JENIS}</div>
-                        </div>
-                    ),
-                },
-                {
                     accessor: 'QTY',
                     title: 'QTY',
                     sortable: true,
@@ -345,16 +466,6 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
                         </div>
                     ),
                 },
-                {
-                    accessor: 'OTORISATOR',
-                    title: 'OTORISATOR',
-                    sortable: true,
-                    render: ({ OTORISATOR }) => (
-                        <div className="flex items-center gap-2">
-                            <div className="font-semibold">{OTORISATOR}</div>
-                        </div>
-                    ),
-                }
             ];
             return  cols;
     }
@@ -367,7 +478,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
                 <>
                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconBox />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Input Received Item"} in_content={
                         <>
-                        <InputTextType in_title={"Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
+                        <InputTextType   in_title={"Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
@@ -389,16 +500,27 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, comm
                         <InputCheckBoxFilterType event={FormInputSelectMetodeItem} in_title={"Metode Input"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Scan"} in_name_2={"Select Item"} in_name_component_1={"is_metode"} in_name_component_2={"is_metode"} />                
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div className={IN_METODE === '1' ? "" : "hidden"}>
-                            <InputTextType in_title={"Scan Barcode"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputScanBarcode} in_value={IN_BARCODE} />
+                            <InputTextTypeKeyDown in_title={"Scan Barcode"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputScanBarcode} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyDown} />
                             </div>
                             <div className={IN_METODE === '0' ? "" : "hidden"}>
                             <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsItem} isSearchable={true} isMulti={false} event={FormInputItem} name_component={"Item"} idComponent={"item"} />
                             </div>
                             <div className={IN_METODE === '' ? "hidden" : ""}>
-                                <InputTextType in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} />                        
+                                <InputTextTypeKeyDown in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={null} />                        
                             </div>
+                            <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
+                            <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
+                            <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
                         </div>
-                        
+                        <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs' : 'btn btn-outline-success w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Add'} HandleClick={AddList} />
+                        {
+                            data_rows.length > 0 ?
+                            <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
+                            :
+                            ''
+                        }
+                        {/* <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} /> */}
+                             
                       </>
                     } />
                 </>

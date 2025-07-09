@@ -1160,7 +1160,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                             Isinput ?   
                                             <DropDownGlobal in_classname_title={""} in_classname_content={""} data_options={options5} isSearchable={true} isMulti={false} event={userSelectBranch} name_component={"Select Branch Code"} idComponent={"cmb_kode_cabang_input"} />        
                                             :
-                                            <InputTextType in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectCmbBranchCoverage} in_value={IN_DETAIL_CMB_BRANCH_COVERAGE} /> 
+                                            <InputTextType   in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectCmbBranchCoverage} in_value={IN_DETAIL_CMB_BRANCH_COVERAGE} /> 
                                             }
                                             </div>
                                     </div>
@@ -1170,7 +1170,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                         <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b] text-xs">
                                                 <IconInbox />
                                             </div>
-                                            <InputTextType in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={true} event={userSelectNama} in_value={jenis} />
+                                            <InputTextType   in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={true} event={userSelectNama} in_value={jenis} />
                                         </div>
                                     </div>
                                     {
@@ -1181,7 +1181,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                                 <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b] text-xs">
                                                     <IconEdit />
                                                 </div>
-                                                <InputTextType in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectUSER} in_value={IN_DETAIL_USER} />
+                                                <InputTextType   in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectUSER} in_value={IN_DETAIL_USER} />
                                             </div>
                                         </div>
                                     }
@@ -1191,7 +1191,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                         <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b] text-xs">
                                                 <IconEdit />
                                             </div>
-                                            <InputTextType in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectPassword} in_value={IN_DETAIL_PASSWORD} />
+                                            <InputTextType   in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectPassword} in_value={IN_DETAIL_PASSWORD} />
                                         </div>
                                     </div>
 
@@ -1212,7 +1212,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                                 <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b] text-xs">
                                                     <IconEdit />
                                                 </div>
-                                                <InputTextType in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectPort} in_value={IN_DETAIL_PORT} />
+                                                <InputTextType   in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectPort} in_value={IN_DETAIL_PORT} />
                                             </div>
                                         </div>
                                     }

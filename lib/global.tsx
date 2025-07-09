@@ -726,6 +726,11 @@ export function GetFormatCurrency(price:string){
     return rupiahFormat;
 }
 
+export function validateNumber(input:string) {
+    let hasil = input.replace(/[^0-9]/g, ''); // hapus semua non-angka
+    return hasil;
+}
+
 export async function ConvertBinaryToText(event:any){
     const text = await new Response(event.data).text();
     return text;

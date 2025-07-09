@@ -362,7 +362,7 @@ const FormHistoryIDMCommand: React.FC<FormHistoryIDMCommandProps> = ({ url, comm
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-3">
-                                            <InputTextType in_title={"Nik User"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg text-xs"} data_options={undefined} isDisabled={false} event={userSelectNik} in_value={IN_NIK} />
+                                            <InputTextType   in_title={"Nik User"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg text-xs"} data_options={undefined} isDisabled={false} event={userSelectNik} in_value={IN_NIK} />
                                         </div>
                                         <div className="grid grid-cols-2 gap-3 mb-3">
                                             <div>
