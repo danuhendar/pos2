@@ -22,7 +22,7 @@ const InputCheckBoxFilterType: React.FC<InputCheckBoxFilterTypeProps> = ({in_tit
                 <label className="flex items-center cursor-pointer">
                     <div>
                         <label className="flex items-center cursor-pointer">
-                            <input onChange={event} type="radio" name={in_name_component_1} className="form-radio" value={in_value_1} defaultChecked />
+                            <input onChange={event} type="radio" name={in_name_component_1} className="form-radio" value={in_value_1} />
                             <span className="text-white-dark">{t(in_name_1)}</span>
                         </label>
                     </div>

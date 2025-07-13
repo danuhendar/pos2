@@ -38,11 +38,14 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const [TextButtonFilter,setTextButtonFilter] = useState('Process')
     const [IconButton,setIconButton] = useState(<IconRefresh />)
     const [modal13,setModal13] = useState(false)
+    const [modal14,setModal14] = useState(false)
     const [Title,setTitle] = useState('')
     const [IN_BRANCH,setIN_BRANCH] = useState('G001')
     const [IN_STORE,setIN_STORE] = useState('')
     const [IN_CONTENT,setIN_CONTENT] = useState('')
     const [CheckedISActive,setCheckedISActive] = useState(false)
+    const [IN_KODE_CABANG,setIN_KODE_CABANG] = useState('')
+
     
     useEffect(() => {
         const res_host = themeConfig.host
@@ -63,6 +66,11 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         var val = event.target.value;
         setIN_CONTENT(val);  
     };
+    const FormInputKodeCabang = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        setIN_KODE_CABANG(val);  
+    };
+    
     const FormISActive = (event: { target: { value: any; }; }) => {
         setCheckedISActive(!CheckedISActive);  
         console.log(!CheckedISActive)
@@ -82,8 +90,125 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterGerai`
-                const param = {"IN_KODE_GERAI":IN_KODE_GERAI}
+                let url = '';
+                let param = {}
+                if(IDReport === 'Master Store'){
+                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterGerai`
+                    param = {"IN_KODE_GERAI":IN_KODE_GERAI}
+                }else if(IDReport === 'Master Branch'){
+                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterCabang`
+                    param = {"IN_KODE_CABANG":IN_KODE_CABANG}
+                }else{
+
+                }
+             
+                if(url !== ''){
+                    const Token = GetToken()
+                    Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                        const res_data = response;
+                        var code = res_data.code;
+                        var msg = res_data.msg;
+                        if(parseFloat(code) === 200){
+                            Swal.fire({
+                                title: t("Infomration"),
+                                text: ""+parseFloat(code)+"-"+msg,
+                                icon: "success",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                            if(IDReport === 'Master Store'){
+                                GetData(IN_HOST,IN_PORT)
+                            }else if(IDReport === 'Master Branch'){
+                                GetDataMasterCabang(IN_HOST,IN_PORT)
+                            }
+                        }else if(code.toString().substring(0,1) === '4'){
+                            if(code === 401 && msg.includes("Invalid")){
+                                
+                            }else{
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "warning",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                            }
+                        }else{
+                            Swal.fire({
+                                title: t("Warning"),
+                                text: ""+parseFloat(code)+"-"+msg,
+                                icon: "warning",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                        }
+                    }).catch((error) => {
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    });
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "403-Error : URL was null!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                
+            }
+        })
+    }
+    const AddData = () => {
+        if(IDReport === 'Master Store'){
+            setModal13(true)
+            setIN_STORE('')
+            setIN_CONTENT('')
+            setCheckedISActive(false)
+            setTitle('Form Add : '+IDReport)
+        }else if(IDReport === 'Master Branch'){
+            setModal14(true)
+            setIN_KODE_CABANG('')
+            setIN_CONTENT('')
+            setTitle('Form : '+IDReport)
+        }
+   
+    }
+    const showModal = (IDReport:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string) => {
+        setModal13(true)
+        setIN_STORE(IN_KODE_GERAI)
+        setIN_CONTENT(IN_CONTENT)
+        const res_is_active = (IN_STATUS === 'AKTIF' ? true : false)
+        setCheckedISActive(res_is_active)
+        setTitle('Form : '+IDReport)
+    }
+    const showModalCabang = (IDReport:string,IN_KODE_CABANG:string,IN_CONTENT:string) => {
+        setModal14(true)
+        setIN_KODE_CABANG(IN_KODE_CABANG)
+        setIN_CONTENT(IN_CONTENT)
+        setTitle('Form : '+IDReport)
+    }
+    const InsData = () =>{
+        Swal.fire({
+            icon: "question",
+            title: t("Confirmation"),
+            text: t("Are you sure for")+" save data?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+            padding: '2em',
+            customClass: 'sweet-alerts'
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                const InputNik = get_data_local_storage('nik')
+                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterGerai`
+                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
                     const res_data = response;
@@ -98,6 +223,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                             customClass: 'sweet-alerts'
                         });
                         GetData(IN_HOST,IN_PORT)
+                        CloseModal()
                     }else if(code.toString().substring(0,1) === '4'){
                         if(code === 401 && msg.includes("Invalid")){
                             
@@ -131,22 +257,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             }
         })
     }
-    const AddData = () => {
-        setModal13(true)
-        setIN_STORE('')
-        setIN_CONTENT('')
-        setCheckedISActive(false)
-        setTitle('Form Add : '+IDReport)
-    }
-    const showModal = (IDReport:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string) => {
-        setModal13(true)
-        setIN_STORE(IN_KODE_GERAI)
-        setIN_CONTENT(IN_CONTENT)
-        const res_is_active = (IN_STATUS === 'AKTIF' ? true : false)
-        setCheckedISActive(res_is_active)
-        setTitle('Form : '+IDReport)
-    }
-    const InsData = () =>{
+    const InsDataCabang = () =>{
         Swal.fire({
             icon: "question",
             title: t("Confirmation"),
@@ -160,8 +271,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 const InputNik = get_data_local_storage('nik')
-                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterGerai`
-                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik}
+                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterCabang`
+                const param = {"IN_KODE_CABANG":IN_KODE_CABANG,"IN_CONTENT":IN_CONTENT}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
                     const res_data = response;
@@ -175,7 +286,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                             padding: '2em',
                             customClass: 'sweet-alerts'
                         });
-                        GetData(IN_HOST,IN_PORT)
+                        GetDataMasterCabang(IN_HOST,IN_PORT)
                         CloseModal()
                     }else if(code.toString().substring(0,1) === '4'){
                         if(code === 401 && msg.includes("Invalid")){
@@ -269,6 +380,71 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             ];
             return  cols;
     }
+
+    const Def_Column_MasterCabang = () => {
+        var cols = [
+                {
+                    accessor: 'id',
+                    title: 'ACTION',
+                    sortable: true,
+                    render: ({ KODE_CABANG,CONTENT }) => (
+                        <div className="flex flex-row gap-2">
+                            <div className="mt-1">
+                                <a onClick={() => {showModalCabang(' Edit '+IDReport,KODE_CABANG,CONTENT)}} data-twe-toggle="tooltip" title="Edit Data">
+                                    <span className="text-warning"><IconPencil  /></span>
+                                </a>
+                            </div>
+                            <div className="mt-1">
+                                <a onClick={() => {DelData(KODE_CABANG)}} data-twe-toggle="tooltip" title="Delete Data">
+                                    <span className="text-danger"><IconTrash  /></span>
+                                </a>
+                            </div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    render: ({ id }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{id}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'KODE_CABANG',
+                    title: 'BRANCH',
+                    sortable: true,
+                    render: ({ KODE_CABANG }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_CABANG}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'CONTENT',
+                    title: 'NAME',
+                    sortable: true,
+                    render: ({ CONTENT }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{CONTENT}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'JUMLAH_COVERAGE_GERAI',
+                    title: 'TOTAL_STORE',
+                    sortable: true,
+                    render: ({ JUMLAH_COVERAGE_GERAI }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{JUMLAH_COVERAGE_GERAI}</div>
+                        </div>
+                    ),
+                }
+            ];
+            return  cols;
+    }
     const GetData = (in_host:string,in_port:number) => {
         setData_rows([])
         setData_columns([])
@@ -341,18 +517,97 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             setLoadingButton(false)
         });
     }
+
+    const GetDataMasterCabang = (in_host:string,in_port:number) => {
+         setData_rows([])
+        setData_columns([])
+        
+        let url = ""
+        let param = {}
+        var cols = []
+        if(IDReport === 'Master Branch'){
+            url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+            param = {}
+            cols = Def_Column_MasterCabang()
+        }else{
+
+        }
+   
+        const Token = GetToken()
+        setLoading(true)
+        setTextButtonFilter(t('Please wait'))
+        setLoadingButton(true)
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS;
+                var res_rows = AddID(rows);
+                setData_rows(res_rows);
+                setData_columns(cols);
+                setLoading(false)
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoading(false)
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoading(false)
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoading(false)
+            setTextButtonFilter(t('Refresh'))
+            setLoadingButton(false)
+        });
+    }
     
     const RefreshData = () => {
         try {
             if(IDReport === 'Master Store'){
                 GetData(IN_HOST,IN_PORT)
+            }else if(IDReport === 'Master Branch'){
+                GetDataMasterCabang(IN_HOST,IN_PORT)
             }
         } catch (Ex) {
             console.log('error : ' + Ex.toString())
         }
     };
     const CloseModal = ()=>{
-        setModal13(false)
+        if(modal13){
+            setModal13(false)
+        }else if(modal14){
+            setModal14(false)
+        }
     }
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -389,6 +644,18 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                             <div className="flex items-center justify-end gap-3 mt-8">
                                 <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
                                 <ButtonAdd in_classname={!isDark ? 'btn btn-primary rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_save"} isLoading={false} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Save'} HandleClick={InsData} />
+                            </div>
+                        </div>
+                    } />
+                    <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal14} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                        <div className="p-2">
+                            <div className="mb-5">
+                                <InputTextType   in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputKodeCabang} in_value={IN_KODE_CABANG} />
+                                <InputTextType   in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
+                            </div>
+                            <div className="flex items-center justify-end gap-3 mt-8">
+                                <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                <ButtonAdd in_classname={!isDark ? 'btn btn-primary rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_save"} isLoading={false} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Save'} HandleClick={InsDataCabang} />
                             </div>
                         </div>
                     } />

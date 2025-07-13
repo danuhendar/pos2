@@ -21,12 +21,12 @@ import InputCheckBoxFilterType from "../form/InputCheckBoxFilterType";
 import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
 import { DataTable } from "mantine-datatable";
 import IconSave from "../Icon/IconSave";
-interface FormTerimaBarangMasukProps {
+interface FormReturProps {
     url: string,
     jenis: string,
     IDReport: string,
 }
-const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jenis, IDReport }) => {
+const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
     const [data_rows, setData_rows] = useState([]);
     const [data_columns, setData_columns] = useState([]);
     const { t, i18n } = useTranslation();
@@ -40,6 +40,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const [optionsItem,setoptionsItem] = useState([])
     const [optionsGerai,setOptionsGerai] = useState([])
     const [options6,setOptions6] = useState([])
+    const [options7,setOptions7] = useState([])
     const [optionsGeraiMutasi,setOptionsGeraiMutasi] = useState([])
     const [IN_KODE_TRANSAKSI,setIN_KODE_TRANSAKSI] = useState('')
     const [IN_KETERANGAN,setIN_KETERANGAN] = useState('')
@@ -69,6 +70,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
         setIN_NIK_PEMBUAT(InputNikPemohon)
         const columns = Def_Column_Terima_Barang()
         setData_columns(columns)
+        GetMasterCabang(res_host,res_PORT_LOGIN)
     },[]);
 
    
@@ -107,7 +109,57 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const FormInputResultScanDeskripsi = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_DESKRIPSI(val);  };
     const FormInputResultScanSatuan = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_SATUAN(val);  };
      
-
+    const GetMasterCabang = (in_host:string,in_port:number) => {
+        setOptions7([])
+        let url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+        let param = {"":""}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS
+                var arr_ = []
+                for(var i = 0;i<rows.length;i++){
+                    const value_result = rows[i].KODE_CABANG
+                    const obj = {"label":rows[i].CONTENT,"value":value_result}
+                    arr_.push(obj)
+                }
+                setOptions7(arr_)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
     const GetMasterProdukByKodeProdukAndKodeGerai = (in_kode_gerai:string) => {
         setoptionsItem([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
@@ -458,7 +510,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                         const date = new Date(date2)
                         const tahun = date.getFullYear()
                         const bulan = date.getMonth()
-                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":jenis,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_ASAL,"IN_TUJUAN":IN_TUJUAN,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows}
+                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":jenis,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_TUJUAN,"IN_TUJUAN":IN_ASAL,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows}
                         console.log(JSON.stringify(param))
                         const Token = GetToken()
                         setLoadingButton(true)
@@ -553,11 +605,17 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
-                            </div>
-                            <div>
                             <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
                             </div>
+                            <div>
+                                {
+                                    IDReport === 'Retur DC' ? 
+                                    <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Distribution Center"} idComponent={"DC"} />
+                                    :
+                                    <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
+                                }
+                            </div>
+                            
                         </div>
 
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
@@ -604,4 +662,4 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
         </>
     )
 }
-export default FormTerimaBarangMasuk;
+export default FormRetur;
