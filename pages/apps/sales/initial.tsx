@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { GetToken } from "@/lib/global";
-import FormVoidTransaksiInventory from "@/components/inventory/FormVoidTransaksiInventory";
+import FormSales from "@/components/sales/FormSales";
 //-- component menu --//
-const Void_Transaksi_Inventory = () => {
+const Initial = () => {
     const [Token,setToken] = useState('')
     const { t, i18n } = useTranslation();
     
@@ -19,20 +19,20 @@ const Void_Transaksi_Inventory = () => {
         <>
             <div className="mb-5">
             <ul className="flex space-x-2 rtl:space-x-reverse">
-                 <li>{t('Transaction')}</li>
-                <Link href="/apps/inventory/void_transaksi_inventory/" className="text-primary hover:underline">    
+                 <li>{t('Sales')}</li>
+                <Link href="/apps/sales/initial/" className="text-primary hover:underline">    
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>{t('Void Transaction Inventory')}</span>
+                    <span>{t('Initial')}</span>
                 </li>
                 </Link>
             </ul>
             </div>
-            <FormVoidTransaksiInventory IDReport="Void Transaksi Inventory" 
+            <FormSales IDReport="Initial" 
                                     url={``}
-                                    jenis={'8'}
+                                    jenis={'2'}
                                     />
         </>
     )
 };
 
-export default Void_Transaksi_Inventory;
+export default Initial;
