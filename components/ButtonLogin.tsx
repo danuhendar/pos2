@@ -49,6 +49,8 @@ const ButtonLogin: React.FC<ButtonLoginProps> = ({url,param,idComponent,idAlert,
                 handleSave('unit',p_content.UNIT,false)
                 handleSave('bagian',p_content.BAGIAN,false)
                 handleSave('id_periode',p_content.ID_PERIODE,false)
+                handleSave('is_gerai',p_content.IS_GERAI,false)
+                handleSave('kode_gerai',p_content.KODE_GERAI,false)
                 handleSave('menu','horizontal',false)
                 router.push('/utama');
             }else{
@@ -292,6 +294,8 @@ const ButtonLogin: React.FC<ButtonLoginProps> = ({url,param,idComponent,idAlert,
                             handleSave('unit',data_api.UNIT,false)
                             handleSave('bagian',data_api.BAGIAN,false)
                             handleSave('id_periode',data_api.ID_PERIODE,false)
+                            handleSave('is_gerai',data_api.IS_GERAI,false)
+                            handleSave('kode_gerai',data_api.KODE_GERAI,false)
                             handleSave('menu','horizontal',false)
                             dispatch(setIsAuthenticated());
                             router.push('/utama');

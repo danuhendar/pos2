@@ -1,9 +1,9 @@
 'use client'
-import {  use, useEffect,  useState } from "react";
+import {   useEffect,  useState } from "react";
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import {   get_data_local_storage, get_format_tanggal_jam, GetFormatCurrency, GetToken} from "@/lib/global";
+import {   AddID, get_data_local_storage, get_format_tanggal_jam, GetFormatCurrency, GetToken, validateNumber} from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -14,14 +14,19 @@ import withReactContent from "sweetalert2-react-content";
 import CardComponent from "../form/CardComponent";
 import InputTextType from "../form/InputTypeText";
 import { DataTable } from "mantine-datatable";
-import IconSearch from "../Icon/IconSearch";
-import IconTrash from "../Icon/IconTrash";
 import IconLogin from "../Icon/IconLogin";
 import DropDownGlobal from "../dropdown/DropDownGlobal";
 import DatePicker from "../datepicker/DatePicker";
 import IconSave from "../Icon/IconSave";
 import IconChecks from "../Icon/IconChecks";
 import IconX from "../Icon/IconX";
+import IconShoppingCart from "../Icon/IconShoppingCart";
+import { useRouter } from "next/router";
+import IconPlus from "../Icon/IconPlus";
+import IconPlusCircle from "../Icon/IconPlusCircle";
+import { Button } from "@mui/base";
+import IconBox from "../Icon/IconBox";
+
 interface FormSalesProps {
     url: string,
     jenis: string,
@@ -55,9 +60,19 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     const [OptionsGerai,setOptionsGerai] = useState([])
     const [IN_KODE_GERAI,setIN_KODE_GERAI] = useState('')
-    const [mountedForm, setmountedForm] = useState(false);
+    const [IN_IS_GERAI,setIN_IS_GERAI] = useState('')
+    const [arr_input_item, setarr_input_item] = useState([]);
+    const [IN_KODE_BARANG,setIN_KODE_BARANG] = useState('')
+    const [IN_DESKRIPSI,setIN_DESKRIPSI] = useState('')
+    const [IN_SATUAN,setIN_SATUAN] = useState('')
+    const [IN_QTY,setIN_QTY] = useState('')
+    const [IN_HPP,setIN_HPP] = useState('')
+    const [IN_GROSS,setIN_GROSS] = useState('')
+    const [IN_KODE_INITIAL,setIN_KODE_INITIAL] = useState('')
 
     const MySwal = withReactContent(Swal);
+    const router = useRouter();
+
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -67,19 +82,35 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_NIK_PEMBUAT(InputNikPemohon)
         const InputNamaPemohon = get_data_local_storage('nama');
         setIN_NAMA_PEMBUAT(InputNamaPemohon)
-        
+        const is_gerai = get_data_local_storage('is_gerai');
+        setIN_IS_GERAI(is_gerai)
+       
+        const kode_gerai = get_data_local_storage('kode_gerai');
+        setIN_KODE_GERAI(kode_gerai)
+         if(is_gerai === '1'){
+             GetPosInitialByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai)
+        }else{
+           
+        }
         const columns = Def_Column_Transaksi_Inventory()
         setData_columns(columns)
         GetMasterGerai(res_host,res_PORT_LOGIN)
+       
     },[]);
 
    
-    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val); };
-    const FormInputModal = (value: any) => {var val = value.target.value;var res_val = GetFormatCurrency(val.split(',').join('')); setIN_MODAL(res_val); };
-    const FormInputNikPembuat = (value: any) => {var val = value.target.value;setIN_NIK_PEMBUAT(val); };
-    const FormInputNamaPembuat = (value: any) => {var val = value.target.value;setIN_NAMA_PEMBUAT(val); };
-    const FormInputUangLaci = (value: any) => {var val = value.target.value;var res_val = GetFormatCurrency(val.split(',').join('')); setIN_UANG_LACI(res_val); };
-    const FormInputShift = (value: any) => {var val = value.value;setIN_SHIFT(val); GetPosInitialByKodeGerai() };
+    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val); GetPosInitialByKodeGerai(IN_HOST,IN_PORT,val)};
+    // const FormInputModal = (value: any) => {var val = value.target.value;var res_val = GetFormatCurrency(val.split(',').join('')); setIN_MODAL(res_val); };
+    // const FormInputNikPembuat = (value: any) => {var val = value.target.value;setIN_NIK_PEMBUAT(val); };
+    // const FormInputNamaPembuat = (value: any) => {var val = value.target.value;setIN_NAMA_PEMBUAT(val); };
+    // const FormInputUangLaci = (value: any) => {var val = value.target.value;var res_val = GetFormatCurrency(val.split(',').join('')); setIN_UANG_LACI(res_val); };
+    // const FormInputShift = (value: any) => {var val = value.value;setIN_SHIFT(val); GetPosInitialByKodeGerai() };
+    const FormInputItem = (value: any) => {var val = value.target.value;setIN_KODE_BARANG(val); };
+    const FormInputDeskripsi = (value: any) => {var val = value.target.value;setIN_DESKRIPSI(val); };
+    const FormInputSatuan = (value: any) => {var val = value.target.value;setIN_SATUAN(val); };
+    const FormInputQty  = (event: { target: { value: any; }; }) => {var val = event.target.value;const validate_number = validateNumber(val);setIN_QTY(validate_number);  };
+    const FormInputHPP = (value: any) => {var val = value.target.value;setIN_HPP(val); };
+    const FormInputGross = (value: any) => {var val = value.target.value;setIN_GROSS(val); };
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptionsGerai([])
         let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
@@ -129,24 +160,31 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         });
     }
-    const GetPosInitialByKodeGerai = () => {
+    const GetPosInitialByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string) => {
         try{
-            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosInitialByKodeGerai`
-            let param = {"IN_KODE_GERAI":IN_KODE_GERAI,"IN_SHIFT":IN_SHIFT}
+            let url = `http://${in_host}:${in_port}/api/v2/GetPosInitialByKodeGerai`
+            let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT}
             const Token = GetToken()
             setLoadingButton(true)
             setisDisabled(true)
             Posts(url,JSON.stringify(param),false,Token).then((response) => {
                 const res_data = response;
+                console.log(res_data)
                 var code = res_data.code;
                 var msg = res_data.msg;
                 if(parseFloat(code) === 200){
                     var data_body = res_data.data;
                     if(data_body.length > 0){
-                        setmountedForm(true)
-                        setData_rows(data_body)
+                       setIN_KODE_INITIAL(data_body[0].KODE_INITIAL)
                     }else{
-                        setmountedForm(false)
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: ""+parseFloat(code)+"-"+msg,
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                        router.push('/apps/sales/initial/')
                     }
                     
                     setLoadingButton(false)
@@ -173,7 +211,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     popup: `color-warning`,
                                 },
                             });
-                            setmountedForm(true)
+                            
                         }else{
                             MySwal.fire({
                                 title: t("Data initial for shift "+IN_SHIFT+" not found!"),
@@ -228,149 +266,58 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const Def_Column_Transaksi_Inventory = () => {
         var cols = [
                 {
-                    accessor: 'TANGGAL',
-                    title: 'DATE'
+                    accessor: 'KODE_BARANG',
+                    title: 'CODE ITEM'
                 },
                 {
-                    accessor: 'KODE_INITIAL',
-                    title: 'INITIAL CODE'
+                    accessor: 'DESKRIPSI',
+                    title: 'DESCRIPTION'
                 },
                 {
-                    accessor: 'KODE_GERAI',
-                    title: 'STORE'
+                    accessor: 'SATUAN',
+                    title: 'SATUAN'
                 },
                 {
-                    accessor: 'NIK',
-                    title: 'NIK'
+                    accessor: 'QTY',
+                    title: 'QTY'
                 },
                 {
-                    accessor: 'NAMA',
-                    title: 'USER'
+                    accessor: 'GROSS',
+                    title: 'GROSS'
                 },
                 {
-                    accessor: 'SHIFT',
-                    title: 'SHIFT'
+                    accessor: 'DISKON',
+                    title: 'DISCOUNT',
                 },
                 {
-                    accessor: 'IS_CLOSING_SHIFT',
-                    title: 'IS CLOSING SHIFT',
-                    render: ({ IS_CLOSING_SHIFT }) => (
-                        <div className="flex items-center gap-2">
-                            <div className="font-semibold">{IS_CLOSING_SHIFT === 1 ? <IconChecks className="text-success" /> : <IconX className="text-danger" />}</div>
-                        </div>
-                    ),
+                    accessor: 'PRICE',
+                    title: 'AMOUNT'
                 },
-                {
-                    accessor: 'WAKTU_CLOSING_SHIFT',
-                    title: 'CLOSING SHIFT TIME',
-                },
-                {
-                    accessor: 'IS_CLOSING_HARIAN',
-                    title: 'IS CLOSING HARIAN',
-                    render: ({ IS_CLOSING_HARIAN }) => (
-                        <div className="flex items-center gap-2">
-                            <div className="font-semibold">{IS_CLOSING_HARIAN === 1 ? <IconChecks className="text-success" /> : <IconX className="text-danger" />}</div>
-                        </div>
-                    ),
-                },
-                {
-                    accessor: 'WAKTU_CLOSING_HARIAN',
-                    title: 'CLOSING HARIAN TIME',
-                },
+               
             ];
             return  cols;
     }
 
-    const InsPosInitial = () => {
+    const AddList = () => {
         try{
-            Swal.fire({
-                icon: "question",
-                title: t("Confirmation"),
-                text: t("Are you sure for")+" "+t("save data")+" ?",
-                showDenyButton: true,
-                confirmButtonText: "Ya",
-                denyButtonText: "Tidak",
-                padding: '2em',
-                customClass: 'sweet-alerts'
-                }).then((result) => {
-                /* Read more about isConfirmed, isDenied below */
-                if (result.isConfirmed) {
-                    let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosInitial`
-                    let param = {"IN_KODE_INITIAL":2025061101,"IN_KODE_GERAI":IN_KODE_GERAI,"IN_MODAL":IN_MODAL.split(',').join(''),"IN_UANG_LACI":IN_UANG_LACI.split(',').join(''),"IN_NIK":IN_NIK_PEMBUAT,"IN_NAMA":IN_NAMA_PEMBUAT,"IN_SHIFT":IN_SHIFT}
-                    const Token = GetToken()
-                    setLoadingButton(true)
-                    setisDisabled(true)
-                    Posts(url,JSON.stringify(param),false,Token).then((response) => {
-                        const res_data = response;
-                        var code = res_data.code;
-                        var msg = res_data.msg;
-                        if(parseFloat(code) === 200){
-                            var data_body = res_data.data;
-                            Swal.fire({
-                                title: t("Information"),
-                                text: ""+parseFloat(code)+"-"+msg,
-                                icon: "success",
-                                padding: '2em',
-                                customClass: 'sweet-alerts'
-                            });
-                            setIN_SHIFT('')
-                            setIN_KODE_GERAI('')
-                            setIN_MODAL('')
-                            setIN_UANG_LACI('')
-                            setIN_NIK_PEMBUAT('')
-                            setIN_NAMA_PEMBUAT('')
-                            setDate2(curdate)
-                            
-                            GetPosInitialByKodeGerai()
-                            setLoadingButton(false)
-                            setisDisabled(false)
-                        }else if(code.toString().substring(0,1) === '4'){
-                            if(code === 401 && msg.includes("Invalid")){
-                                Swal.fire({
-                                    title: t("Warning"),
-                                    text: ""+parseFloat(code)+"-"+msg,
-                                    icon: "warning",
-                                    padding: '2em',
-                                    customClass: 'sweet-alerts'
-                                });
-                            }else{
-                                Swal.fire({
-                                    title: t("Warning"),
-                                    text: ""+parseFloat(code)+"-"+msg,
-                                    icon: "warning",
-                                    padding: '2em',
-                                    customClass: 'sweet-alerts'
-                                });  
-                            }
-                            
-                            setLoadingButton(false)
-                            setisDisabled(false)
-                        }else{
-                            Swal.fire({
-                                title: t("Warning"),
-                                text: ""+parseFloat(code)+"-"+msg,
-                                icon: "warning",
-                                padding: '2em',
-                                customClass: 'sweet-alerts'
-                            });
-                            setLoadingButton(false)
-                            setisDisabled(false)
-                        }
-                    }).catch((error) => {
-                        console.log(error)
-                        Swal.fire({
-                            title: t("Warning"),
-                            text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                            icon: "warning",
-                            padding: '2em',
-                            customClass: 'sweet-alerts'
-                        });
-                        setLoadingButton(false)
-                        setisDisabled(false)
-                    });
-                }
-            })
             
+            
+            //-- scan barcode --//
+            const res_kode_barang = IN_KODE_BARANG
+            const res_satuan = IN_SATUAN
+            const res_deskripsi = IN_DESKRIPSI
+            const res_qty = IN_QTY
+            const res_hpp = IN_HPP
+            const res_gross = IN_GROSS
+            if(res_kode_barang !== '' || res_satuan !== '' || res_deskripsi !== '' || res_qty !== '' || res_hpp !== '' || res_gross !== ''){
+                const obj = {"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty,"DISKON":"0","PRICE":res_hpp,"GROSS":res_gross}
+                arr_input_item.push(obj)
+            }else{
+
+            }
+            
+            const res_rows = AddID(arr_input_item)
+            setData_rows(res_rows)
         }catch(Ex){
             Swal.fire({
                 title: t("Warning"),
@@ -389,7 +336,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         <>
             <AntiScrapedShieldComponent in_content={
                 <>
-                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconLogin />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Input initial"} in_content={
+                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={IDReport === 'Initial' ? <IconLogin /> : <IconShoppingCart />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={IDReport} in_content={
                         <>
                         <div className="flex items-center p-3.5 rounded text-danger bg-danger-light dark:bg-danger-dark-light">
                             <span className="ltr:pr-2 rtl:pl-2">
@@ -397,38 +344,24 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             </span>
                         </div>
                         <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-2 md:grid-cols-2">
-                            <div>
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
-                            </div>
-                            <div className="w-1/5 mt-6">
+                            {
+                                IN_IS_GERAI === '0' ?
+                                <div>
+                                <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
+                                </div>
+                                :
+                                <div>
+                                <InputTextType in_title={"Gerai"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiMutasi} in_value={IN_KODE_GERAI} />
+                                </div>
+                            } 
+                            {/* <div className="w-1/5 mt-6">
                             <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Filter'} HandleClick={GetPosInitialByKodeGerai} />     
-                            </div>
+                            </div> */}
                         </div>
-                        <div className={mountedForm ? "mt-6 panel rounded-3xl" : "mt-6 panel rounded-3xl hidden" }>
-                            <div className="grid gap-3 lg:grid-cols-4 md:grid-cols-2">
-                                <InputTextType   in_title={"Modal"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputModal} in_value={IN_MODAL} />
-                                <InputTextType   in_title={"Uang Laci"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputUangLaci} in_value={IN_UANG_LACI} />
-                                <InputTextType   in_title={"Nik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNikPembuat} in_value={IN_NIK_PEMBUAT} />
-                                <InputTextType   in_title={"Staff Name"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNamaPembuat} in_value={IN_NAMA_PEMBUAT} />
-                            </div>
-                            <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-4 md:grid-cols-2">
-                                <div>
-                                    <DatePicker      is_time_24hr={true} in_mode={'single'} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg"} event={(date2) => setDate2(date2)} name_component={"Date"} idComponent={"txt_date"} isRtl={isRtl} in_date={date2} isEnableTime={true} date_format={"Y-m-d H:i"} />
-                                </div>
-                                <div>
-                                    <DropDownGlobal  in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionShift} isSearchable={true} isMulti={false} event={FormInputShift} name_component={"Shift"} idComponent={"shift"} />
-                                </div>
-                            </div>
-                        </div>
-                        {
-                            mountedForm ?
-                            <>
-                            <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_save"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Submit Initial'} HandleClick={InsPosInitial} />                             
-                            {/* <label className="mt-3 text-xs text-gray-500 dark:text-white-light">{t('Note: Please check your data input, because process data input can\'t try again!')}</label> */}
-                            
-                            
-                            <h5 className="mt-8 text-lg font-semibold dark:text-white-light">History Initial</h5>
-                            <div id="dt" className="mt-3 datatables">
+                        <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
+                            <div className="col-span-2 mt-6 panel rounded-3xl">
+                                <h5 className="mt-2 text-lg font-semibold dark:text-white-light">Table Item</h5>
+                                <div id="dt" className="mt-3 datatables">
                                     <DataTable
                                         noRecordsText="No results match your search query"
                                         highlightOnHover
@@ -437,14 +370,29 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         columns={data_columns}
                                         minHeight={200}
                                     />
+                                </div>
+                                <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-2 md:grid-cols-2">
+                                    <div>
+                                        <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={null} />
+                                    </div>
+                                    <div>
+                                        <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Open Master Produk'} HandleClick={null} />
+                                    </div>
+                                </div>
+                                
                             </div>
-                            </>
-                            : 
-                            ''
-                        }
-
-
-                        
+                            <div className="mt-6 panel rounded-3xl">
+                                <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-2">
+                                    <InputTextType   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_KODE_BARANG} />
+                                    <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />
+                                    <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
+                                    <InputTextType   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} />
+                                    <InputTextType   in_title={"HPP"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
+                                    <InputTextType   in_title={"GROSS"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
+                                    <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconPlusCircle />} in_title_button={'Add Item'} HandleClick={AddList} />
+                                </div>
+                            </div>
+                        </div>
                       </>
                     } />
                 </>
