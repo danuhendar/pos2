@@ -3,7 +3,7 @@ import {   useEffect,  useRef,  useState } from "react";
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import {   AddID, GenerateUniqNumber, get_data_local_storage, get_format_tanggal_jam, GetFormatCurrency, GetToken, groupByValueAndCount, summarizeJSONObjectByValue, validateNumber} from "@/lib/global";
+import {   AddID, GenerateUniqNumber, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, GetFormatCurrency, GetToken, groupByValueAndCount, summarizeJSONObjectByValue, validateNumber} from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -33,6 +33,12 @@ import { Input } from "postcss";
 import IconDollarSignCircle from "../Icon/IconDollarSignCircle";
 import IconMenuTodo from "../Icon/Menu/IconMenuTodo";
 import { set } from "lodash";
+import ModalComponent from "../modal/ModalComponent";
+import ComponentsDatatablesAdvanced from "../table/ComponentsDatatablesAdvanced";
+import IconXCircle from "../Icon/IconXCircle";
+import IconCircleCheck from "../Icon/IconCircleCheck";
+import IconCopy from "../Icon/IconCopy";
+import IconTrash from "../Icon/IconTrash";
 
 interface FormSalesProps {
     url: string,
@@ -49,19 +55,16 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [isDisabled,setisDisabled] = useState(false)
     const [TextButtonFilter,setTextButtonFilter] = useState('Process')
     const [IconButton,setIconButton] = useState(<IconRefresh />)
-    const [IN_KODE_TRANSAKSI,setIN_KODE_TRANSAKSI] = useState('')
     const [IN_NIK_PEMBUAT,setIN_NIK_PEMBUAT] = useState('')
     const [IN_NAMA_PEMBUAT,setIN_NAMA_PEMBUAT] = useState('')
-    const [IN_MODAL,setIN_MODAL] = useState('')
     const [OptionShift,setOptionShift] = useState([
         { value: '1', label: 'Shift 1' },
         { value: '2', label: 'Shift 2' },
         { value: '3', label: 'Shift 3' }
     ]);
     const [IN_SHIFT,setIN_SHIFT] = useState('')
-    const curdate = get_format_tanggal_jam().substring(0,16);
-    const [date2, setDate2] = useState<any>(curdate);
-    const [IN_UANG_LACI,setIN_UANG_LACI] = useState('')
+    const curdate = get_format_tanggal_jam().substring(0,16)
+    const [date2, setDate2] = useState<any>(curdate)
     
 
 
@@ -106,7 +109,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const input4Ref = useRef(null);
     const MySwal = withReactContent(Swal);
     const router = useRouter();
-
+    const [modal13, setModal13] = useState(false);
+    const [Title, setTitle] = useState('Master Produk');
+    const [data_rows_produk, setData_rows_produk] = useState([]);
+    const [data_columns_produk, setData_columns_produk] = useState([]);
+    const [LoadingButtonPayment,setLoadingButtonPayment] = useState(false)
+    const [isDisabledButtonPayment,setisDisabledButtonPayment] = useState(false)
+    
+    
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -137,16 +147,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             { value: 'QRIS', label: 'QRIS' }
         ];
         setOptionMetodePembayaran(OptionMetodePembayaran)
+        const column_master_produk = Def_Column_Master_Produk()
+        setData_columns_produk(column_master_produk)
        
     },[]);
 
    
     const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val); GetPosInitialByKodeGerai(IN_HOST,IN_PORT,val)};
-    // const FormInputModal = (value: any) => {var val = value.target.value;var res_val = GetFormatCurrency(val.split(',').join('')); setIN_MODAL(res_val); };
-    // const FormInputNikPembuat = (value: any) => {var val = value.target.value;setIN_NIK_PEMBUAT(val); };
-    // const FormInputNamaPembuat = (value: any) => {var val = value.target.value;setIN_NAMA_PEMBUAT(val); };
-    // const FormInputUangLaci = (value: any) => {var val = value.target.value;var res_val = GetFormatCurrency(val.split(',').join('')); setIN_UANG_LACI(res_val); };
-    // const FormInputShift = (value: any) => {var val = value.value;setIN_SHIFT(val); GetPosInitialByKodeGerai() };
     const FormInputItem = (value: any) => {var val = value.target.value;setIN_BARCODE(val); };
     const FormInputDeskripsi = (value: any) => {var val = value.target.value;setIN_DESKRIPSI(val); };
     const FormInputSatuan = (value: any) => {var val = value.target.value;setIN_SATUAN(val); };
@@ -161,8 +168,18 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         const validate_number = validateNumber(val);
         const val_currency = GetFormatCurrency(validate_number);
         setBiayaOngkir(val_currency);
+        const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) - parseFloat(TotalDiscount.split(',').join('')) + parseFloat(val.split(',').join(''))
+        //console.log('res_grand_total_final : '+res_grand_total_final)
+        setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()));
     }
-    const FormInputBayar = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number);setIN_BAYAR(val_currency); };
+    const FormInputBayar = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number);
+        setIN_BAYAR(val_currency); 
+        const bayar = parseFloat(val_currency.split(',').join(''))
+        const grand_total = parseFloat(GrandTotal.split(',').join(''))
+        const res_kembalian = bayar - grand_total;
+        //console.log('res_kembalian : '+res_kembalian)
+        setIN_KEMBALIAN(GetFormatCurrency(res_kembalian.toString()));
+    }
     const FormInputKembalian = (value: any) => {var val = value.target.value;setIN_KEMBALIAN(val); };
     const FormInputBank = (value: any) => {var val = value.value;setIN_BANK(val); };
     const FormInputDiskon = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setIN_DISKON(val_currency); };
@@ -190,6 +207,21 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             setIN_GROSS('')
             setIN_DISKON('')
         }
+    }
+
+    const CopyText = (Text:string) => {
+        navigator.clipboard.writeText(Text);
+        MySwal.fire({
+            title: "Text was copied!",
+            toast: true,
+            position: isRtl ? 'top-start' : 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            showCloseButton: true,
+            customClass: {
+                popup: `color-success`,
+            },
+        });
     }
 
     const GetMasterGerai = (in_host:string,in_port:number) => {
@@ -417,9 +449,22 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         }
     }   
-
+    const deleteRow = (idToRemove: number) => {
+        setData_rows((prev) => prev.filter((data_rows) => data_rows.id !== idToRemove));
+    };    
     const Def_Column_Transaksi_Inventory = () => {
         var cols = [
+                {
+                    accessor: 'ACTION',
+                    title: '#',
+                    render: (row:any) => (
+                    <button className="text-danger"
+                        onClick={() => deleteRow(row.id)}
+                    >
+                        <IconTrash />
+                    </button>
+                    ),
+                },
                 {
                     accessor: 'KODE_BARANG',
                     title: 'CODE ITEM',
@@ -452,6 +497,147 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             ];
             return  cols;
     }
+
+    const Def_Column_Master_Produk = () => {
+        var cols = [
+                {
+                    accessor: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    render: ({ id }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{id}</div>
+                        </div>
+                    ),
+                },
+                
+                {
+                    accessor: 'KATEGORI',
+                    title: 'CATEGORY',
+                    sortable: true,
+                    render: ({ KATEGORI }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KATEGORI}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'KODE_BARANG',
+                    title: 'ITEM CODE',
+                    sortable: true,
+                    render: ({ KODE_BARANG }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_BARANG}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'CONTENT',
+                    title: 'DESCRIPTION',
+                    sortable: true,
+                    render: ({ CONTENT }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{CONTENT}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SUPPLIER',
+                    title: 'SUPPLIER',
+                    sortable: true,
+                    render: ({ SUPPLIER }) => (
+                        <div className="flex items-center gap-2">
+                            {/* <div>
+                                <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
+                            </div> */}
+                            <div className="font-semibold">{SUPPLIER}</div>
+                            
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SINGKATAN',
+                    title: 'SINGKATAN',
+                    sortable: true,
+                    render: ({ SINGKATAN }) => (
+                        <div className="flex items-center gap-2">
+                            {/* <div>
+                                <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
+                            </div> */}
+                            <div className="font-semibold">{SINGKATAN}</div>
+                            
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'GROSS',
+                    title: 'PRICE',
+                    sortable: true,
+                    render: ({ GROSS }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{GetFormatCurrency(GROSS)}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SATUAN',
+                    title: 'SATUAN',
+                    sortable: true,
+                    render: ({ SATUAN }) => (
+                        <div className="flex items-center gap-2">
+                            {/* <div className="font-semibold">{SATUAN}</div> */}
+                            <span className={`badge badge-outline-${SATUAN === 'KARTON' ? 'success' : 'danger'} `}>{SATUAN}</span>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'VARIAN',
+                    title: 'VARIAN',
+                    sortable: true,
+                    render: ({ VARIAN }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{VARIAN}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'BARCODE',
+                    title: 'BARCODE',
+                    sortable: true,
+                    render: ({ BARCODE }) => (
+                        <div className="flex items-center gap-2">
+                            <div>
+                                <a onClick={()=> CopyText(BARCODE)}><IconCopy className="text-primary"/></a>
+                            </div>
+                            <div className="font-semibold">{BARCODE}</div>
+                            
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'IS_FIXED',
+                    title: 'IS_FIXED',
+                    sortable: true,
+                    render: ({ IS_FIXED }) => (
+                        <div className="flex items-center gap-2">
+                            <span className={`text-${IS_FIXED === 1 ? 'success' : 'danger'} `}>{(IS_FIXED === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'IS_RETUR_SUPPLIER',
+                    title: 'IS_RETUR_SUPPLIER',
+                    sortable: true,
+                    render: ({ IS_RETUR_SUPPLIER }) => (
+                        <div className="flex items-center gap-2">
+                            <span className={`text-${IS_RETUR_SUPPLIER === 1 ? 'success' : 'danger'} `}>{(IS_RETUR_SUPPLIER === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
+                        </div>
+                    ),
+                },
+            ];
+            return  cols;
+    }
+
     const CreateNewOrder = () => {
         setarr_input_item([])
         setData_rows([])
@@ -465,7 +651,16 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_DISKON('')
         setTotalBelanja('0')
         setTotalDiscount('0')
-        setGrandTotal('0')  
+        setGrandTotal('0')
+        setIN_TOTAL_BELANJA('')
+        setIN_BAYAR('')
+        setIN_KEMBALIAN('')
+        setBiayaOngkir('0')
+        setIN_BANK('')
+        setIN_METODE_PEMBAYARAN('')
+        setIN_SHIFT('')
+        setIN_KODE_INITIAL('')
+        input1Ref.current.focus();
     }
 
     const AddList = () => {
@@ -480,7 +675,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             const res_diskon = IN_DISKON === '' ? '0' : IN_DISKON.split(',').join('')
             const res_amount = (parseFloat(res_qty.split(',').join('')) * parseFloat(res_gross.split(',').join('')) ) - parseFloat(res_diskon.split(',').join(''));
             const objIndex = data_rows.findIndex(((obj: { KODE_BARANG: any; }) => obj.KODE_BARANG == res_kode_barang));
-            console.log('objIndex',objIndex)
+            // console.log('objIndex',objIndex)
             //-- cek apakah item sudah ada di list --//
             //-- jika item belum ada di list --//
             if(objIndex === -1){
@@ -516,7 +711,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 const price = parseFloat(item.PRICE);
                 return acc + price;
             }, 0);
-            console.log('res_grand_total',res_grand_total)
+            //console.log('res_grand_total',res_grand_total)
             // Hitung total diskon
             const valid_diskon = arr_input_item.filter(item => item.DISKON !== null && !isNaN(item.DISKON));
             // Hitung total harga (PRICE * QTY)
@@ -524,14 +719,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 const diskon = parseFloat(item.DISKON);
                 return acc + diskon;
             }, 0);
-            console.log('res_total_diskon',res_total_diskon)
+            //console.log('res_total_diskon',res_total_diskon)
             const res_subtotal =  res_grand_total + res_total_diskon
-            console.log('res_subtotal',res_subtotal)
+            const res_grand_total_final = res_grand_total + parseFloat(BiayaOngkir.split(',').join(''))
+            //console.log('res_subtotal',res_subtotal)
             setTotalBelanja(GetFormatCurrency(res_subtotal.toString()))
             setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
-            setGrandTotal(GetFormatCurrency(res_grand_total.toString()))  
-            
-           
+            setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
         }catch(Ex){
             Swal.fire({
                 title: t("Warning"),
@@ -541,6 +735,236 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 customClass: 'sweet-alerts'
             });
         }
+    }
+
+    const GetMasterProdukByKodeGerai = () => {
+        setData_rows_produk([])
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+        let param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":IN_KODE_GERAI}
+        
+        const Token = GetToken()
+        setLoadingButton(true)
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var res_rows = AddID(data_body);
+                setData_rows_produk(res_rows);
+                setLoadingButton(false)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+                setModal13(false);
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+                setModal13(false);
+            }
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setTextButtonFilter(t('Refresh'))
+            setLoadingButton(false)
+            setModal13(false);
+        });
+    }
+
+    const CloseModal = async () => {
+        setModal13(false);
+        input1Ref.current.focus();
+        try{
+            const text = await navigator.clipboard.readText();
+            if(text !== ''){
+                setIN_BARCODE(text);
+            }else{
+                setIN_BARCODE('');
+            }
+        }catch(Ex){
+            console.log(Ex)
+        }
+    }
+
+    const ShowMasterProduk = () => {
+        setModal13(true);
+        GetMasterProdukByKodeGerai()
+    }
+
+    const InsPosTransaksiSales = () => {
+        Swal.fire({
+            icon: "question",
+            title: t("Confirmation"),
+            text: t("Are you sure for")+" "+t("save data")+" ?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+            padding: '2em',
+            customClass: 'sweet-alerts'
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                try{
+                    var today = new Date();
+                    var bulan = today.getMonth()+1;
+                    var detail = [];
+                    for(var i = 0;i<data_rows.length;i++){
+                        const obj = {
+                            "IN_KODE_BARANG": data_rows[i].KODE_BARANG,
+                            "IN_DESKRIPSI": data_rows[i].DESKRIPSI,
+                            "IN_SATUAN": data_rows[i].SATUAN,
+                            "IN_HPP": data_rows[i].GROSS,
+                            "IN_PPN": "0",
+                            "IN_GROSS": data_rows[i].GROSS,
+                            "IN_QTY": data_rows[i].QTY,
+                            "IN_DISKON": data_rows[i].DISKON,
+                            "IN_PRICE": data_rows[i].PRICE,
+                            "IN_IS_HADIAH": 0,
+                            "IN_KODE_PROMO": 0,
+                            "IN_IS_RETUR_ITEM": 0
+                        }
+                        detail.push(obj)
+                    }
+                    let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
+                    let param = {
+                                    "IN_KODE_INITIAL": IN_KODE_INITIAL,
+                                    "IN_KODE_GERAI": IN_KODE_GERAI,
+                                    "IN_JENIS": jenis,
+                                    "IN_TANGGAL": get_format_tanggal_jam(),
+                                    "IN_TAHUN": get_format_tanggal_jam().substring(0,4),
+                                    "IN_BULAN": bulan,
+                                    "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
+                                    "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
+                                    "IN_BAYAR": IN_BAYAR.split(',').join(''),
+                                    "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
+                                    "IN_IS_STATUS": 1,
+                                    "IN_OTORISATOR_VOID": "-",
+                                    "IN_APP": themeConfig.versi_app,
+                                    "IN_BANK": IN_BANK,
+                                    "IN_DETAIL":detail
+                                }
+                    const Token = GetToken()
+                    console.log(JSON.stringify(param))
+                    setLoadingButtonPayment(true)
+                    setisDisabledButtonPayment(true)
+                    Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                        const res_data = response;
+                        var code = res_data.code;
+                        var msg = res_data.msg;
+                        if(parseFloat(code) === 200){
+                            var data_body = res_data.data;
+                            Swal.fire({
+                                title: t("Information"),
+                                text: ""+parseFloat(code)+"-"+msg,
+                                icon: "success",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                            CreateNewOrder()
+                            
+                            setLoadingButtonPayment(false)
+                            setisDisabledButtonPayment(false)
+                        }else if(code.toString().substring(0,1) === '4'){
+                            if(code === 401 && msg.includes("Invalid")){
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "warning",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                            }else if(code === 403){
+                                if(IN_SHIFT === ''){
+                                    MySwal.fire({
+                                        title: t(""+parseFloat(code)+"-"+msg),
+                                        toast: true,
+                                        position: isRtl ? 'top-start' : 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 5000,
+                                        showCloseButton: true,
+                                        customClass: {
+                                            popup: `color-warning`,
+                                        },
+                                    });
+                                    
+                                }else{
+                                    MySwal.fire({
+                                        title: t("Data initial for shift "+IN_SHIFT+" not found!"),
+                                        toast: true,
+                                        position: isRtl ? 'top-start' : 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 5000,
+                                        showCloseButton: true,
+                                        customClass: {
+                                            popup: `color-warning`,
+                                        },
+                                    });
+                                }
+                            }
+                            
+                            setLoadingButtonPayment(false)
+                            setisDisabledButtonPayment(false)
+                        }else{
+                            Swal.fire({
+                                title: t("Warning"),
+                                text: ""+parseFloat(code)+"-"+msg,
+                                icon: "warning",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                            setLoadingButtonPayment(false)
+                            setisDisabledButtonPayment(false)
+                        }
+                    }).catch((error) => {
+                        console.log(error)
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                        setLoadingButtonPayment(false)
+                        setisDisabledButtonPayment(false)
+                    });
+                }catch(Ex){
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                    setLoadingButtonPayment(false)
+                    setisDisabledButtonPayment(false)
+                }
+            }
+        });
     }
  
 
@@ -601,12 +1025,10 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                 <div className="flex-1">Discount :</div>
                                                 <div className="w-[37%]">{TotalDiscount}</div>
                                             </div>
-                                            {/* <div className="flex items-center text-lg">
-                                                <div className="flex-1">Shipping Rate :</div>
-                                                <div className="w-[37%]">
-                                                    <InputTextType in_title={""} in_classname_title={""} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} />
-                                                </div>
-                                            </div> */}
+                                            <div className="flex items-center text-lg">
+                                                <div className="flex-1">Shipping :</div>
+                                                <div className="w-[37%]">{BiayaOngkir}</div>
+                                            </div>
                                             <div className="flex items-center text-xl font-semibold">
                                                 <div className="flex-1">Grand Total :</div>
                                                 <div className="w-[37%]">{GrandTotal}</div>
@@ -655,7 +1077,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs' : 'btn btn-outline-success w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconPlusCircle />} in_title_button={'Add'} HandleClick={AddList} />
                                     </div>
                                     <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={null} />
+                                        <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
                                     </div>
                                 </div>
                                 </>
@@ -665,8 +1087,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
                                 <>
                                 <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                    <div  className="col-span-2 sm:grid-cols-1">
+                                    <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={input4Ref} in_event_keydown={null}/>
+                                    </div>
                                     <div  className="sm:grid-cols-1">
-                                    <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={input4Ref} in_event_keydown={FormInputBayar}/>
+                                    <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
                                     </div>
                                     <div  className="m:grid-cols-1">
                                     <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
@@ -682,13 +1107,31 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 </div>
                                 <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
                                     <div className="col-span-2">
-                                    <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={null} />
+                                    <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
                                     </div>
                                 </div>
                                 </>
                             } />
                            </div>
                         </div>
+
+                        {/* OPEN MODAL MASTER PRODUK */}
+                        <ModalComponent in_size_modal={`panel animate__animated my-7 w-full overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                            <div className="p-2">
+                                <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_refresh"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Refresh'} HandleClick={GetMasterProdukByKodeGerai} />
+                                <div className="mb-5">
+                                    {
+                                        data_rows_produk.length > 0 ?
+                                        <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows_produk} DataColumns={data_columns_produk} />
+                                        :
+                                        ''
+                                    }
+                                </div>
+                                <div className="flex items-center justify-end gap-3 mt-8">
+                                    <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                </div>
+                            </div>
+                        } />
                       </>
                     } />
                 </>
