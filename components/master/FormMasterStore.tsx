@@ -39,6 +39,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const [IconButton,setIconButton] = useState(<IconRefresh />)
     const [modal13,setModal13] = useState(false)
     const [modal14,setModal14] = useState(false)
+    const [modal15,setModal15] = useState(false)
+    const [IN_KODE_SATUAN,setIN_KODE_SATUAN] = useState('')
     const [Title,setTitle] = useState('')
     const [IN_BRANCH,setIN_BRANCH] = useState('G001')
     const [IN_STORE,setIN_STORE] = useState('')
@@ -70,6 +72,11 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         var val = event.target.value;
         setIN_KODE_CABANG(val);  
     };
+
+    const FormInputKodeSatuan = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        setIN_KODE_SATUAN(val);  
+    }
     
     const FormISActive = (event: { target: { value: any; }; }) => {
         setCheckedISActive(!CheckedISActive);  
@@ -97,9 +104,10 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     param = {"IN_KODE_GERAI":IN_KODE_GERAI}
                 }else if(IDReport === 'Master Branch'){
                     url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterCabang`
-                    param = {"IN_KODE_CABANG":IN_KODE_CABANG}
-                }else{
-
+                    param = {"IN_KODE_CABANG":IN_KODE_GERAI}
+                }else if(IDReport === 'Master Satuan'){
+                     url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterSatuan`
+                    param = {"IN_KODE_SATUAN":IN_KODE_GERAI}
                 }
              
                 if(url !== ''){
@@ -120,6 +128,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                                 GetData(IN_HOST,IN_PORT)
                             }else if(IDReport === 'Master Branch'){
                                 GetDataMasterCabang(IN_HOST,IN_PORT)
+                            }else if(IDReport === 'Master Satuan'){
+                                GetDataMasterSatuan(IN_HOST,IN_PORT)
                             }
                         }else if(code.toString().substring(0,1) === '4'){
                             if(code === 401 && msg.includes("Invalid")){
@@ -176,7 +186,13 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             setIN_KODE_CABANG('')
             setIN_CONTENT('')
             setTitle('Form : '+IDReport)
+        }else if(IDReport === 'Master Satuan'){
+            setModal15(true)
+            setIN_KODE_SATUAN('')
+            setIN_CONTENT('')
+            setTitle('Form : '+IDReport)
         }
+        
    
     }
     const showModal = (IDReport:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string) => {
@@ -190,6 +206,12 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const showModalCabang = (IDReport:string,IN_KODE_CABANG:string,IN_CONTENT:string) => {
         setModal14(true)
         setIN_KODE_CABANG(IN_KODE_CABANG)
+        setIN_CONTENT(IN_CONTENT)
+        setTitle('Form : '+IDReport)
+    }
+    const showModalSatuan = (IDReport:string,IN_KODE_SATUAN:string,IN_CONTENT:string) => {
+        setModal15(true)
+        setIN_KODE_SATUAN(IN_KODE_SATUAN)
         setIN_CONTENT(IN_CONTENT)
         setTitle('Form : '+IDReport)
     }
@@ -321,6 +343,114 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             }
         })
     }
+    const GetGenerateKodeSatuan = () => {
+        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeSatuan`
+        const param = {}
+        const Token = GetToken()
+        return new Promise((resolve,reject)=>{
+            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                const res_data = response;
+                var code = res_data.code;
+                var msg = res_data.msg;
+                if(parseFloat(code) === 200){
+                    var data_body = res_data.data;
+                    if(data_body.length === 1)
+                    {
+                        resolve(data_body[0].KODE_SATUAN)
+                    }else{
+                       reject()
+                    }
+                } 
+                
+            }).catch((error) => {
+               reject(error)
+            });
+        })
+    }
+    const InsDataSatuan = () =>{
+        Swal.fire({
+            icon: "question",
+            title: t("Confirmation"),
+            text: t("Are you sure for")+" save data?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+            padding: '2em',
+            customClass: 'sweet-alerts'
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                GetGenerateKodeSatuan().then((d)=>{
+                    const kode_satuan = d;
+                    const InputNik = get_data_local_storage('nik')
+                    let res_kode_satuan = ''
+                    if(IN_KODE_SATUAN === ''){
+                        res_kode_satuan = kode_satuan as string
+                    }else{
+                        res_kode_satuan = IN_KODE_SATUAN
+                    }
+                    const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterSatuan`
+                    const param = {"IN_KODE_SATUAN":res_kode_satuan,"IN_CONTENT":IN_CONTENT}
+                    const Token = GetToken()
+                    Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                        const res_data = response;
+                        var code = res_data.code;
+                        var msg = res_data.msg;
+                        if(parseFloat(code) === 200){
+                            Swal.fire({
+                                title: t("Infomration"),
+                                text: ""+parseFloat(code)+"-"+msg,
+                                icon: "success",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                            GetDataMasterSatuan(IN_HOST,IN_PORT)
+                            setIN_KODE_SATUAN('')
+                            setIN_CONTENT('')
+                            CloseModal()
+                        }else if(code.toString().substring(0,1) === '4'){
+                            if(code === 401 && msg.includes("Invalid")){
+                                
+                            }else{
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "warning",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                            }
+                        }else{
+                            Swal.fire({
+                                title: t("Warning"),
+                                text: ""+parseFloat(code)+"-"+msg,
+                                icon: "warning",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                        }
+                    }).catch((error) => {
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    });
+                }
+                ).catch((e)=>{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                })
+            }
+        })
+    }
     const Def_Column_MasterGerai = () => {
         var cols = [
                 {
@@ -439,6 +569,60 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     render: ({ JUMLAH_COVERAGE_GERAI }) => (
                         <div className="flex items-center gap-2">
                             <div className="font-semibold">{JUMLAH_COVERAGE_GERAI}</div>
+                        </div>
+                    ),
+                }
+            ];
+            return  cols;
+    }
+    const Def_Column_MasterSatuan = () => {
+        var cols = [
+                {
+                    accessor: 'id',
+                    title: 'ACTION',
+                    sortable: true,
+                    render: ({ KODE_SATUAN,CONTENT }) => (
+                        <div className="flex flex-row gap-2">
+                            <div className="mt-1">
+                                <a onClick={() => {showModalSatuan('Edit '+IDReport,KODE_SATUAN,CONTENT)}} data-twe-toggle="tooltip" title="Edit Data">
+                                    <span className="text-warning"><IconPencil  /></span>
+                                </a>
+                            </div>
+                            <div className="mt-1">
+                                <a onClick={() => {DelData(KODE_SATUAN)}} data-twe-toggle="tooltip" title="Delete Data">
+                                    <span className="text-danger"><IconTrash  /></span>
+                                </a>
+                            </div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'id',
+                    title: 'ID',
+                    sortable: true,
+                    render: ({ id }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{id}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'KODE_SATUAN',
+                    title: 'CODE SATUAN',
+                    sortable: true,
+                    render: ({ KODE_SATUAN }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_SATUAN}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'CONTENT',
+                    title: 'NAME',
+                    sortable: true,
+                    render: ({ CONTENT }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{CONTENT}</div>
                         </div>
                     ),
                 }
@@ -590,6 +774,78 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             setLoadingButton(false)
         });
     }
+    const GetDataMasterSatuan = (in_host:string,in_port:number) => {
+        setData_rows([])
+        setData_columns([])
+        
+        let url = ""
+        let param = {}
+        var cols = []
+        if(IDReport === 'Master Satuan'){
+            url = `http://${in_host}:${in_port}/api/v2/GetMasterSatuan`
+            param = {}
+            cols = Def_Column_MasterSatuan()
+        }else{
+
+        }
+   
+        const Token = GetToken()
+        setLoading(true)
+        setTextButtonFilter(t('Please wait'))
+        setLoadingButton(true)
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS;
+                var res_rows = AddID(rows);
+                setData_rows(res_rows);
+                setData_columns(cols);
+                setLoading(false)
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoading(false)
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoading(false)
+                setTextButtonFilter(t('Refresh'))
+                setLoadingButton(false)
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoading(false)
+            setTextButtonFilter(t('Refresh'))
+            setLoadingButton(false)
+        });
+    }
     
     const RefreshData = () => {
         try {
@@ -597,6 +853,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                 GetData(IN_HOST,IN_PORT)
             }else if(IDReport === 'Master Branch'){
                 GetDataMasterCabang(IN_HOST,IN_PORT)
+            }else if(IDReport === 'Master Satuan'){
+                GetDataMasterSatuan(IN_HOST,IN_PORT)
             }
         } catch (Ex) {
             console.log('error : ' + Ex.toString())
@@ -607,6 +865,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             setModal13(false)
         }else if(modal14){
             setModal14(false)
+        }else if(modal15){
+            setModal15(false)   
         }
     }
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -656,6 +916,18 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                             <div className="flex items-center justify-end gap-3 mt-8">
                                 <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
                                 <ButtonAdd in_classname={!isDark ? 'btn btn-primary rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_save"} isLoading={false} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Save'} HandleClick={InsDataCabang} />
+                            </div>
+                        </div>
+                    } />
+                    <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal15} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                        <div className="p-2">
+                            <div className="mb-5">
+                                <InputTextType   in_title={"Satuan"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeSatuan} in_value={IN_KODE_SATUAN} />
+                                <InputTextType   in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
+                            </div>
+                            <div className="flex items-center justify-end gap-3 mt-8">
+                                <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                <ButtonAdd in_classname={!isDark ? 'btn btn-primary rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_save"} isLoading={false} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Save'} HandleClick={InsDataSatuan} />
                             </div>
                         </div>
                     } />
