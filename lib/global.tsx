@@ -781,6 +781,16 @@ export function get_dateTimeDiff_second(endDate:Date,startDate:Date){
     var seconds = (endDate.getTime() - startDate.getTime()) / 1000;
     return seconds.toString();
 }
+export function get_tahun(){
+    var today = new Date();
+    var tahun = today.getFullYear()
+    return tahun;
+}
+export function get_bulan(){
+    var today = new Date();
+    var bulan = today.getMonth()+1;
+    return bulan;
+}
 export function get_format_tanggal_jam(){
     var today = new Date();
     var bulan = today.getMonth()+1;

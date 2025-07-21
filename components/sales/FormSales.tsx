@@ -816,6 +816,31 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         GetMasterProdukByKodeGerai()
     }
 
+    const GetGenerateKodeTransaksiInventory = () => {
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeTransaksiInventory`
+        let param = {}
+        const Token = GetToken()
+        return new Promise((resolve,reject)=>{
+            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                const res_data = response;
+                var code = res_data.code;
+                var msg = res_data.msg;
+                if(parseFloat(code) === 200){
+                    var data_body = res_data.data;
+                    if(data_body.length === 1)
+                    {
+                        resolve(data_body[0].KODE_TRANSAKSI)
+                    }else{
+                       reject()
+                    }
+                }
+            }).catch((error) => {
+                reject(error)
+            });
+        });
+        
+    }
+
     const InsPosTransaksiSales = () => {
         Swal.fire({
             icon: "question",
@@ -830,67 +855,110 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 try{
-                    var today = new Date();
-                    var bulan = today.getMonth()+1;
-                    var detail = [];
-                    for(var i = 0;i<data_rows.length;i++){
-                        const obj = {
-                            "IN_KODE_BARANG": data_rows[i].KODE_BARANG,
-                            "IN_DESKRIPSI": data_rows[i].DESKRIPSI,
-                            "IN_SATUAN": data_rows[i].SATUAN,
-                            "IN_HPP": data_rows[i].GROSS,
-                            "IN_PPN": "0",
-                            "IN_GROSS": data_rows[i].GROSS,
-                            "IN_QTY": data_rows[i].QTY,
-                            "IN_DISKON": data_rows[i].DISKON,
-                            "IN_PRICE": data_rows[i].PRICE,
-                            "IN_IS_HADIAH": 0,
-                            "IN_KODE_PROMO": 0,
-                            "IN_IS_RETUR_ITEM": 0
+                    GetGenerateKodeTransaksiInventory().then((d)=>{
+                        const kode_transaksi_inventory = d;
+                        var today = new Date();
+                        var bulan = today.getMonth()+1;
+                        var detail = [];
+                        for(var i = 0;i<data_rows.length;i++){
+                            const obj = {
+                                "IN_KODE_BARANG": data_rows[i].KODE_BARANG,
+                                "IN_DESKRIPSI": data_rows[i].DESKRIPSI,
+                                "IN_SATUAN": data_rows[i].SATUAN,
+                                "IN_HPP": data_rows[i].GROSS,
+                                "IN_PPN": "0",
+                                "IN_GROSS": data_rows[i].GROSS,
+                                "IN_QTY": data_rows[i].QTY,
+                                "IN_DISKON": data_rows[i].DISKON,
+                                "IN_PRICE": data_rows[i].PRICE,
+                                "IN_IS_HADIAH": 0,
+                                "IN_KODE_PROMO": 0,
+                                "IN_IS_RETUR_ITEM": 0
+                            }
+                            detail.push(obj)
                         }
-                        detail.push(obj)
-                    }
-                    let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
-                    let param = {
-                                    "IN_KODE_INITIAL": IN_KODE_INITIAL,
-                                    "IN_KODE_GERAI": IN_KODE_GERAI,
-                                    "IN_JENIS": jenis,
-                                    "IN_TANGGAL": get_format_tanggal_jam(),
-                                    "IN_TAHUN": get_format_tanggal_jam().substring(0,4),
-                                    "IN_BULAN": bulan,
-                                    "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
-                                    "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
-                                    "IN_BAYAR": IN_BAYAR.split(',').join(''),
-                                    "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
-                                    "IN_IS_STATUS": 1,
-                                    "IN_OTORISATOR_VOID": "-",
-                                    "IN_APP": themeConfig.versi_app,
-                                    "IN_BANK": IN_BANK,
-                                    "IN_DETAIL":detail
+                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
+                        let param = {
+                                        "IN_KODE_INITIAL": IN_KODE_INITIAL,
+                                        "IN_KODE_GERAI": IN_KODE_GERAI,
+                                        "IN_JENIS": jenis,
+                                        "IN_TANGGAL": get_format_tanggal_jam(),
+                                        "IN_TAHUN": get_format_tanggal_jam().substring(0,4),
+                                        "IN_BULAN": bulan,
+                                        "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
+                                        "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
+                                        "IN_BAYAR": IN_BAYAR.split(',').join(''),
+                                        "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
+                                        "IN_IS_STATUS": 1,
+                                        "IN_OTORISATOR_VOID": "-",
+                                        "IN_APP": themeConfig.versi_app,
+                                        "IN_BANK": IN_BANK,
+                                        "IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,
+                                        "IN_KODE_TRANSAKSI_INVENTORY":kode_transaksi_inventory,
+                                        "IN_DETAIL":detail
+                                    }
+                        const Token = GetToken()
+                        console.log(JSON.stringify(param))
+                        setLoadingButtonPayment(true)
+                        setisDisabledButtonPayment(true)
+                        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                            const res_data = response;
+                            var code = res_data.code;
+                            var msg = res_data.msg;
+                            if(parseFloat(code) === 200){
+                                var data_body = res_data.data;
+                                Swal.fire({
+                                    title: t("Information"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "success",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                CreateNewOrder()
+                                
+                                setLoadingButtonPayment(false)
+                                setisDisabledButtonPayment(false)
+                            }else if(code.toString().substring(0,1) === '4'){
+                                if(code === 401 && msg.includes("Invalid")){
+                                    Swal.fire({
+                                        title: t("Warning"),
+                                        text: ""+parseFloat(code)+"-"+msg,
+                                        icon: "warning",
+                                        padding: '2em',
+                                        customClass: 'sweet-alerts'
+                                    });
+                                }else if(code === 403){
+                                    if(IN_SHIFT === ''){
+                                        MySwal.fire({
+                                            title: t(""+parseFloat(code)+"-"+msg),
+                                            toast: true,
+                                            position: isRtl ? 'top-start' : 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 5000,
+                                            showCloseButton: true,
+                                            customClass: {
+                                                popup: `color-warning`,
+                                            },
+                                        });
+                                        
+                                    }else{
+                                        MySwal.fire({
+                                            title: t("Data initial for shift "+IN_SHIFT+" not found!"),
+                                            toast: true,
+                                            position: isRtl ? 'top-start' : 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 5000,
+                                            showCloseButton: true,
+                                            customClass: {
+                                                popup: `color-warning`,
+                                            },
+                                        });
+                                    }
                                 }
-                    const Token = GetToken()
-                    console.log(JSON.stringify(param))
-                    setLoadingButtonPayment(true)
-                    setisDisabledButtonPayment(true)
-                    Posts(url,JSON.stringify(param),false,Token).then((response) => {
-                        const res_data = response;
-                        var code = res_data.code;
-                        var msg = res_data.msg;
-                        if(parseFloat(code) === 200){
-                            var data_body = res_data.data;
-                            Swal.fire({
-                                title: t("Information"),
-                                text: ""+parseFloat(code)+"-"+msg,
-                                icon: "success",
-                                padding: '2em',
-                                customClass: 'sweet-alerts'
-                            });
-                            CreateNewOrder()
-                            
-                            setLoadingButtonPayment(false)
-                            setisDisabledButtonPayment(false)
-                        }else if(code.toString().substring(0,1) === '4'){
-                            if(code === 401 && msg.includes("Invalid")){
+                                
+                                setLoadingButtonPayment(false)
+                                setisDisabledButtonPayment(false)
+                            }else{
                                 Swal.fire({
                                     title: t("Warning"),
                                     text: ""+parseFloat(code)+"-"+msg,
@@ -898,59 +966,31 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     padding: '2em',
                                     customClass: 'sweet-alerts'
                                 });
-                            }else if(code === 403){
-                                if(IN_SHIFT === ''){
-                                    MySwal.fire({
-                                        title: t(""+parseFloat(code)+"-"+msg),
-                                        toast: true,
-                                        position: isRtl ? 'top-start' : 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 5000,
-                                        showCloseButton: true,
-                                        customClass: {
-                                            popup: `color-warning`,
-                                        },
-                                    });
-                                    
-                                }else{
-                                    MySwal.fire({
-                                        title: t("Data initial for shift "+IN_SHIFT+" not found!"),
-                                        toast: true,
-                                        position: isRtl ? 'top-start' : 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 5000,
-                                        showCloseButton: true,
-                                        customClass: {
-                                            popup: `color-warning`,
-                                        },
-                                    });
-                                }
+                                setLoadingButtonPayment(false)
+                                setisDisabledButtonPayment(false)
                             }
-                            
-                            setLoadingButtonPayment(false)
-                            setisDisabledButtonPayment(false)
-                        }else{
+                        }).catch((error) => {
+                            console.log(error)
                             Swal.fire({
                                 title: t("Warning"),
-                                text: ""+parseFloat(code)+"-"+msg,
+                                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
                                 icon: "warning",
                                 padding: '2em',
                                 customClass: 'sweet-alerts'
                             });
                             setLoadingButtonPayment(false)
                             setisDisabledButtonPayment(false)
-                        }
-                    }).catch((error) => {
-                        console.log(error)
+                        });
+                    }).catch((e)=>{
                         Swal.fire({
                             title: t("Warning"),
-                            text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                            text: "401-Error : Generate Kode, Hubungi administrator, untuk proses pengecekan lebih lanjut!",
                             icon: "warning",
                             padding: '2em',
                             customClass: 'sweet-alerts'
                         });
-                        setLoadingButtonPayment(false)
-                        setisDisabledButtonPayment(false)
+                        setLoadingButton(false)
+                        setisDisabled(false)
                     });
                 }catch(Ex){
                     Swal.fire({

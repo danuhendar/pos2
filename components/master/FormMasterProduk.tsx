@@ -73,6 +73,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const [options6,setOptions6] = useState([])
     const [options7,setOptions7] = useState([])
     const [options8,setOptions8] = useState([])
+    const [OptionSatuan,setOptionSatuan] = useState([])
     const [Tabs,setTabs] = useState<string>('kategori');
 
     const MySwal = withReactContent(Swal);
@@ -95,13 +96,14 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const FormInputHPPLast = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_HPP_LAST(val);  };
     const FormInputHPPLast_2 = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_HPP_LAST_2(val);  };
     const FormInputGross = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_GROSS(val);  };
-    const FormInputSatuan= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_SATUAN(val);  };
+    const FormInputSatuan = (value: any) => {var val = value.value;setIN_SATUAN(val);  };
     const FormInputVarian= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_VARIAN(val);  };
     const FormInputBarcode= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_BARCODE(val);  };
     const FormInputIS_Fixed= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_IS_FIXED(val); console.log(val)  };
     const FormInputIS_Retur_Supplier = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_IS_RETUR_SUPPLIER(val);  };
     const FormInputKodeKategori = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KODE_KATEGORI(val);  };
     const FormInputContentKategori = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_CONTENT_KATEGORI(val);  };
+
 
     const GetMasterKategoriProduk = (in_host:string,in_port:number) => {
         setOptions8([])
@@ -251,6 +253,57 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
             });
         });
     }
+
+    const GetMasterSatuan = (in_host:string,in_port:number) => {
+        setOptionSatuan([])
+        let url = `http://${in_host}:${in_port}/api/v2/GetMasterSatuan`
+        let param = {"":""}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS;
+                var arr_ = []
+                for(var i = 0;i<rows.length;i++){
+                    const obj = {"label":rows[i].CONTENT,"value":rows[i].CONTENT}
+                    arr_.push(obj)
+                }
+                setOptionSatuan(arr_)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
+
     const DelData = (IN_KODE_BARANG:any) => {
         Swal.fire({
             icon: "question",
@@ -342,6 +395,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
             GetMasterSupplier(IN_HOST,IN_PORT)
             GetMasterGerai(IN_HOST,IN_PORT)
             GetMasterKategoriProduk(IN_HOST,IN_PORT)
+            GetMasterSatuan(IN_HOST,IN_PORT)
         }else{
             setModal14(true)
             setIN_CONTENT_KATEGORI('')
@@ -376,6 +430,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         GetMasterSupplier(IN_HOST,IN_PORT)
         GetMasterGerai(IN_HOST,IN_PORT)
         GetMasterKategoriProduk(IN_HOST,IN_PORT)
+        GetMasterSatuan(IN_HOST,IN_PORT)
     }
     
     const InsData = () =>{
@@ -952,7 +1007,8 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                                     
                                     <InputCheckBoxFilterType event={FormInputIS_Retur_Supplier} in_title={"IS Retur Supplier"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Y"} in_name_2={"N"} in_name_component_1={"is_retur_supplier"} in_name_component_2={"is_retur_supplier"} />
                                     <InputTextType   in_title={"Varian"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputVarian} in_value={IN_VARIAN} />
-                                    <InputCheckBoxFilterType event={FormInputSatuan} in_title={"Satuan"} in_value_1={"KARTON"} in_value_2={"PCS"} in_name_1={"KARTON"} in_name_2={"PCS"} in_name_component_1={"satuan"} in_name_component_2={"satuan"} />
+                                    {/* <InputCheckBoxFilterType event={FormInputSatuan} in_title={"Satuan"} in_value_1={"KARTON"} in_value_2={"PCS"} in_name_1={"KARTON"} in_name_2={"PCS"} in_name_component_1={"satuan"} in_name_component_2={"satuan"} /> */}
+                                    <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionSatuan} isSearchable={true} isMulti={false} event={FormInputSatuan} name_component={"Satuan"} idComponent={"satuan"} />
                                     <InputCheckBoxFilterType event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Y"} in_name_2={"N"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
                                     <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputBarcode} in_value={IN_BARCODE} />
                                     <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Kode Gerai"} idComponent={"kode_gerai"} />
