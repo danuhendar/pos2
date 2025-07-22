@@ -115,8 +115,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [data_columns_produk, setData_columns_produk] = useState([]);
     const [LoadingButtonPayment,setLoadingButtonPayment] = useState(false)
     const [isDisabledButtonPayment,setisDisabledButtonPayment] = useState(false)
-    
-    
+    const [IN_NIK_INITIAL,setIN_NIK_INITIAL] = useState('')
+    const [IN_NAMA_INITIAL,setIN_NAMA_INITIAL] = useState('')
+    const [IN_UANG_MODAL,setIN_UANG_MODAL] = useState('')
+    const [IN_UANG_LACI,setIN_UANG_LACI] = useState('')
+    const [LoadingButtonSubmit,setLoadingButtonSubmit] = useState(false)
+    const [isDisabledButtonSubmit,setisDisabledButtonSubmit] = useState(false)
+    const [IN_SHIFT_INITIAL,setIN_SHIFT_INITIAL] = useState('')
+
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -124,8 +130,10 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setPORT(res_PORT_LOGIN)
         const InputNikPemohon = get_data_local_storage('nik');
         setIN_NIK_PEMBUAT(InputNikPemohon)
+        setIN_NIK_INITIAL(InputNikPemohon)
         const InputNamaPemohon = get_data_local_storage('nama');
         setIN_NAMA_PEMBUAT(InputNamaPemohon)
+        setIN_NAMA_INITIAL(InputNamaPemohon)
         const is_gerai = get_data_local_storage('is_gerai');
         setIN_IS_GERAI(is_gerai)
        
@@ -183,6 +191,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const FormInputKembalian = (value: any) => {var val = value.target.value;setIN_KEMBALIAN(val); };
     const FormInputBank = (value: any) => {var val = value.value;setIN_BANK(val); };
     const FormInputDiskon = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setIN_DISKON(val_currency); };
+    const FormInputNikInitial = (value: any) => {var val = value.target.value;setIN_NIK_INITIAL(val); };
+    const FormInputNamaInitial = (value: any) => {var val = value.target.value;setIN_NAMA_INITIAL(val); };
+    const FormInputUangModal = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setIN_UANG_MODAL(val_currency); };
+    const FormInputUangLaci = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number);setIN_UANG_LACI(val_currency); };
+    const FormInputShiftInitial = (value: any) => {var val = value.value;setIN_SHIFT_INITIAL(val); };
     const SubmitPayment = () => {
         input4Ref.current.focus();
     }
@@ -351,6 +364,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         try{
             let url = `http://${in_host}:${in_port}/api/v2/GetPosInitialByKodeGerai`
             let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT}
+            console.log('GetPosInitialByKodeGerai : '+url)
+            console.log('GetPosInitialByKodeGerai : '+JSON.stringify(param))
             const Token = GetToken()
             setLoadingButton(true)
             setisDisabled(true)
@@ -1006,6 +1021,127 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             }
         });
     }
+
+    const InsPosInitial = () => {
+        Swal.fire({
+            icon: "question",
+            title: t("Confirmation"),
+            text: t("Are you sure for")+" "+t("save data")+" ?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+            padding: '2em',
+            customClass: 'sweet-alerts'
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                try{
+                     
+                        
+                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosInitial`
+                        let param = {"IN_KODE_INITIAL":"","IN_KODE_GERAI":IN_KODE_GERAI,"IN_MODAL":IN_UANG_MODAL.split(",").join(""),"IN_UANG_LACI":IN_UANG_LACI.split(",").join(""),"IN_NIK":IN_NIK_INITIAL,"IN_NAMA":IN_NAMA_INITIAL,"IN_SHIFT":IN_SHIFT_INITIAL}
+                        const Token = GetToken()
+                        console.log(JSON.stringify(param))
+                        setLoadingButtonSubmit(true)
+                        setisDisabledButtonSubmit(true)
+                        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                            const res_data = response;
+                            var code = res_data.code;
+                            var msg = res_data.msg;
+                            if(parseFloat(code) === 200){
+                                Swal.fire({
+                                    title: t("Information"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "success",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                setLoadingButtonSubmit(false)
+                                setisDisabledButtonSubmit(false)
+                            }else if(code.toString().substring(0,1) === '4'){
+                                if(code === 401 && msg.includes("Invalid")){
+                                    Swal.fire({
+                                        title: t("Warning"),
+                                        text: ""+parseFloat(code)+"-"+msg,
+                                        icon: "warning",
+                                        padding: '2em',
+                                        customClass: 'sweet-alerts'
+                                    });
+                                }else if(code === 403){
+                                    if(IN_SHIFT === ''){
+                                        MySwal.fire({
+                                            title: t(""+parseFloat(code)+"-"+msg),
+                                            toast: true,
+                                            position: isRtl ? 'top-start' : 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 5000,
+                                            showCloseButton: true,
+                                            customClass: {
+                                                popup: `color-warning`,
+                                            },
+                                        });
+                                        
+                                    }else{
+                                        MySwal.fire({
+                                            title: t("Data initial for shift "+IN_SHIFT+" not found!"),
+                                            toast: true,
+                                            position: isRtl ? 'top-start' : 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 5000,
+                                            showCloseButton: true,
+                                            customClass: {
+                                                popup: `color-warning`,
+                                            },
+                                        });
+                                    }
+                                 
+                                }
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "warning",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                setLoadingButtonSubmit(false)
+                                setisDisabledButtonSubmit(false)
+                            }else{
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "warning",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                setLoadingButtonSubmit(false)
+                                setisDisabledButtonSubmit(false)
+                            }
+                        }).catch((error) => {
+                            console.log(error)
+                            Swal.fire({
+                                title: t("Warning"),
+                                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                                icon: "warning",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                            setLoadingButtonSubmit(false)
+                            setisDisabledButtonSubmit(false)
+                        });
+                }catch(Ex){
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                    setLoadingButtonSubmit(false)
+                    setisDisabledButtonSubmit(false)
+                }
+            }
+        });
+    }
  
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -1031,147 +1167,175 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 <div>
                                 <InputTextType in_title={"Gerai"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiMutasi} in_value={IN_KODE_GERAI} />
                                 </div>
-                            } 
-                            {/* <div className="w-1/5 mt-6">
-                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Filter'} HandleClick={GetPosInitialByKodeGerai} />     
-                            </div> */}
-                        </div>
-                   
-                        <div className="grid grid-cols-3 grid-rows-2 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
-                            <div className="col-span-2 row-span-2">
-                            <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
-                                <>
-                                <div className="mt-3 datatables">
-                                    <DataTable
-                                        noRecordsText="No results match your search query"
-                                        highlightOnHover
-                                        className="table-hover whitespace-nowrap"
-                                        records={data_rows}
-                                        columns={data_columns}
-                                        minHeight={200}
-                                    />
-                                </div>
-                                <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
-                                        <div className="space-y-2 ltr:text-right rtl:text-left">
-                                            <div className="flex items-center text-lg">
-                                                <div className="flex-1">Subtotal :</div>
-                                                <div className="w-[37%]">{TotalBelanja}</div>
-                                            </div>
-                                            <div className="flex items-center text-lg">
-                                                <div className="flex-1">Tax :</div>
-                                                <div className="w-[37%]">{TotalPPN}</div>
-                                            </div>
-                                            <div className="flex items-center text-lg">
-                                                <div className="flex-1">Discount :</div>
-                                                <div className="w-[37%]">{TotalDiscount}</div>
-                                            </div>
-                                            <div className="flex items-center text-lg">
-                                                <div className="flex-1">Shipping :</div>
-                                                <div className="w-[37%]">{BiayaOngkir}</div>
-                                            </div>
-                                            <div className="flex items-center text-xl font-semibold">
-                                                <div className="flex-1">Grand Total :</div>
-                                                <div className="w-[37%]">{GrandTotal}</div>
-                                            </div>
-                                    </div>
-                                </div> 
-                                <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
-                                    <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_buat_sales_baru"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Create New Order'} HandleClick={CreateNewOrder} />
-                                    </div>
-                                    <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={null} />
-                                    </div>
-                                    <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSend />} in_title_button={'Submit Payment'} HandleClick={SubmitPayment} />
-                                    </div>
-                                </div>
-                                </>
                             }
-                            />
-                            </div>
-                            <div>
-                            <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
-                                <>
-                                <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
-                                    <div className="col-span-2">
-                                    <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} />
-                                    </div>
-                                    <div className="sm:grid-cols-1">
-                                    <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
-                                    <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />    
-                                    </div>
-                                    <div className="sm:grid-cols-1">
-                                    <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
-                                    </div>
-                                    <div className="sm:col-span-1">
-                                    <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyAddList} />
-                                    </div>
-                                    
-                                    <div className="sm:col-span-1">
-                                    <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyAddList} />
-                                    </div>
-                                    <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
-                                    <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
-                                    <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs' : 'btn btn-outline-success w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconPlusCircle />} in_title_button={'Add'} HandleClick={AddList} />
-                                    </div>
-                                    <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
-                                    </div>
+                            {
+                                IDReport === 'Initial' ?
+                                <div>
+                                <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionShift} isSearchable={true} isMulti={false} event={FormInputShiftInitial} name_component={"Shift Initial"} idComponent={"ShiftInitial"} />
                                 </div>
-                                </>
-                            } />
-                            </div>
-                           <div>
-                            <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
-                                <>
-                                <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                    <div  className="col-span-2 sm:grid-cols-1">
-                                    <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={input4Ref} in_event_keydown={null}/>
-                                    </div>
-                                    <div  className="sm:grid-cols-1">
-                                    <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
-                                    </div>
-                                    <div  className="m:grid-cols-1">
-                                    <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
-                                    </div>
-                                </div>
-                                <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                    <div>
-                                    <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
-                                    </div>
-                                    <div>
-                                    <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Bank"} idComponent={"bank"} />
-                                    </div>
-                                </div>
-                                <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                    <div className="col-span-2">
-                                    <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
-                                    </div>
-                                </div>
-                                </>
-                            } />
-                           </div>
+                                :
+                                ''
+                            }
                         </div>
-
-                        {/* OPEN MODAL MASTER PRODUK */}
-                        <ModalComponent in_size_modal={`panel animate__animated my-7 w-full overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
-                            <div className="p-2">
-                                <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_refresh"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Refresh'} HandleClick={GetMasterProdukByKodeGerai} />
-                                <div className="mb-5">
-                                    {
-                                        data_rows_produk.length > 0 ?
-                                        <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows_produk} DataColumns={data_columns_produk} />
-                                        :
-                                        ''
-                                    }
+                        {
+                            IDReport === 'Initial' ?
+                            <>
+                            <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-2 md:grid-cols-2">
+                                <div>
+                                <InputTextType in_title={"Nik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNikInitial} in_value={IN_NIK_INITIAL} />
                                 </div>
-                                <div className="flex items-center justify-end gap-3 mt-8">
-                                    <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                <div>
+                                <InputTextType in_title={"Nama"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNamaInitial} in_value={IN_NAMA_INITIAL} />
+                                </div>                            
+                                <div>
+                                <InputTextType in_title={"Modal"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputUangModal} in_value={IN_UANG_MODAL} />
+                                </div>
+                                <div>
+                                <InputTextType in_title={"Uang Laci"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputUangLaci} in_value={IN_UANG_LACI} />
                                 </div>
                             </div>
-                        } />
+                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_submit_initial"} isLoading={LoadingButtonSubmit} isDisabled={isDisabledButtonSubmit} in_icon={<IconLogin />} in_title_button={'Submit Initial'} HandleClick={InsPosInitial} />
+                            </>
+                            :
+                            <>
+                            <div className="grid grid-cols-3 grid-rows-2 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
+                                <div className="col-span-2 row-span-2">
+                                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
+                                    <>
+                                    <div className="mt-3 datatables">
+                                        <DataTable
+                                            noRecordsText="No results match your search query"
+                                            highlightOnHover
+                                            className="table-hover whitespace-nowrap"
+                                            records={data_rows}
+                                            columns={data_columns}
+                                            minHeight={200}
+                                        />
+                                    </div>
+                                    <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
+                                            <div className="space-y-2 ltr:text-right rtl:text-left">
+                                                <div className="flex items-center text-lg">
+                                                    <div className="flex-1">Subtotal :</div>
+                                                    <div className="w-[37%]">{TotalBelanja}</div>
+                                                </div>
+                                                <div className="flex items-center text-lg">
+                                                    <div className="flex-1">Tax :</div>
+                                                    <div className="w-[37%]">{TotalPPN}</div>
+                                                </div>
+                                                <div className="flex items-center text-lg">
+                                                    <div className="flex-1">Discount :</div>
+                                                    <div className="w-[37%]">{TotalDiscount}</div>
+                                                </div>
+                                                <div className="flex items-center text-lg">
+                                                    <div className="flex-1">Shipping :</div>
+                                                    <div className="w-[37%]">{BiayaOngkir}</div>
+                                                </div>
+                                                <div className="flex items-center text-xl font-semibold">
+                                                    <div className="flex-1">Grand Total :</div>
+                                                    <div className="w-[37%]">{GrandTotal}</div>
+                                                </div>
+                                        </div>
+                                    </div> 
+                                    <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
+                                        <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_buat_sales_baru"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Create New Order'} HandleClick={CreateNewOrder} />
+                                        </div>
+                                        <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={null} />
+                                        </div>
+                                        <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSend />} in_title_button={'Submit Payment'} HandleClick={SubmitPayment} />
+                                        </div>
+                                    </div>
+                                    </>
+                                }
+                                />
+                                </div>
+                                <div>
+                                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
+                                    <>
+                                    <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
+                                        <div className="col-span-2">
+                                        <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} />
+                                        </div>
+                                        <div className="sm:grid-cols-1">
+                                        <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
+                                        <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />    
+                                        </div>
+                                        <div className="sm:grid-cols-1">
+                                        <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
+                                        </div>
+                                        <div className="sm:col-span-1">
+                                        <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyAddList} />
+                                        </div>
+                                        
+                                        <div className="sm:col-span-1">
+                                        <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyAddList} />
+                                        </div>
+                                        <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
+                                        <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
+                                        <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs' : 'btn btn-outline-success w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconPlusCircle />} in_title_button={'Add'} HandleClick={AddList} />
+                                        </div>
+                                        <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
+                                        </div>
+                                    </div>
+                                    </>
+                                } />
+                                </div>
+                            <div>
+                                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
+                                    <>
+                                    <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                        <div  className="col-span-2 sm:grid-cols-1">
+                                        <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={input4Ref} in_event_keydown={null}/>
+                                        </div>
+                                        <div  className="sm:grid-cols-1">
+                                        <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
+                                        </div>
+                                        <div  className="m:grid-cols-1">
+                                        <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
+                                        </div>
+                                    </div>
+                                    <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                        <div>
+                                        <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
+                                        </div>
+                                        <div>
+                                        <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Bank"} idComponent={"bank"} />
+                                        </div>
+                                    </div>
+                                    <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                        <div className="col-span-2">
+                                        <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
+                                        </div>
+                                    </div>
+                                    </>
+                                } />
+                            </div>
+                            </div>
+
+                            {/* OPEN MODAL MASTER PRODUK */}
+                            <ModalComponent in_size_modal={`panel animate__animated my-7 w-full overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                                <div className="p-2">
+                                    <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_refresh"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Refresh'} HandleClick={GetMasterProdukByKodeGerai} />
+                                    <div className="mb-5">
+                                        {
+                                            data_rows_produk.length > 0 ?
+                                            <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows_produk} DataColumns={data_columns_produk} />
+                                            :
+                                            ''
+                                        }
+                                    </div>
+                                    <div className="flex items-center justify-end gap-3 mt-8">
+                                        <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                    </div>
+                                </div>
+                            } />
+                            </>
+                        }        
+                        
                       </>
                     } />
                 </>
