@@ -28,7 +28,7 @@ const Retur_DC = () => {
                 </Link>
             </ul>
             </div>
-            <FormRetur IDReport="Retur DC" 
+            <FormRetur IDReport="Retur Item" 
                                     url={``}
                                     jenis={'8'}
                                     />

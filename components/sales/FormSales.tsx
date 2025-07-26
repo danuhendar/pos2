@@ -39,6 +39,9 @@ import IconXCircle from "../Icon/IconXCircle";
 import IconCircleCheck from "../Icon/IconCircleCheck";
 import IconCopy from "../Icon/IconCopy";
 import IconTrash from "../Icon/IconTrash";
+import { useReactToPrint } from 'react-to-print';
+import Receipt from "./PrintReceipt";
+import IconPrinter from "../Icon/IconPrinter";
 
 interface FormSalesProps {
     url: string,
@@ -85,6 +88,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [IN_TOTAL_BELANJA,setIN_TOTAL_BELANJA] = useState('')
     const [IN_BAYAR,setIN_BAYAR] = useState('')
     const [IN_KEMBALIAN,setIN_KEMBALIAN] = useState('')
+    const [IN_GENERATE_KODE_TRANSAKSI_INVENTORY,setIN_GENERATE_KODE_TRANSAKSI_INVENTORY] = useState('')
     const [OptionBank,setOptionBank] = useState([
         { value: 'BCA', label: 'BCA' },
         { value: 'BNI', label: 'BNI' },
@@ -94,6 +98,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         { value: 'DANA', label: 'DANA' },
         { value: 'OVO', label: 'OVO' },
         { value: 'GOPAY', label: 'GOPAY' },
+        { value: 'SPAY', label: 'SPAY' },
         { value: 'LINKAJA', label: 'LINKAJA' }
     ]);
     const [IN_BANK,setIN_BANK] = useState('')
@@ -122,7 +127,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [LoadingButtonSubmit,setLoadingButtonSubmit] = useState(false)
     const [isDisabledButtonSubmit,setisDisabledButtonSubmit] = useState(false)
     const [IN_SHIFT_INITIAL,setIN_SHIFT_INITIAL] = useState('')
-
+    const [IN_IS_CASH,setIN_IS_CASH] = useState(false)
+    const [IN_ALAMAT,setIN_ALAMAT] = useState('')
+    const [IN_NAMA_GERAI,setIN_NAMA_GERAI] = useState('')
+    const receiptRef = useRef();
+    const [dummyData, setDummyData] = useState({
+        items: []
+    });
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -140,7 +151,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         const kode_gerai = get_data_local_storage('kode_gerai');
         setIN_KODE_GERAI(kode_gerai)
          if(is_gerai === '1'){
-             GetPosInitialByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai)
+            GetPosInitialByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai)
+            GetMasterGeraiByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai);
         }else{
            
         }
@@ -161,14 +173,23 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     },[]);
 
    
-    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val); GetPosInitialByKodeGerai(IN_HOST,IN_PORT,val)};
+    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value; var sp_val = val.split('|'); var kode_gerai = sp_val[0]; setIN_KODE_GERAI(kode_gerai); var nama_gerai = sp_val[1]; setIN_NAMA_GERAI(nama_gerai); var alamat = sp_val[2]; setIN_ALAMAT(alamat); GetPosInitialByKodeGerai(IN_HOST,IN_PORT,kode_gerai)};
+    const FormInputAlamat  = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_ALAMAT(val); };
     const FormInputItem = (value: any) => {var val = value.target.value;setIN_BARCODE(val); };
     const FormInputDeskripsi = (value: any) => {var val = value.target.value;setIN_DESKRIPSI(val); };
     const FormInputSatuan = (value: any) => {var val = value.target.value;setIN_SATUAN(val); };
     const FormInputQty  = (event: { target: { value: any; }; }) => {var val = event.target.value;const validate_number = validateNumber(val);setIN_QTY(validate_number);  };
     const FormInputHPP = (value: any) => {var val = value.target.value;setIN_HPP(val); };
     const FormInputGross = (value: any) => {var val = value.target.value;setIN_GROSS(val); };
-    const FormInputMetodePembayaran = (value: any) => {var val = value.value;setIN_METODE_PEMBAYARAN(val); };
+    const FormInputMetodePembayaran = (value: any) => {var val = value.value;setIN_METODE_PEMBAYARAN(val);
+        if(val === 'CASH'){
+            // Do something for cash payment
+            setIN_IS_CASH(true)
+            setIN_BANK('')
+        }else{
+            setIN_IS_CASH(false)
+        }
+    };
     const FormInputKodeBarang = (value: any) => {var val = value.target.value;setIN_KODE_BARANG(val); };
     const FormInputTotalBelanja = (value: any) => {var val = value.target.value;setIN_TOTAL_BELANJA(val); };
     const FormInputBiayaOngkir = (value: any) => {
@@ -184,9 +205,28 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_BAYAR(val_currency); 
         const bayar = parseFloat(val_currency.split(',').join(''))
         const grand_total = parseFloat(GrandTotal.split(',').join(''))
-        const res_kembalian = bayar - grand_total;
-        //console.log('res_kembalian : '+res_kembalian)
-        setIN_KEMBALIAN(GetFormatCurrency(res_kembalian.toString()));
+        if(bayar < grand_total){
+            MySwal.fire({
+                title: t("Payment must be greater than or equal to the Grand Total"),
+                toast: true,
+                position: isRtl ? 'top-start' : 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                showCloseButton: true,
+                customClass: {
+                    popup: `color-warning`,
+                },
+            });
+            setIN_KEMBALIAN('0');
+            setisDisabledButtonPayment(true)
+            return;
+        }else{
+            const res_kembalian = bayar - grand_total;
+            //console.log('res_kembalian : '+res_kembalian)
+            setIN_KEMBALIAN(GetFormatCurrency(res_kembalian.toString()));
+            setisDisabledButtonPayment(false)
+        }
+       
     }
     const FormInputKembalian = (value: any) => {var val = value.target.value;setIN_KEMBALIAN(val); };
     const FormInputBank = (value: any) => {var val = value.value;setIN_BANK(val); };
@@ -210,7 +250,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         if (e.key === 'Enter') {
             // Move focus to input 3
             input1Ref.current.focus();
-            AddList();
+            AddList(IN_KODE_BARANG,IN_SATUAN,IN_DESKRIPSI,IN_QTY,IN_HPP,IN_GROSS,(IN_DISKON === '' ? '0' : IN_DISKON.split(',').join('')));
             setIN_BARCODE('')
             setIN_KODE_BARANG('')
             setIN_DESKRIPSI('')
@@ -251,7 +291,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 var rows = data_body[0].ROWS;
                 var arr_ = []
                 for(var i = 0;i<rows.length;i++){
-                    const obj = {"label":rows[i].KODE_GERAI+'-'+rows[i].CONTENT,"value":rows[i].KODE_GERAI}
+                    const obj = {"label":rows[i].KODE_GERAI+'-'+rows[i].CONTENT,"value":rows[i].KODE_GERAI+'|'+rows[i].CONTENT+'|'+rows[i].ALAMAT}
                     arr_.push(obj)
                 }
                 setOptionsGerai(arr_)
@@ -286,11 +326,55 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         });
     }
-    const GetMasterProdukByBarcode = async () => {
+    const GetMasterGeraiByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string) => {
+       
+        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGeraiByKodeGerai`
+        let param = {"IN_KODE_GERAI":in_kode_gerai}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                setIN_ALAMAT(data_body[0].ALAMAT)
+                
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
+    const GetMasterProdukByBarcode = () => {
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByBarcode`
         let param = {"IN_BARCODE":IN_BARCODE,"IN_KODE_GERAI":IN_KODE_GERAI}
         const Token = GetToken()
-        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+        Posts(url,JSON.stringify(param),false,Token).then(async (response) => {
             const res_data = response;
             var code = res_data.code;
             var msg = res_data.msg;
@@ -303,6 +387,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     setIN_SATUAN(data_body[0].SATUAN)
                     setIN_HPP(data_body[0].HPP)
                     setIN_GROSS(data_body[0].GROSS)
+                    setIN_QTY('1')
+                    AddList(data_body[0].KODE_BARANG,data_body[0].SATUAN,data_body[0].CONTENT,'1',data_body[0].HPP,data_body[0].GROSS,'0');
                 }else if(data_body.length > 1){
                         MySwal.fire({
                         title: t("Data Item More Than 1, Check Item or Select Item Manually"),
@@ -363,9 +449,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const GetPosInitialByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string) => {
         try{
             let url = `http://${in_host}:${in_port}/api/v2/GetPosInitialByKodeGerai`
-            let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT}
-            console.log('GetPosInitialByKodeGerai : '+url)
-            console.log('GetPosInitialByKodeGerai : '+JSON.stringify(param))
+            let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT,"IN_TANGGAL":get_format_tanggal_jam().substring(0,10)}
             const Token = GetToken()
             setLoadingButton(true)
             setisDisabled(true)
@@ -378,6 +462,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     var data_body = res_data.data;
                     if(data_body.length > 0){
                        setIN_KODE_INITIAL(data_body[0].KODE_INITIAL)
+                       setIN_SHIFT(data_body[0].SHIFT)
                     }else{
                         Swal.fire({
                             title: t("Warning"),
@@ -465,7 +550,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         }
     }   
     const deleteRow = (idToRemove: number) => {
+        console.log('deleteRow : '+idToRemove)
         setData_rows((prev) => prev.filter((data_rows) => data_rows.id !== idToRemove));
+        console.log('row now : '+JSON.stringify(data_rows))
     };    
     const Def_Column_Transaksi_Inventory = () => {
         var cols = [
@@ -675,25 +762,42 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_METODE_PEMBAYARAN('')
         setIN_SHIFT('')
         setIN_KODE_INITIAL('')
-        input1Ref.current.focus();
+        setIN_BARCODE('')
+        setIN_GENERATE_KODE_TRANSAKSI_INVENTORY('')
+        try{
+            input1Ref.current.focus();
+        }catch(Ex){
+            console.log('input1Ref not found')
+        }
+        
     }
 
-    const AddList = () => {
+    const AddList = (res_kode_barang:string,res_satuan:string,res_deskripsi:string,res_qty:string,res_hpp:string,res_gross:string,res_diskon:string) => {
         try{
             //-- scan barcode --//
-            const res_kode_barang = IN_KODE_BARANG
-            const res_satuan = IN_SATUAN
-            const res_deskripsi = IN_DESKRIPSI
-            const res_qty = IN_QTY
-            const res_hpp = IN_HPP
-            const res_gross = IN_GROSS
-            const res_diskon = IN_DISKON === '' ? '0' : IN_DISKON.split(',').join('')
-            const res_amount = (parseFloat(res_qty.split(',').join('')) * parseFloat(res_gross.split(',').join('')) ) - parseFloat(res_diskon.split(',').join(''));
+            // res_kode_barang = IN_KODE_BARANG
+            // res_satuan = IN_SATUAN
+            // res_deskripsi = IN_DESKRIPSI
+            // res_qty = IN_QTY === '' ? '0' : IN_QTY.split(',').join('')
+            // res_hpp = IN_HPP
+            // res_gross = IN_GROSS
+            // res_diskon = IN_DISKON === '' ? '0' : IN_DISKON.split(',').join('')
             const objIndex = data_rows.findIndex(((obj: { KODE_BARANG: any; }) => obj.KODE_BARANG == res_kode_barang));
+            var qty_before = 0
+            try{
+                qty_before  = parseFloat(data_rows[objIndex].QTY.split(',').join(''));
+            }catch(Ex){
+                qty_before = 0
+            }
+            
+            res_qty = (parseFloat(res_qty.split(',').join('')) + qty_before).toString();
+            const res_amount = (parseFloat(res_qty.split(',').join('')) * parseFloat(res_gross.split(',').join('')) ) - parseFloat(res_diskon.split(',').join(''));
+            
             // console.log('objIndex',objIndex)
             //-- cek apakah item sudah ada di list --//
             //-- jika item belum ada di list --//
             if(objIndex === -1){
+                console.log('objIndex : '+objIndex+' belum ada di list')
                 if(res_kode_barang !== '' || res_satuan !== '' || res_deskripsi !== '' || res_qty !== '' || res_hpp !== '' || res_gross !== ''){
                     const obj = {"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty,"DISKON":res_diskon,"PRICE":res_amount,"GROSS":res_gross}
                     arr_input_item.push(obj)
@@ -709,6 +813,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 data_rows[objIndex].KODE_BARANG = res_kode_barang;
                 data_rows[objIndex].DESKRIPSI = res_deskripsi;
                 data_rows[objIndex].SATUAN = res_satuan;
+
+              
+                
                 data_rows[objIndex].QTY = res_qty;
                 data_rows[objIndex].DISKON = res_diskon;
                 data_rows[objIndex].PRICE = res_amount;
@@ -742,6 +849,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
             setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
         }catch(Ex){
+            console.log(Ex)
             Swal.fire({
                 title: t("Warning"),
                 text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
@@ -818,6 +926,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             const text = await navigator.clipboard.readText();
             if(text !== ''){
                 setIN_BARCODE(text);
+                setIN_DESKRIPSI('')
+                setIN_KODE_BARANG('')
+                setIN_SATUAN('')
+                setIN_QTY('')
+                setIN_HPP('')
+                setIN_GROSS('')
+                setIN_DISKON('')
             }else{
                 setIN_BARCODE('');
             }
@@ -892,6 +1007,16 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             }
                             detail.push(obj)
                         }
+                        const r = {
+                                // items: [
+                                // { name: 'Indomie Goreng', qty: 2, gross:1000, price: 2000 },
+                                // { name: 'Teh Botol', qty: 1, gross:4000,price: 4000 },
+                                // ],
+                                items: detail,
+                            };
+                            console.log(JSON.stringify(r))
+                            setDummyData(r);
+                            setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(kode_transaksi_inventory.toString());
                         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
                         let param = {
                                         "IN_KODE_INITIAL": IN_KODE_INITIAL,
@@ -913,7 +1038,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         "IN_DETAIL":detail
                                     }
                         const Token = GetToken()
-                        console.log(JSON.stringify(param))
+                        //console.log(JSON.stringify(param))
                         setLoadingButtonPayment(true)
                         setisDisabledButtonPayment(true)
                         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -922,6 +1047,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             var msg = res_data.msg;
                             if(parseFloat(code) === 200){
                                 var data_body = res_data.data;
+                            
+                             
                                 Swal.fire({
                                     title: t("Information"),
                                     text: ""+parseFloat(code)+"-"+msg,
@@ -929,6 +1056,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     padding: '2em',
                                     customClass: 'sweet-alerts'
                                 });
+                                handlePrint()
                                 CreateNewOrder()
                                 
                                 setLoadingButtonPayment(false)
@@ -1142,7 +1270,196 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             }
         });
     }
- 
+
+    const InsPendingSales = () => {
+        Swal.fire({
+            icon: "question",
+            title: t("Confirmation"),
+            text: t("Are you sure for")+" "+t("save data to pending sales")+" ?",
+            showDenyButton: true,
+            confirmButtonText: "Ya",
+            denyButtonText: "Tidak",
+            padding: '2em',
+            customClass: 'sweet-alerts'
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                try{
+                    //-- proses simpan data pending sales --//
+                    GetGenerateKodeTransaksiInventory().then((d)=>{
+                        const kode_transaksi_inventory = d;
+                        var today = new Date();
+                        var bulan = today.getMonth()+1;
+                        var detail = [];
+                        for(var i = 0;i<data_rows.length;i++){
+                            const obj = {
+                                "IN_KODE_BARANG": data_rows[i].KODE_BARANG,
+                                "IN_DESKRIPSI": data_rows[i].DESKRIPSI,
+                                "IN_SATUAN": data_rows[i].SATUAN,
+                                "IN_HPP": data_rows[i].GROSS,
+                                "IN_PPN": "0",
+                                "IN_GROSS": data_rows[i].GROSS,
+                                "IN_QTY": data_rows[i].QTY,
+                                "IN_DISKON": data_rows[i].DISKON,
+                                "IN_PRICE": data_rows[i].PRICE,
+                                "IN_IS_HADIAH": 0,
+                                "IN_KODE_PROMO": 0,
+                                "IN_IS_RETUR_ITEM": 0
+                            }
+                            detail.push(obj)
+                        }
+                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
+                        let param = {
+                                        "IN_KODE_INITIAL": IN_KODE_INITIAL,
+                                        "IN_KODE_GERAI": IN_KODE_GERAI,
+                                        "IN_JENIS": jenis,
+                                        "IN_TANGGAL": get_format_tanggal_jam(),
+                                        "IN_TAHUN": get_format_tanggal_jam().substring(0,4),
+                                        "IN_BULAN": bulan,
+                                        "IN_METODE_BAYAR": (IN_METODE_PEMBAYARAN === '' ? '0' : IN_METODE_PEMBAYARAN),
+                                        "IN_TOTAL_BELANJA": (GrandTotal === '' ? '0' : GrandTotal.split(',').join('')),
+                                        "IN_BAYAR": (IN_BAYAR === '' ? '0' : IN_BAYAR.split(',').join('')),
+                                        "IN_KEMBALIAN": (IN_KEMBALIAN === '' ? '0' : IN_KEMBALIAN.split(',').join('')),
+                                        "IN_IS_STATUS": 0,
+                                        "IN_OTORISATOR_VOID": "-",
+                                        "IN_APP": themeConfig.versi_app,
+                                        "IN_BANK": (IN_BANK === '' ? '0' : IN_BANK.split(',').join('')),
+                                        "IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,
+                                        "IN_KODE_TRANSAKSI_INVENTORY":kode_transaksi_inventory,
+                                        "IN_DETAIL":detail
+                                    }
+                        const Token = GetToken()
+                        console.log(JSON.stringify(param))
+                        setLoadingButtonPayment(true)
+                        setisDisabledButtonPayment(true)
+                        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                            const res_data = response;
+                            var code = res_data.code;
+                            var msg = res_data.msg;
+                            if(parseFloat(code) === 200){
+                                var data_body = res_data.data;
+                                Swal.fire({
+                                    title: t("Information"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "success",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                CreateNewOrder()
+                                
+                                setLoadingButtonPayment(false)
+                                setisDisabledButtonPayment(false)
+                            }else if(code.toString().substring(0,1) === '4'){
+                                if(code === 401 && msg.includes("Invalid")){
+                                    Swal.fire({
+                                        title: t("Warning"),
+                                        text: ""+parseFloat(code)+"-"+msg,
+                                        icon: "warning",
+                                        padding: '2em',
+                                        customClass: 'sweet-alerts'
+                                    });
+                                }else if(code === 403){
+                                    if(IN_SHIFT === ''){
+                                        MySwal.fire({
+                                            title: t(""+parseFloat(code)+"-"+msg),
+                                            toast: true,
+                                            position: isRtl ? 'top-start' : 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 5000,
+                                            showCloseButton: true,
+                                            customClass: {
+                                                popup: `color-warning`,
+                                            },
+                                        });
+                                        
+                                    }else{
+                                        MySwal.fire({
+                                            title: t("Data initial for shift "+IN_SHIFT+" not found!"),
+                                            toast: true,
+                                            position: isRtl ? 'top-start' : 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 5000,
+                                            showCloseButton: true,
+                                            customClass: {
+                                                popup: `color-warning`,
+                                            },
+                                        });
+                                    }
+                                }
+                                
+                                setLoadingButtonPayment(false)
+                                setisDisabledButtonPayment(false)
+                            }else{
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: ""+parseFloat(code)+"-"+msg,
+                                    icon: "warning",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                setLoadingButtonPayment(false)
+                                setisDisabledButtonPayment(false)
+                            }
+                        }).catch((error) => {
+                            console.log(error)
+                            Swal.fire({
+                                title: t("Warning"),
+                                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                                icon: "warning",
+                                padding: '2em',
+                                customClass: 'sweet-alerts'
+                            });
+                            setLoadingButtonPayment(false)
+                            setisDisabledButtonPayment(false)
+                        });
+                    }).catch((e)=>{
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: "401-Error : Generate Kode, Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                        setLoadingButton(false)
+                        setisDisabled(false)
+                    });
+                }catch(Ex){
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                    setLoadingButtonSubmit(false)
+                    setisDisabledButtonSubmit(false)
+                }
+            }
+        });
+    }
+    
+    const GetHandlePrint = () => {
+        if(IN_BAYAR === null || IN_BAYAR === '' || IN_BAYAR === '0' || IN_BAYAR === '0.00'){
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Receipt not found, please check your data input!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        }else{
+            handlePrint()
+        }
+    }
+    const handlePrint = useReactToPrint({
+        content: () => receiptRef.current,
+    });
+    // const dummyData = {
+    //     items: [
+    //         { IN_DESKRIPSI: 'Indomie Goreng', IN_QTY: 2, IN_GROSS:1000, IN_PRICE: 2000 },
+    //         { IN_DESKRIPSI: 'Teh Botol', IN_QTY: 1, IN_GROSS:4000, IN_PRICE: 4000 },
+    //     ],
+    // };
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -1160,13 +1477,23 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-2 md:grid-cols-2">
                             {
                                 IN_IS_GERAI === '0' ?
+                                <>
                                 <div>
                                 <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
+                                <div>
+                                <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
+                                </div>
+                                </>
                                 :
+                                <>
                                 <div>
                                 <InputTextType in_title={"Gerai"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiMutasi} in_value={IN_KODE_GERAI} />
                                 </div>
+                                <div>
+                                <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
+                                </div>
+                                </>
                             }
                             {
                                 IDReport === 'Initial' ?
@@ -1241,7 +1568,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_buat_sales_baru"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Create New Order'} HandleClick={CreateNewOrder} />
                                         </div>
                                         <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={null} />
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={InsPendingSales} />
                                         </div>
                                         <div>
                                             <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSend />} in_title_button={'Submit Payment'} HandleClick={SubmitPayment} />
@@ -1274,17 +1601,15 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         </div>
                                         <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
                                         <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
-                                        <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs' : 'btn btn-outline-success w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconPlusCircle />} in_title_button={'Add'} HandleClick={AddList} />
-                                        </div>
-                                        <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
-                                        </div>
+                                    </div>
+                                    <div>
+                                        <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
                                     </div>
                                     </>
                                 } />
                                 </div>
-                            <div>
+                                {/* INPUT PAYMENT */}
+                                <div className="-mt-1">
                                 <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
                                     <>
                                     <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
@@ -1303,17 +1628,23 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
                                         </div>
                                         <div>
-                                        <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Bank"} idComponent={"bank"} />
+                                        <DropDownGlobal  in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Bank"} idComponent={"bank"} />
                                         </div>
                                     </div>
                                     <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                        <div className="col-span-2">
+                                        <div>
                                         <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
+                                        </div>
+                                        <div>
+                                        <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
+                                        </div>
+                                        <div className="hidden">
+                                            <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} />
                                         </div>
                                     </div>
                                     </>
                                 } />
-                            </div>
+                                </div>
                             </div>
 
                             {/* OPEN MODAL MASTER PRODUK */}

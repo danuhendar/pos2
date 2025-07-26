@@ -14,6 +14,7 @@ import * as Excel from 'exceljs';
 import FileSaver from 'file-saver';
 import { Gets } from './get';
 import JsBarcode from 'jsbarcode';
+import QRCode from "qrcode";
 export const GenerateUniqNumber = () =>{
     const uniq_number = parseFloat(Math.floor(new Date().valueOf() * Math.random()).toString().substring(0,6));
     return uniq_number;
@@ -838,6 +839,53 @@ export function get_format_tanggal_jam(){
     return hasil;
 }
 
+export function get_format_tanggal_jam_format_indo(){
+    var today = new Date();
+    var bulan = today.getMonth()+1;
+    var res_bulan = "";
+    if(bulan<10){
+        res_bulan = "0"+bulan;
+    }else{
+        res_bulan = ""+bulan;
+    }
+
+    var menit = today.getMinutes();
+    var res_menit = "";
+    if(menit<10){
+        res_menit = "0"+menit;
+    }else{
+        res_menit = ""+menit;
+    }
+
+    var detik = today.getSeconds()+1;
+    var res_detik = "";
+    if(detik<10){
+        res_detik = "0"+detik;
+    }else{
+        res_detik = ""+detik;
+    }
+
+    var tanggal = today.getDate();
+    var res_tanggal = "";
+    if(tanggal<10){
+        res_tanggal = "0"+tanggal;
+    }else{
+        res_tanggal = ""+tanggal;
+    }
+
+    var jam = today.getHours();
+    var res_jam = "";
+    if(jam<10){
+        res_jam = "0"+jam;
+    }else{
+        res_jam = ""+jam;
+    }
+    var date = res_tanggal+'-'+res_bulan+'-'+today.getFullYear();
+    var time = res_jam+':'+res_menit+':'+res_detik;
+    var hasil = date + ' '+ time;
+    return hasil;
+}
+
 export function get_format_tanggal_jam_substract(in_hour_substract:number){
     var today = new Date();
     var bulan = today.getMonth()+1;
@@ -1161,9 +1209,16 @@ export function GetCommandPowershell(in_command:string,timeout_command:number){
     return awal;
 }
 
-export function textToBase64Barcode(text:string){
+export function textToBase64Barcode(text:string,format:string){
   //var JsBarcode = require('jsbarcode');
   var canvas = document.createElement("canvas");
-  JsBarcode(canvas, text, {format: "CODE39"});
+  JsBarcode(canvas, text, {format: format});
   return canvas.toDataURL("image/png");
+}
+
+
+export function textToBase64QR(text: string){
+    var canvas = document.createElement("canvas");
+    QRCode.toCanvas(canvas, text, {margin: 1, width: 200});
+    return canvas.toDataURL("image/png");
 }

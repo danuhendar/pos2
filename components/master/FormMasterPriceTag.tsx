@@ -53,6 +53,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
     const [options7,setOptions7] = useState([])
     const [IN_KATEGORI,setIN_KATEGORI] = useState([])
     const [IN_KODE_GERAI,setIN_KODE_GERAI] = useState('')
+	const [ISCOMBO_GERAI,setIN_ISCOMBO_GERAI] = useState(false)
     
     
     useEffect(() => {
@@ -62,10 +63,12 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
         setPORT(res_PORT_LOGIN)
         GetMasterKategoriProduk(res_host,res_PORT_LOGIN)
         const kode_gerai = get_data_local_storage('kode_gerai')
-        if(kode_gerai === '%'){
+        if(kode_gerai === '%' || kode_gerai === ''){
             GetMasterGerai(res_host,res_PORT_LOGIN)
+			setIN_ISCOMBO_GERAI(true)
         }else{
             setIN_KODE_GERAI(kode_gerai)    
+			setIN_ISCOMBO_GERAI(false)
         }
         
     },[]);
@@ -250,7 +253,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
                         <>
                         <div className="grid gap-3 lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-1 xs:grid-cols-1">
                             {
-                                get_data_local_storage('kode_gerai')  === '%' ?
+                                ISCOMBO_GERAI ?
                                 <div>
                                 <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>

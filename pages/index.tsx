@@ -123,7 +123,7 @@ const LoginCover = () => {
                             <div className="relative flex w-full flex-col items-center justify-center gap-6 px-4 pb-16 pt-6 sm:px-6 lg:max-w-[667px]">
                                 <div className="flex items-center w-full gap-2 lg:absolute lg:end-6 lg:top-6 lg:max-w-full">
                                     <Link href="/" className="items-end block w-48 lg:hidden">
-                                        <img src="/assets/images/idm_200_71.svg" alt="Logo" className="w-full" />
+                                        <img src="/assets/images/segaricon logo (sementara).svg" alt="Logo" className="w-full" />
                                     </Link>
                                 </div>
                                 <div className="w-full max-w-[440px] lg:mt-13">

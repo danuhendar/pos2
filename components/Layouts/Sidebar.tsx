@@ -67,8 +67,7 @@ const Sidebar = () => {
                 <div className="h-full bg-white dark:bg-black">
                     <div className="flex items-center justify-between px-4 py-3 bg-primary">
                         {/* <Link href="/" className="flex items-center main-logo shrink-0"> */}
-                            {/* <img className="ml-[5px] w-8 flex-none" src="/assets/images/idm_200_71.svg" alt="logo" /> */}
-                            <img className="w-20 ml-[5px] flex-none" src="/assets/images/idm_200_71.svg" alt="logo" />
+                            <img className="w-20 ml-[5px] flex-none" src="/assets/images/segaricon logo (sementara).svg" alt="logo" />
                             <span className="align-middle text-1.5xl font-semibold ltr:ml-1.5 rtl:mr-1.5 text-white dark:text-white-light lg:inline">POS</span>
                         {/* </Link> */}
                         <button

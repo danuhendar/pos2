@@ -783,7 +783,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                     sortable: true,
                     render: ({ BARCODE }) => (
                         <div className="flex items-center gap-2">
-                            <Image alt="No Barcode" width={500} height={400} quality={10} src={textToBase64Barcode(BARCODE)} />
+                            <Image alt="No Barcode" width={500} height={400} quality={10} src={textToBase64Barcode(BARCODE,'CODE39')} />
                         </div>
                     ),
                 },

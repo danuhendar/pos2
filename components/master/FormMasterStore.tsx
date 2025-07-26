@@ -20,6 +20,7 @@ import ModalComponent from "../modal/ModalComponent";
 import InputTextType from "../form/InputTypeText";
 import IconXCircle from "../Icon/IconXCircle";
 import IconSave from "../Icon/IconSave";
+import DropDownGlobal from "../dropdown/DropDownGlobal";
 interface FormMasterStoreProps {
     url: string,
     command: string,
@@ -42,18 +43,20 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const [modal15,setModal15] = useState(false)
     const [IN_KODE_SATUAN,setIN_KODE_SATUAN] = useState('')
     const [Title,setTitle] = useState('')
-    const [IN_BRANCH,setIN_BRANCH] = useState('G001')
+    const [IN_BRANCH,setIN_BRANCH] = useState('')
     const [IN_STORE,setIN_STORE] = useState('')
     const [IN_CONTENT,setIN_CONTENT] = useState('')
     const [CheckedISActive,setCheckedISActive] = useState(false)
     const [IN_KODE_CABANG,setIN_KODE_CABANG] = useState('')
-
+	const [OptionBranch,setOptionBranch] = useState([])
+    const [IN_ALAMAT,setIN_ALAMAT] = useState('')
     
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
         setHOST(res_host)
         setPORT(res_PORT_LOGIN)
+		GetDataMasterCabangForCombo(res_host,res_PORT_LOGIN)
     },[]);
 
     const FormInputBranch = (event: { target: { value: any; }; }) => {
@@ -67,6 +70,10 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const FormInputContent = (event: { target: { value: any; }; }) => {
         var val = event.target.value;
         setIN_CONTENT(val);  
+    };
+    const FormInputAlamat = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        setIN_ALAMAT(val);  
     };
     const FormInputKodeCabang = (event: { target: { value: any; }; }) => {
         var val = event.target.value;
@@ -82,6 +89,61 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         setCheckedISActive(!CheckedISActive);  
         console.log(!CheckedISActive)
     };
+	
+	
+	const FormSelectBranch = (value: any) => {var val = value.value;setIN_BRANCH(val);};
+	
+	const GetDataMasterCabangForCombo = (in_host:string,in_port:number) => {
+        let url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+        let param = {}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS;
+				var arr_ = []
+                for(var i = 0;i<rows.length;i++){
+					const obj = {"label":rows[i].KODE_CABANG+"-"+rows[i].CONTENT,"value":rows[i].KODE_CABANG}
+					arr_.push(obj)
+				}
+				setOptionBranch(arr_)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+               
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            
+        });
+    } 
     
     
     const DelData = (IN_KODE_GERAI:any) => {
@@ -195,10 +257,12 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         
    
     }
-    const showModal = (IDReport:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string) => {
+    const showModal = (IDReport:string,IN_KODE_CABANG:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string,IN_ALAMAT:string) => {
         setModal13(true)
+        setIN_BRANCH(IN_KODE_CABANG)
         setIN_STORE(IN_KODE_GERAI)
         setIN_CONTENT(IN_CONTENT)
+        setIN_ALAMAT(IN_ALAMAT)
         const res_is_active = (IN_STATUS === 'AKTIF' ? true : false)
         setCheckedISActive(res_is_active)
         setTitle('Form : '+IDReport)
@@ -230,7 +294,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             if (result.isConfirmed) {
                 const InputNik = get_data_local_storage('nik')
                 const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterGerai`
-                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik}
+                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik,"IN_ALAMAT": IN_ALAMAT}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
                     const res_data = response;
@@ -457,10 +521,10 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     accessor: 'id',
                     title: 'ACTION',
                     sortable: true,
-                    render: ({ KODE_GERAI,CONTENT,STATUS }) => (
+                    render: ({ KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT }) => (
                         <div className="flex flex-row gap-2">
                             <div className="mt-1">
-                                <a onClick={() => {showModal(' Edit '+IDReport,KODE_GERAI,CONTENT,STATUS)}} data-twe-toggle="tooltip" title="Edit Data">
+                                <a onClick={() => {showModal(' Edit '+IDReport,KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT)}} data-twe-toggle="tooltip" title="Edit Data">
                                     <span className="text-warning"><IconPencil  /></span>
                                 </a>
                             </div>
@@ -483,6 +547,16 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     ),
                 },
                 {
+                    accessor: 'KODE_CABANG',
+                    title: 'BRANCH',
+                    sortable: true,
+                    render: ({ KODE_CABANG }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_CABANG}</div>
+                        </div>
+                    ),
+                },
+                {
                     accessor: 'KODE_GERAI',
                     title: 'STORE',
                     sortable: true,
@@ -499,6 +573,16 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     render: ({ CONTENT }) => (
                         <div className="flex items-center gap-2">
                             <div className="font-semibold">{CONTENT}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'ALAMAT',
+                    title: 'ADDRESS',
+                    sortable: true,
+                    render: ({ ALAMAT }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{ALAMAT}</div>
                         </div>
                     ),
                 },
@@ -703,7 +787,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     }
 
     const GetDataMasterCabang = (in_host:string,in_port:number) => {
-         setData_rows([])
+        setData_rows([])
         setData_columns([])
         
         let url = ""
@@ -892,9 +976,15 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
                         <div className="p-2">
                             <div className="mb-5">
-                                <InputTextType   in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBranch} in_value={IN_BRANCH} />
+								{
+									Title.includes("Form Add") ? 
+									<DropDownGlobal  in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionBranch} isSearchable={true} isMulti={false} event={FormSelectBranch} name_component={"Branch"} idComponent={"branch"} />
+									:
+									<InputTextType    in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBranch} in_value={IN_BRANCH} />
+								}
                                 <InputTextType   in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputStore} in_value={IN_STORE} />
                                 <InputTextType   in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
+                                <InputTextType   in_title={"Alamat"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputAlamat} in_value={IN_ALAMAT} />
                                 <label>IS Active</label>
                                 <label className="relative w-12 h-6">
                                     <input checked={CheckedISActive} onChange={FormISActive} type="checkbox" className="absolute z-10 w-full h-full opacity-0 cursor-pointer custom_switch peer" id="custom_switch_checkbox1" />

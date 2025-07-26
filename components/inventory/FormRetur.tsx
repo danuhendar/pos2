@@ -52,6 +52,7 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
     const [IN_RESULT_SELECTED_MANUAL,setIN_RESULT_SELECTED_MANUAL] = useState('')
     const [IN_QTY,setIN_QTY] = useState('')
     const [IN_METODE,setIN_METODE] = useState('')
+    const [IN_METODE_RETUR,setIN_METODE_RETUR] = useState('9') // 9 = Retur to Supplier, 8 = Retur to Distribution Center   
     const [IN_BARCODE,setIN_BARCODE] = useState('')
     const [IN_RESULT_SCAN_KODE_BARANG,setIN_RESULT_SCAN_KODE_BARANG] = useState('')
     const [IN_RESULT_SCAN_DESKRIPSI,setIN_RESULT_SCAN_DESKRIPSI] = useState('')
@@ -79,9 +80,13 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
 
     const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_TUJUAN(val); GetMasterProdukByKodeProdukAndKodeGerai(val+"%") };
     const FormInputSupplier = (value: any) => {var val = value.value;setIN_ASAL(val);  };
+
+    
     const FormInputNikPembuat = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NIK_PEMBUAT(val);  };
     const FormInputItem = (value: any) => {var val = value.value;setIN_RESULT_SELECTED_MANUAL(val);   };
+    const FormInputDC = (value: any) => {var val = value.value;setIN_ASAL(val);  };
     const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_METODE(val);  };
+    const FormInputSelectMetodeRetur = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_METODE_RETUR(val);  };
     const input1Ref = useRef(null);
     const input2Ref = useRef(null);
     const KeyDown = (e: { key: string; }) => {
@@ -603,14 +608,17 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                         <>
                         <InputTextType   in_title={"Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
+                    
+                        <InputCheckBoxFilterType event={FormInputSelectMetodeRetur} in_title={"Type Retur"} in_value_1={"9"} in_value_2={"8"} in_name_1={"Retur to Supplier"} in_name_2={"Retur to Distribution Center"} in_name_component_1={"is_tipe_retur"} in_name_component_2={"is_tipe_retur"} />                
+                        
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
                             <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
                             </div>
                             <div>
                                 {
-                                    IDReport === 'Retur DC' ? 
-                                    <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Distribution Center"} idComponent={"DC"} />
+                                    IN_METODE_RETUR === '8' ? 
+                                    <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputDC} name_component={"Distribution Center"} idComponent={"DC"} />
                                     :
                                     <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
                                 }

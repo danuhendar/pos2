@@ -440,6 +440,18 @@ const [data_rows, setData_rows] = useState([]);
                                 },
                             });
                         }
+                    }else{
+                        MySwal.fire({
+                            title: t(""+parseFloat(code)+"-"+msg),
+                            toast: true,
+                            position: isRtl ? 'top-start' : 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            showCloseButton: true,
+                            customClass: {
+                                popup: `color-warning`,
+                            },
+                        });
                     }
                     
                     setLoadingButton(false)
