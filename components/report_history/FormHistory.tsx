@@ -18,6 +18,10 @@ import CardComponent from "../form/CardComponent";
 import IconPrinter from "../Icon/IconPrinter";
 import IconPaperclip from "../Icon/IconPaperclip";
 import DatePicker from "../datepicker/DatePicker";
+import IconCircleCheck from "../Icon/IconCircleCheck";
+import IconXCircle from "../Icon/IconXCircle";
+import { useReactToPrint } from "react-to-print";
+import Receipt from "../sales/PrintReceipt";
 
 interface FormHistoryProps {
     url: string,
@@ -41,24 +45,34 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const [IN_KODE_GERAI,setIN_KODE_GERAI] = useState('')
     const curdate = get_format_tanggal_jam().substring(0,16);
     const [date2, setDate2] = useState<any>(curdate);
-    
+
+    const [IN_NAMA_GERAI,setIN_NAMA_GERAI] = useState('')
+    const [IN_ALAMAT,setIN_ALAMAT] = useState('')
+    const [IN_NAMA_PEMBUAT,setIN_NAMA_PEMBUAT] = useState('')
+    const [IN_SHIFT,setIN_SHIFT] = useState('')
+    const [IN_BAYAR,setIN_BAYAR] = useState('')
+    const [IN_KEMBALIAN,setIN_KEMBALIAN] = useState('')
+    const [IN_TANGGAL_STRUK,setIN_TANGGAL_STRUK] = useState('')
+    const [IN_GENERATE_KODE_TRANSAKSI_INVENTORY,setIN_GENERATE_KODE_TRANSAKSI_INVENTORY] = useState('')
+    const [GrandTotal,setGrandTotal] = useState('0');
+    const receiptRef = useRef();
+    const [dummyData, setDummyData] = useState({
+        items: []
+    });
     
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
         setHOST(res_host)
         setPORT(res_PORT_LOGIN)
-        
         const kode_gerai = get_data_local_storage('kode_gerai')
         if(kode_gerai === '%'){
             GetMasterGerai(res_host,res_PORT_LOGIN)
         }else{
             setIN_KODE_GERAI(kode_gerai)    
         }
-        
     },[]);
-    const FormInputKodeGerai = (value: any) => {var val = value.value;setIN_KODE_GERAI(val);};
-
+    const FormInputKodeGerai = (value: any) => {var val = value.value;var sp = val.split('|');setIN_KODE_GERAI(sp[0]); setIN_NAMA_GERAI(sp[1]); setIN_ALAMAT(sp[2]);};
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
         let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
@@ -73,7 +87,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 var rows = data_body[0].ROWS;
                 var arr_ = []
                 for(var i = 0;i<rows.length;i++){
-                    const obj = {"label":rows[i].KODE_GERAI+'-'+rows[i].CONTENT,"value":rows[i].KODE_GERAI}
+                    const obj = {"label":rows[i].KODE_GERAI+'-'+rows[i].CONTENT,"value":rows[i].KODE_GERAI+"|"+rows[i].CONTENT+"|"+rows[i].ALAMAT}
                     arr_.push(obj)
                 }
                 setOptions7(arr_)
@@ -109,8 +123,145 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         });
     }
 
+    const handlePrint = useReactToPrint({
+            content: () => receiptRef.current,
+    });
+
+    const GetHandlePrint = (no_struk:string,total_belanja:number,bayar:number,kembalian:number) => {
+        
+        
+        const in_bayar = GetFormatCurrency(""+bayar)
+        console.log("in_bayar : "+in_bayar)
+        const in_kembali = GetFormatCurrency(""+kembalian)
+        console.log("in_kembali : "+in_kembali)
+        const in_no_struk = no_struk
+        console.log("in_no_struk : "+in_no_struk)
+        const in_total_belanja = GetFormatCurrency(""+total_belanja)
+        console.log("in_total_belanja : "+in_total_belanja)
+        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
+        const param = {"IN_NO_STRUK":no_struk}
+        const Token = GetToken()
+        setLoadingButton(true)
+        setisDisabled(true)
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var summary = data_body[0].SUMMARY;
+                console.log(JSON.stringify(summary))
+                console.log('nama_pembuat : '+summary[0].NAMA_PEMBUAT)
+                setIN_NAMA_PEMBUAT(summary[0].NAMA_PEMBUAT)
+                setIN_SHIFT(summary[0].SHIFT)
+                console.log('shift : '+summary[0].SHIFT)
+                setIN_TANGGAL_STRUK(summary[0].TANGGAL)
+                console.log('tanggal : '+summary[0].TANGGAL)
+                var rdetail = data_body[0].DETAIL;
+                var detail = [];
+                for(var i = 0;i<rdetail.length;i++){
+                    const obj = {
+                        "IN_KODE_BARANG": rdetail[i].KODE_BARANG,
+                        "IN_DESKRIPSI": rdetail[i].DESKRIPSI,
+                        "IN_SATUAN": rdetail[i].SATUAN,
+                        "IN_HPP": rdetail[i].GROSS,
+                        "IN_PPN": "0",
+                        "IN_GROSS": rdetail[i].GROSS,
+                        "IN_QTY": rdetail[i].QTY,
+                        "IN_DISKON": rdetail[i].DISKON,
+                        "IN_PRICE": rdetail[i].PRICE,
+                        "IN_IS_HADIAH": 0,
+                        "IN_KODE_PROMO": 0,
+                        "IN_IS_RETUR_ITEM": 0
+                    }
+                    detail.push(obj)
+                }
+                if(detail.length > 0){ 
+                    const r = {
+                        items: detail,
+                    };
+                    console.log(JSON.stringify(r))
+                    setDummyData(r);
+                    setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(in_no_struk)
+                    setIN_BAYAR(in_bayar)
+                    setIN_KEMBALIAN(in_kembali)
+                    setGrandTotal(in_total_belanja)
+                    setTimeout(() => {
+                        if(receiptRef.current){
+                            console.log("handlePrint()")
+                            handlePrint()
+                        }else{
+                            console.log("receiptRef.current is null")
+                        }
+                    }, 5000);        
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "Data tidak ditemukan!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoadingButton(false)
+                setisDisabled(false)    
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoadingButton(false)
+                setisDisabled(false)
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButton(false)
+                setisDisabled(false)
+            }
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoadingButton(false)
+            setisDisabled(false)
+        });
+       
+
+    }
+
     const Def_Column_HistorySales = () => {
         var cols = [
+                {
+                    accessor: 'NO_STRUK',
+                    title: '#',
+                    sortable: true,
+                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN }) => (
+                        <div className="flex items-center gap-2">
+                            <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN)}>
+                                <IconPrinter />
+                            </button>
+                            {/* <div className="font-semibold">{NO_STRUK}</div> */}
+                        </div>
+                    ),
+                },
                 {
                     accessor: 'TANGGAL',
                     title: 'DATE',
@@ -205,7 +356,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     sortable: true,
                     render: ({ STATUS }) => (
                         <div className="flex items-center gap-2">
-                            <div className="font-semibold">{STATUS}</div>
+                            <span className={`text-${STATUS === 'OK' ? 'success' : 'danger'} `}>{(STATUS === 'OK' ? <IconCircleCheck /> : <IconXCircle /> )}</span>
                         </div>
                     ),
                 },
@@ -321,6 +472,9 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                         :
                         ''
                     }
+                    <div className="hidden">
+                        <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} />
+                    </div>
                     </>
                 } />
                 </>

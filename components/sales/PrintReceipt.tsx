@@ -25,17 +25,33 @@ type ReceiptProps = {
   in_kembali: string;
   in_no_struk:string;
   in_total_belanja: string;
+  in_tanggal_struk: string; // Optional, if you want to include the date on the receipt
 };
 
 const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
-  const { data, in_kode_gerai,in_name_gerai, in_alamat,in_nama,in_shift,in_bayar,in_kembali,in_no_struk,in_total_belanja } = props;
+  const { data, in_kode_gerai,in_name_gerai, in_alamat,in_nama,in_shift,in_bayar,in_kembali,in_no_struk,in_total_belanja,in_tanggal_struk } = props;
+  console.log("======== Receipt Data ========")
+  console.log("in_kode_gerai : "+in_kode_gerai)
+  console.log("in_name_gerai : "+in_name_gerai)
+  console.log("in_alamat : "+in_alamat)
+  console.log("in_nama : "+in_nama)
+  console.log("in_shift : "+in_shift)
+  console.log("in_bayar : "+in_bayar)
+  console.log("in_kembali : "+in_kembali)
+  console.log("in_no_struk : "+in_no_struk)
+  console.log("in_total_belanja : "+in_total_belanja)
+  console.log("in_tanggal_struk : "+in_tanggal_struk)
+  console.log("data.items : ", JSON.stringify(data.items))
+  console.log("data.items length : "+data.items.length)
+  console.log("======== End Receipt Data ========")
+
   return (
     <div ref={ref} className="p-4 w-[300px] text-sm font-mono">
       {/* HEADER */}
       <h2 className="font-bold text-center">{in_name_gerai}</h2>
       <h2 className="font-bold text-center">{in_alamat}</h2>
       <div className="py-1 my-2 border-t border-b border-black border-dotted">
-        <label className="text-[11px] font-thin">{get_format_tanggal_jam_format_indo()+"/"+in_kode_gerai+"/"+in_nama.substring(0,6).trim()+"/"+in_shift}</label>
+        <label className="text-[11px] font-thin">{in_tanggal_struk+"/"+in_kode_gerai+"/"+in_nama.substring(0,6).trim()+"/"+in_shift}</label>
       </div>
       {/* BODY */}
       <div className="border-b border-black border-dotted">
@@ -90,11 +106,10 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
         <div className="text-right">
             {
                 in_no_struk !== '' ?
-                <img src={textToBase64QR((in_no_struk ? in_no_struk : ''))} alt="QR Code" className="w-16 h-16 mx-auto" />
+                <img src={textToBase64QR('halawa.co.id')} alt="QR Code" className="w-16 h-16 mx-auto" />
                 :
                 ''
             }
-            
         </div>
       </div>
       <div className='mt-1 border-t border-b border-black border-dotted font-semi-bold'>

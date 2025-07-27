@@ -3,7 +3,7 @@ import {   useEffect,  useRef,  useState } from "react";
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import {   AddID, GenerateUniqNumber, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, GetFormatCurrency, GetToken, groupByValueAndCount, summarizeJSONObjectByValue, validateNumber} from "@/lib/global";
+import {   AddID, GenerateUniqNumber, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, get_format_tanggal_jam_format_indo, GetFormatCurrency, GetToken, groupByValueAndCount, summarizeJSONObjectByValue, validateNumber} from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -967,10 +967,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             }).catch((error) => {
                 reject(error)
             });
-        });
-        
+        });   
     }
-
     const InsPosTransaksiSales = () => {
         Swal.fire({
             icon: "question",
@@ -1149,7 +1147,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             }
         });
     }
-
     const InsPosInitial = () => {
         Swal.fire({
             icon: "question",
@@ -1454,13 +1451,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const handlePrint = useReactToPrint({
         content: () => receiptRef.current,
     });
-    // const dummyData = {
-    //     items: [
-    //         { IN_DESKRIPSI: 'Indomie Goreng', IN_QTY: 2, IN_GROSS:1000, IN_PRICE: 2000 },
-    //         { IN_DESKRIPSI: 'Teh Botol', IN_QTY: 1, IN_GROSS:4000, IN_PRICE: 4000 },
-    //     ],
-    // };
-
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     return (
@@ -1639,7 +1629,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
                                         </div>
                                         <div className="hidden">
-                                            <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} />
+                                            <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} in_tanggal_struk={get_format_tanggal_jam_format_indo()} />
                                         </div>
                                     </div>
                                     </>
