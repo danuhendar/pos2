@@ -22,6 +22,10 @@ import IconCircleCheck from "../Icon/IconCircleCheck";
 import IconXCircle from "../Icon/IconXCircle";
 import { useReactToPrint } from "react-to-print";
 import Receipt from "../sales/PrintReceipt";
+import { set } from "lodash";
+import IconLoader from "../Icon/IconLoader";
+import IconWheel from "../Icon/IconWheel";
+import IconBox from "../Icon/IconBox";
 
 interface FormHistoryProps {
     url: string,
@@ -59,7 +63,10 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const [dummyData, setDummyData] = useState({
         items: []
     });
-    
+    const [isLoadingButtonReprint, setLoadingButtonReprint] = useState(false);
+    const [isLoadingContent,setLoadingContent] = useState(false);
+    const [isLoadawal,setLoadawal] = useState(true);
+
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -124,12 +131,11 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     }
 
     const handlePrint = useReactToPrint({
-            content: () => receiptRef.current,
+        content: () => receiptRef.current,
     });
 
     const GetHandlePrint = (no_struk:string,total_belanja:number,bayar:number,kembalian:number) => {
-        
-        
+        setLoadingButtonReprint(true)
         const in_bayar = GetFormatCurrency(""+bayar)
         console.log("in_bayar : "+in_bayar)
         const in_kembali = GetFormatCurrency(""+kembalian)
@@ -193,7 +199,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                         }else{
                             console.log("receiptRef.current is null")
                         }
-                    }, 5000);        
+                    }, 3000);        
                     
                 }else{
                     Swal.fire({
@@ -205,7 +211,8 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     });
                 }
                 setLoadingButton(false)
-                setisDisabled(false)    
+                setisDisabled(false)   
+                setLoadingButtonReprint(false)
             }else if(code.toString().substring(0,1) === '4'){
                 if(code === 401 && msg.includes("Invalid")){
                     
@@ -220,6 +227,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 }
                 setLoadingButton(false)
                 setisDisabled(false)
+                setLoadingButtonReprint(false)
             }else{
                 Swal.fire({
                     title: t("Warning"),
@@ -230,6 +238,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 });
                 setLoadingButton(false)
                 setisDisabled(false)
+                setLoadingButtonReprint(false)
             }
         }).catch((error) => {
             console.log(error)
@@ -242,6 +251,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             });
             setLoadingButton(false)
             setisDisabled(false)
+            setLoadingButtonReprint(false)
         });
        
 
@@ -253,11 +263,25 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     accessor: 'NO_STRUK',
                     title: '#',
                     sortable: true,
-                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN }) => (
+                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN,STATUS }) => (
                         <div className="flex items-center gap-2">
-                            <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN)}>
-                                <IconPrinter />
-                            </button>
+                            {
+                               STATUS === 'OK' ?
+                               <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN)}>
+                                    {
+                                        isLoadingButtonReprint ? 
+                                        t('Please wait...')
+                                        :
+                                        <IconPrinter />
+                                    }
+                                </button>
+                               :
+                               STATUS === 'PENDING' ?
+                                 <span className="text-warning">{'Pending'}</span>
+                                 :
+                                 <span className="text-danger">{'Void'}</span>
+                            }
+                            
                             {/* <div className="font-semibold">{NO_STRUK}</div> */}
                         </div>
                     ),
@@ -356,7 +380,15 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     sortable: true,
                     render: ({ STATUS }) => (
                         <div className="flex items-center gap-2">
-                            <span className={`text-${STATUS === 'OK' ? 'success' : 'danger'} `}>{(STATUS === 'OK' ? <IconCircleCheck /> : <IconXCircle /> )}</span>
+                            {
+                               STATUS === 'OK' ?
+                               <span className="text-success">{<IconCircleCheck />}</span> 
+                               :
+                               STATUS === 'PENDING' ?
+                                 <span className="text-warning">{<IconBox />}</span>
+                                 :
+                                 <span className="text-danger">{<IconXCircle />}</span>
+                            }
                         </div>
                     ),
                 },
@@ -375,6 +407,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     }
 
     const GetHistorySales = () => {
+        setLoadawal(false)
         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistorySales`
         const rdate = date2
         const in_periode_awal = ConvertDateFormat(rdate[0],false)
@@ -384,6 +417,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         const Token = GetToken()
         setLoadingButton(true)
         setisDisabled(true)
+        setLoadingContent(true)
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
             const res_data = response;
             var code = res_data.code;
@@ -395,6 +429,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 setData_columns(cols)
                 setLoadingButton(false)
                 setisDisabled(false)
+                setLoadingContent(false)
             }else if(code.toString().substring(0,1) === '4'){
                 if(code === 401 && msg.includes("Invalid")){
                     
@@ -409,7 +444,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 }
                 setLoadingButton(false)
                 setisDisabled(false)
-               
+                setLoadingContent(false)
             }else{
                 Swal.fire({
                     title: t("Warning"),
@@ -420,6 +455,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 });
                 setLoadingButton(false)
                 setisDisabled(false)
+                setLoadingContent(false)
             }
         }).catch((error) => {
             console.log(error)
@@ -432,6 +468,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             });
             setLoadingButton(false)
             setisDisabled(false)
+            setLoadingContent(false)
         });
     }
 
@@ -463,20 +500,39 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                         </div>
                       </>
                 } />
-
-                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPrinter />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Data "+IDReport} in_content={
-                    <>
+                
                     {
-                        data_rows.length > 0 ?
-                        <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
-                        :
+                        isLoadawal ?
                         ''
+                        :
+                        <>
+                        {
+                            isLoadingContent ?
+                            <div className="flex items-center justify-center w-full h-[300px]">
+                                <span className="inline-block w-12 h-12 m-auto mb-10 align-middle border-4 border-transparent rounded-full animate-spin border-l-primary"></span>
+                            </div>
+                            
+                            :
+                            <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPrinter />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Data "+IDReport} in_content={
+                                <>
+                                {
+                                    data_rows.length > 0 ?
+                                    <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
+                                    :
+                                    ''
+                                }
+                                <div className="hidden">
+                                    <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} />
+                                </div>
+                                </>
+                            } />
+                        }
+                        </>
                     }
-                    <div className="hidden">
-                        <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} />
-                    </div>
-                    </>
-                } />
+                    
+
+                
+                
                 </>
             } />
         </>

@@ -150,7 +150,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
        
         const kode_gerai = get_data_local_storage('kode_gerai');
         setIN_KODE_GERAI(kode_gerai)
-         if(is_gerai === '1'){
+        if(is_gerai === '1'){
             GetPosInitialByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai)
             GetMasterGeraiByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai);
         }else{
@@ -174,6 +174,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
    
     const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value; var sp_val = val.split('|'); var kode_gerai = sp_val[0]; setIN_KODE_GERAI(kode_gerai); var nama_gerai = sp_val[1]; setIN_NAMA_GERAI(nama_gerai); var alamat = sp_val[2]; setIN_ALAMAT(alamat); GetPosInitialByKodeGerai(IN_HOST,IN_PORT,kode_gerai)};
+    const FormInputInitialCode = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_KODE_INITIAL(val); };
     const FormInputAlamat  = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_ALAMAT(val); };
     const FormInputItem = (value: any) => {var val = value.target.value;setIN_BARCODE(val); };
     const FormInputDeskripsi = (value: any) => {var val = value.target.value;setIN_DESKRIPSI(val); };
@@ -1015,52 +1016,91 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             console.log(JSON.stringify(r))
                             setDummyData(r);
                             setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(kode_transaksi_inventory.toString());
-                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
-                        let param = {
-                                        "IN_KODE_INITIAL": IN_KODE_INITIAL,
-                                        "IN_KODE_GERAI": IN_KODE_GERAI,
-                                        "IN_JENIS": jenis,
-                                        "IN_TANGGAL": get_format_tanggal_jam(),
-                                        "IN_TAHUN": get_format_tanggal_jam().substring(0,4),
-                                        "IN_BULAN": bulan,
-                                        "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
-                                        "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
-                                        "IN_BAYAR": IN_BAYAR.split(',').join(''),
-                                        "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
-                                        "IN_IS_STATUS": 1,
-                                        "IN_OTORISATOR_VOID": "-",
-                                        "IN_APP": themeConfig.versi_app,
-                                        "IN_BANK": IN_BANK,
-                                        "IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,
-                                        "IN_KODE_TRANSAKSI_INVENTORY":kode_transaksi_inventory,
-                                        "IN_DETAIL":detail
-                                    }
-                        const Token = GetToken()
-                        //console.log(JSON.stringify(param))
-                        setLoadingButtonPayment(true)
-                        setisDisabledButtonPayment(true)
-                        Posts(url,JSON.stringify(param),false,Token).then((response) => {
-                            const res_data = response;
-                            var code = res_data.code;
-                            var msg = res_data.msg;
-                            if(parseFloat(code) === 200){
-                                var data_body = res_data.data;
-                            
-                             
-                                Swal.fire({
-                                    title: t("Information"),
-                                    text: ""+parseFloat(code)+"-"+msg,
-                                    icon: "success",
-                                    padding: '2em',
-                                    customClass: 'sweet-alerts'
-                                });
-                                handlePrint()
-                                CreateNewOrder()
+                            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
+                            let param = {
+                                            "IN_KODE_INITIAL": IN_KODE_INITIAL,
+                                            "IN_KODE_GERAI": IN_KODE_GERAI,
+                                            "IN_JENIS": jenis,
+                                            "IN_TANGGAL": get_format_tanggal_jam(),
+                                            "IN_TAHUN": get_format_tanggal_jam().substring(0,4),
+                                            "IN_BULAN": bulan,
+                                            "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
+                                            "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
+                                            "IN_BAYAR": IN_BAYAR.split(',').join(''),
+                                            "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
+                                            "IN_IS_STATUS": 1,
+                                            "IN_OTORISATOR_VOID": "-",
+                                            "IN_APP": themeConfig.versi_app,
+                                            "IN_BANK": IN_BANK,
+                                            "IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,
+                                            "IN_KODE_TRANSAKSI_INVENTORY":kode_transaksi_inventory,
+                                            "IN_DETAIL":detail
+                                        }
+                            const Token = GetToken()
+                            //console.log(JSON.stringify(param))
+                            setLoadingButtonPayment(true)
+                            setisDisabledButtonPayment(true)
+                            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                                const res_data = response;
+                                var code = res_data.code;
+                                var msg = res_data.msg;
+                                if(parseFloat(code) === 200){
+                                    var data_body = res_data.data;
                                 
-                                setLoadingButtonPayment(false)
-                                setisDisabledButtonPayment(false)
-                            }else if(code.toString().substring(0,1) === '4'){
-                                if(code === 401 && msg.includes("Invalid")){
+                                
+                                    Swal.fire({
+                                        title: t("Information"),
+                                        text: ""+parseFloat(code)+"-"+msg,
+                                        icon: "success",
+                                        padding: '2em',
+                                        customClass: 'sweet-alerts'
+                                    });
+                                    handlePrint()
+                                    CreateNewOrder()
+                                    
+                                    setLoadingButtonPayment(false)
+                                    setisDisabledButtonPayment(false)
+                                }else if(code.toString().substring(0,1) === '4'){
+                                    if(code === 401 && msg.includes("Invalid")){
+                                        Swal.fire({
+                                            title: t("Warning"),
+                                            text: ""+parseFloat(code)+"-"+msg,
+                                            icon: "warning",
+                                            padding: '2em',
+                                            customClass: 'sweet-alerts'
+                                        });
+                                    }else if(code === 403){
+                                        if(IN_SHIFT === ''){
+                                            MySwal.fire({
+                                                title: t(""+parseFloat(code)+"-"+msg),
+                                                toast: true,
+                                                position: isRtl ? 'top-start' : 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 5000,
+                                                showCloseButton: true,
+                                                customClass: {
+                                                    popup: `color-warning`,
+                                                },
+                                            });
+                                            
+                                        }else{
+                                            MySwal.fire({
+                                                title: t("Data initial for shift "+IN_SHIFT+" not found!"),
+                                                toast: true,
+                                                position: isRtl ? 'top-start' : 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 5000,
+                                                showCloseButton: true,
+                                                customClass: {
+                                                    popup: `color-warning`,
+                                                },
+                                            });
+                                        }
+                                    }
+                                    
+                                    setLoadingButtonPayment(false)
+                                    setisDisabledButtonPayment(false)
+                                }else{
                                     Swal.fire({
                                         title: t("Warning"),
                                         text: ""+parseFloat(code)+"-"+msg,
@@ -1068,71 +1108,32 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         padding: '2em',
                                         customClass: 'sweet-alerts'
                                     });
-                                }else if(code === 403){
-                                    if(IN_SHIFT === ''){
-                                        MySwal.fire({
-                                            title: t(""+parseFloat(code)+"-"+msg),
-                                            toast: true,
-                                            position: isRtl ? 'top-start' : 'top-end',
-                                            showConfirmButton: false,
-                                            timer: 5000,
-                                            showCloseButton: true,
-                                            customClass: {
-                                                popup: `color-warning`,
-                                            },
-                                        });
-                                        
-                                    }else{
-                                        MySwal.fire({
-                                            title: t("Data initial for shift "+IN_SHIFT+" not found!"),
-                                            toast: true,
-                                            position: isRtl ? 'top-start' : 'top-end',
-                                            showConfirmButton: false,
-                                            timer: 5000,
-                                            showCloseButton: true,
-                                            customClass: {
-                                                popup: `color-warning`,
-                                            },
-                                        });
-                                    }
+                                    setLoadingButtonPayment(false)
+                                    setisDisabledButtonPayment(false)
                                 }
-                                
-                                setLoadingButtonPayment(false)
-                                setisDisabledButtonPayment(false)
-                            }else{
+                            }).catch((error) => {
+                                console.log(error)
                                 Swal.fire({
                                     title: t("Warning"),
-                                    text: ""+parseFloat(code)+"-"+msg,
+                                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
                                     icon: "warning",
                                     padding: '2em',
                                     customClass: 'sweet-alerts'
                                 });
                                 setLoadingButtonPayment(false)
                                 setisDisabledButtonPayment(false)
-                            }
-                        }).catch((error) => {
-                            console.log(error)
+                            });
+                        }).catch((e)=>{
                             Swal.fire({
                                 title: t("Warning"),
-                                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                                text: "401-Error : Generate Kode, Hubungi administrator, untuk proses pengecekan lebih lanjut!",
                                 icon: "warning",
                                 padding: '2em',
                                 customClass: 'sweet-alerts'
                             });
-                            setLoadingButtonPayment(false)
-                            setisDisabledButtonPayment(false)
+                            setLoadingButton(false)
+                            setisDisabled(false)
                         });
-                    }).catch((e)=>{
-                        Swal.fire({
-                            title: t("Warning"),
-                            text: "401-Error : Generate Kode, Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                            icon: "warning",
-                            padding: '2em',
-                            customClass: 'sweet-alerts'
-                        });
-                        setLoadingButton(false)
-                        setisDisabled(false)
-                    });
                 }catch(Ex){
                     Swal.fire({
                         title: t("Warning"),
@@ -1464,7 +1465,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 <strong className="ltr:mr-1 rtl:ml-1">Warning!</strong>{t('Note: Please check your data input, because process data input can\'t try again!')}
                             </span>
                         </div>
-                        <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-2 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
                             {
                                 IN_IS_GERAI === '0' ?
                                 <>
@@ -1474,6 +1475,15 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 <div>
                                 <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
                                 </div>
+                                {
+                                    IDReport === 'Initial' ?
+                                    ''
+                                    :
+                                    <div>
+                                        <InputTextType in_title={"Initial Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputInitialCode} in_value={IN_KODE_INITIAL} />
+                                    </div>
+                                }
+                               
                                 </>
                                 :
                                 <>
@@ -1483,6 +1493,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 <div>
                                 <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
                                 </div>
+                                {
+                                    IDReport === 'Initial' ?
+                                    ''
+                                    :
+                                    <div>
+                                        <InputTextType in_title={"Initial Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputInitialCode} in_value={IN_KODE_INITIAL} />
+                                    </div>
+                                }
                                 </>
                             }
                             {

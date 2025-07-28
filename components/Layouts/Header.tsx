@@ -147,7 +147,7 @@ const Header = () => {
                     <div className="flex items-center justify-between horizontal-logo ltr:mr-2 rtl:ml-2 lg:hidden">
                         {/* <Link href="#" className="flex items-center main-logo shrink-0"> */}
                             {/* <img className="inline w-8 ltr:-ml-1 rtl:-mr-1" src="/assets/images/logo.svg" alt="logo" /> */}
-                            <img className="w-28 ml-[5px] flex-none bg-white" src="/assets/images/segaricon logo (sementara).svg" alt="logo" />
+                            <img className="w-28 ml-[5px] flex-none bg-white" src="/assets/images/segaricon_background putih.svg" alt="logo" />
                             <span className="hidden align-middle text-2xl  font-semibold  transition-all duration-300 ltr:ml-1.5 rtl:mr-1.5 dark:text-white-light md:inline text-white">Point of Sales | </span>
                         {/* </Link> */}
                         <button
