@@ -925,6 +925,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         input1Ref.current.focus();
         try{
             const text = await navigator.clipboard.readText();
+            console.log('text : '+text)
             if(text !== ''){
                 setIN_BARCODE(text);
                 setIN_DESKRIPSI('')
