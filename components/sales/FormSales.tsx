@@ -1124,17 +1124,17 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 setLoadingButtonPayment(false)
                                 setisDisabledButtonPayment(false)
                             });
-                        }).catch((e)=>{
-                            Swal.fire({
-                                title: t("Warning"),
-                                text: "401-Error : Generate Kode, Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                                icon: "warning",
-                                padding: '2em',
-                                customClass: 'sweet-alerts'
-                            });
-                            setLoadingButton(false)
-                            setisDisabled(false)
+                    }).catch((e)=>{
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: "401-Error : Generate Kode, Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
                         });
+                        setLoadingButton(false)
+                        setisDisabled(false)
+                    });
                 }catch(Ex){
                     Swal.fire({
                         title: t("Warning"),

@@ -59,7 +59,7 @@ const FormVoidSales: React.FC<FormVoidSalesProps> = ({ url, jenis, IDReport }) =
     const GetDataTransaksiInventoryByNoStruk = () => {
         try{
             let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
-            let param = {"IN_NO_STRUK":IN_KODE_TRANSAKSI}
+            let param = {"IN_NO_STRUK":IN_KODE_TRANSAKSI,"IN_IS_STATUS":"1"}
             const Token = GetToken()
             Posts(url,JSON.stringify(param),false,Token).then((response) => {
                 const res_data = response;

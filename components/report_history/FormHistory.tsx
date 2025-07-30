@@ -145,7 +145,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         const in_total_belanja = GetFormatCurrency(""+total_belanja)
         console.log("in_total_belanja : "+in_total_belanja)
         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
-        const param = {"IN_NO_STRUK":no_struk}
+        const param = {"IN_NO_STRUK":no_struk,"IN_IS_STATUS":"1"}
         const Token = GetToken()
         setLoadingButton(true)
         setisDisabled(true)

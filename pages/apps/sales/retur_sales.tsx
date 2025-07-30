@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { GetToken } from "@/lib/global";
-import FormSales from "@/components/sales/FormSales";
+import FormReturSales from "@/components/sales/FormReturSales";
 //-- component menu --//
-const Pos_Sales = () => {
+const Retur_Sales = () => {
     const [Token,setToken] = useState('')
     const { t, i18n } = useTranslation();
     
@@ -20,19 +20,19 @@ const Pos_Sales = () => {
             <div className="mb-5">
             <ul className="flex space-x-2 rtl:space-x-reverse">
                  <li>{t('Sales')}</li>
-                <Link href="/apps/sales/pos_sales/" className="text-primary hover:underline">    
+                <Link href="/apps/sales/retur_sales/" className="text-primary hover:underline">    
                 <li className="before:content-['/'] ltr:before:mr-2 rtl:before:ml-2">
-                    <span>{t('POS Sales')}</span>
+                    <span>{t('Retur Sales')}</span>
                 </li>
                 </Link>
             </ul>
             </div>
-            <FormSales IDReport="Pos Sales" 
+            <FormReturSales IDReport="Retur Sales" 
                                     url={``}
-                                    jenis={'2'}
+                                    jenis={'7'}
                                     />
         </>
     )
 };
 
-export default Pos_Sales;
+export default Retur_Sales;
