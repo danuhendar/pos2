@@ -658,30 +658,30 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         </div>
                     ),
                 },
-                {
-                    accessor: 'SINGKATAN',
-                    title: 'SINGKATAN',
-                    sortable: true,
-                    render: ({ SINGKATAN }) => (
-                        <div className="flex items-center gap-2">
-                            {/* <div>
-                                <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
-                            </div> */}
-                            <div className="font-semibold">{SINGKATAN}</div>
+                // {
+                //     accessor: 'SINGKATAN',
+                //     title: 'SINGKATAN',
+                //     sortable: true,
+                //     render: ({ SINGKATAN }) => (
+                //         <div className="flex items-center gap-2">
+                //             {/* <div>
+                //                 <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
+                //             </div> */}
+                //             <div className="font-semibold">{SINGKATAN}</div>
                             
-                        </div>
-                    ),
-                },
-                {
-                    accessor: 'GROSS',
-                    title: 'PRICE',
-                    sortable: true,
-                    render: ({ GROSS }) => (
-                        <div className="flex items-center gap-2">
-                            <div className="font-semibold">{GetFormatCurrency(GROSS)}</div>
-                        </div>
-                    ),
-                },
+                //         </div>
+                //     ),
+                // },
+                // {
+                //     accessor: 'GROSS',
+                //     title: 'PRICE',
+                //     sortable: true,
+                //     render: ({ GROSS }) => (
+                //         <div className="flex items-center gap-2">
+                //             <div className="font-semibold">{GetFormatCurrency(GROSS)}</div>
+                //         </div>
+                //     ),
+                // },
                 {
                     accessor: 'SATUAN',
                     title: 'SATUAN',
@@ -717,26 +717,26 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         </div>
                     ),
                 },
-                {
-                    accessor: 'IS_FIXED',
-                    title: 'IS_FIXED',
-                    sortable: true,
-                    render: ({ IS_FIXED }) => (
-                        <div className="flex items-center gap-2">
-                            <span className={`text-${IS_FIXED === 1 ? 'success' : 'danger'} `}>{(IS_FIXED === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
-                        </div>
-                    ),
-                },
-                {
-                    accessor: 'IS_RETUR_SUPPLIER',
-                    title: 'IS_RETUR_SUPPLIER',
-                    sortable: true,
-                    render: ({ IS_RETUR_SUPPLIER }) => (
-                        <div className="flex items-center gap-2">
-                            <span className={`text-${IS_RETUR_SUPPLIER === 1 ? 'success' : 'danger'} `}>{(IS_RETUR_SUPPLIER === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
-                        </div>
-                    ),
-                },
+                // {
+                //     accessor: 'IS_FIXED',
+                //     title: 'IS_FIXED',
+                //     sortable: true,
+                //     render: ({ IS_FIXED }) => (
+                //         <div className="flex items-center gap-2">
+                //             <span className={`text-${IS_FIXED === 1 ? 'success' : 'danger'} `}>{(IS_FIXED === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
+                //         </div>
+                //     ),
+                // },
+                // {
+                //     accessor: 'IS_RETUR_SUPPLIER',
+                //     title: 'IS_RETUR_SUPPLIER',
+                //     sortable: true,
+                //     render: ({ IS_RETUR_SUPPLIER }) => (
+                //         <div className="flex items-center gap-2">
+                //             <span className={`text-${IS_RETUR_SUPPLIER === 1 ? 'success' : 'danger'} `}>{(IS_RETUR_SUPPLIER === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
+                //         </div>
+                //     ),
+                // },
             ];
             return  cols;
     }

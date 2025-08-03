@@ -21,6 +21,9 @@ import InputCheckBoxFilterType from "../form/InputCheckBoxFilterType";
 import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
 import { DataTable } from "mantine-datatable";
 import IconSave from "../Icon/IconSave";
+import Flatpickr from "react-flatpickr";
+import "flatpickr/dist/flatpickr.css";
+
 interface FormTerimaBarangMasukProps {
     url: string,
     jenis: string,
@@ -483,6 +486,10 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                                 setIN_RESULT_SCAN_DESKRIPSI('')
                                 setIN_RESULT_SCAN_SATUAN('')
                                 setIN_RESULT_SELECTED_MANUAL('')
+                                setIN_KETERANGAN('')
+                                setDate2('')
+                                setIN_QTY('')
+                                setIN_BARCODE('')
                                 setarr_input_item([])
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
@@ -556,13 +563,34 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                             <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
                             </div>
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
+                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Store"} idComponent={"gerai"} />
                             </div>
                         </div>
 
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
-                            <DatePicker is_time_24hr={true} in_mode={'single'} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg"} event={(date2) => setDate2(date2)} name_component={"Date"} idComponent={"txt_date"} isRtl={isRtl} in_date={date2} isEnableTime={true} date_format={"Y-m-d H:i"} />
+                                <div className={"mb-1"}><label htmlFor="dropdownLeftButton">{t('Date')}</label></div>
+                                <div className="mb-3">
+                                    <div className={"w-full"}>
+                                    <Flatpickr
+                                            data-enable-time
+                                            options={{
+                                                mode:"single",
+                                                enableTime: true,
+                                                dateFormat: 'Y-m-d H:i',
+                                                position: isRtl ? 'auto right' : 'auto left',
+                                                time_24hr: true
+                                            }}
+                                            value={date2}
+                                            className={"form-input rounded-lg"}
+                                            onChange={(selectedDates: Date[], dateStr: string, instance: any)=>{
+                                                (date2) => { setDate2(date2);}
+                                                instance.close();
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            {/* <DatePicker is_time_24hr={true} in_mode={'single'} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg"} event={(date2) => { setDate2(date2);}} name_component={"Date"} idComponent={"txt_date"} isRtl={isRtl} in_date={date2} isEnableTime={true} date_format={"Y-m-d H:i"} /> */}
                             </div>
                             <div>
                             <InputTextType in_title={"Operator"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNikPembuat} in_value={IN_NIK_PEMBUAT} />
@@ -579,9 +607,9 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                             <div className={IN_METODE === '' ? "hidden" : ""}>
                                 <InputTextTypeKeyDown in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyDownQty} />                        
                             </div>
-                            <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
-                            <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
-                            <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
+                            <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
+                            <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
+                            <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
                         </div>
                         <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Add'} HandleClick={AddList} />
                         <div className="mt-6 panel rounded-3xl">

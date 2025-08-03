@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import { AddColumn, AddID, ConvertBinaryToText, GenerateUniqNumber, GetFailedClient, GetSignature, GetToken, GetTotalFailedClient, HitungSuksesDanGagalFomTable, ListKey, SendHandleRowClick, SendHandleRowClickOffice, SummaryValueOfArray, WritePayload, WritePayloadWSOffice, get_branch_code, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop } from "@/lib/global";
+import { AddColumn, AddID, ConvertBinaryToText, GenerateUniqNumber, GetFailedClient, GetSignature, GetToken, GetTotalFailedClient, HitungSuksesDanGagalFomTable, ListKey, SendHandleRowClick, SendHandleRowClickOffice, SummaryValueOfArray, WritePayload, WritePayloadWSOffice, generateAlphanumeric, get_branch_code, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop } from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import IconSend from "../Icon/IconSend";
 import themeConfig from "@/theme.config";
@@ -21,6 +21,7 @@ import InputTextType from "../form/InputTypeText";
 import IconXCircle from "../Icon/IconXCircle";
 import IconSave from "../Icon/IconSave";
 import DropDownGlobal from "../dropdown/DropDownGlobal";
+import InputCheckBoxFilterType from "../form/InputCheckBoxFilterType";
 interface FormMasterStoreProps {
     url: string,
     command: string,
@@ -50,6 +51,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const [IN_KODE_CABANG,setIN_KODE_CABANG] = useState('')
 	const [OptionBranch,setOptionBranch] = useState([])
     const [IN_ALAMAT,setIN_ALAMAT] = useState('')
+    const [IN_KATEGORI_STORE,setIN_KATEGORI_STORE] = useState('')
     
     useEffect(() => {
         const res_host = themeConfig.host
@@ -62,10 +64,6 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const FormInputBranch = (event: { target: { value: any; }; }) => {
         var val = event.target.value;
         setIN_BRANCH(val);  
-    };
-    const FormInputStore = (event: { target: { value: any; }; }) => {
-        var val = event.target.value;
-        setIN_STORE(val);  
     };
     const FormInputContent = (event: { target: { value: any; }; }) => {
         var val = event.target.value;
@@ -89,6 +87,26 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         setCheckedISActive(!CheckedISActive);  
         console.log(!CheckedISActive)
     };
+
+    const FormInputSelectKategori = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        if(val === 'M'){
+            setIN_KATEGORI_STORE('M')
+        }else if(val === 'R'){
+            setIN_KATEGORI_STORE('R')
+        }
+    }
+
+    const GenerateKodeGerai = () => {
+        const generate = generateAlphanumeric(3,false);
+        const kategori = IN_KATEGORI_STORE
+        const res_store_code = kategori+ generate;
+        setIN_STORE(res_store_code);
+    }
+    const FormInputKodeGerai = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        setIN_STORE(val);  
+    }
 	
 	
 	const FormSelectBranch = (value: any) => {var val = value.value;setIN_BRANCH(val);};
@@ -982,9 +1000,23 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
 									:
 									<InputTextType    in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBranch} in_value={IN_BRANCH} />
 								}
-                                <InputTextType   in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputStore} in_value={IN_STORE} />
+                               
+                                {
+                                    Title.includes("Form Add") ?
+                                    <>
+                                    <InputCheckBoxFilterType event={FormInputSelectKategori} in_title={"Category"} in_value_1={"M"} in_value_2={"R"} in_name_1={"MarketPlace"} in_name_2={"Retail"} in_name_component_1={"kategori"} in_name_component_2={"kategori"} />                
+                                    <div className="flex items-center justify-between mb-3">
+                                        <InputTextType   in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGerai} in_value={IN_STORE} />
+                                        <ButtonAdd in_classname={'btn btn-outline-primary rounded-full text-xs mt-1'} idComponent={"btn_generate_kode_gerai"} isLoading={false} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Generate'} HandleClick={GenerateKodeGerai} />
+                                    </div>
+                                    </>
+                                    :
+                                    <InputTextType   in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGerai} in_value={IN_STORE} />
+                                }
+                              
+                                
                                 <InputTextType   in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
-                                <InputTextType   in_title={"Alamat"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputAlamat} in_value={IN_ALAMAT} />
+                                <InputTextType   in_title={"Address"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputAlamat} in_value={IN_ALAMAT} />
                                 <label>IS Active</label>
                                 <label className="relative w-12 h-6">
                                     <input checked={CheckedISActive} onChange={FormISActive} type="checkbox" className="absolute z-10 w-full h-full opacity-0 cursor-pointer custom_switch peer" id="custom_switch_checkbox1" />

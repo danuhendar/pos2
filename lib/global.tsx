@@ -1222,3 +1222,17 @@ export function textToBase64QR(text: string){
     QRCode.toCanvas(canvas, text, {margin: 1, width: 200});
     return canvas.toDataURL("image/png");
 }
+
+export function generateAlphanumeric(length: number,is_only_number:boolean): string {
+  let chars = ''
+  if(is_only_number){
+    chars = '0123456789';
+  }else{
+    chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  }
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}

@@ -26,6 +26,7 @@ const PriceTag: React.FC<PriceTagProps> = ({ name, price, barcode }) => {
       <h2 className="mb-2 font-bold">{name}</h2>
       <p className="mb-2 text-lg font-semibold">Rp {price}</p>
       <svg ref={barcodeRef}></svg>
+      <label className="block mt-2 text-xs font-semibold">{barcode}</label>
     </div>
   );
 };

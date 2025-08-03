@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import { AddColumn, AddID, GetFormatCurrency, GetToken,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
+import { AddColumn, AddID, GetFormatCurrency, GetToken,  generateAlphanumeric,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -918,6 +918,12 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const toggleTabs = (name: string) => {
         setTabs(name);
     };
+    const GenerateBarcode = () => {
+        const text = generateAlphanumeric(13,true);
+        const generate = text.toUpperCase();
+        console.log(generate)
+        setIN_BARCODE(generate)
+    }
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -1006,13 +1012,23 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                                     <InputTextType   in_title={"Gross"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputGross} in_value={IN_GROSS} />
                                     
                                     
-                                    <InputCheckBoxFilterType event={FormInputIS_Retur_Supplier} in_title={"IS Retur Supplier"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Y"} in_name_2={"N"} in_name_component_1={"is_retur_supplier"} in_name_component_2={"is_retur_supplier"} />
+                                    <InputCheckBoxFilterType event={FormInputIS_Retur_Supplier} in_title={"IS Retur Supplier"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_retur_supplier"} in_name_component_2={"is_retur_supplier"} />
                                     <InputTextType   in_title={"Varian"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputVarian} in_value={IN_VARIAN} />
                                     {/* <InputCheckBoxFilterType event={FormInputSatuan} in_title={"Satuan"} in_value_1={"KARTON"} in_value_2={"PCS"} in_name_1={"KARTON"} in_name_2={"PCS"} in_name_component_1={"satuan"} in_name_component_2={"satuan"} /> */}
                                     <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionSatuan} isSearchable={true} isMulti={false} event={FormInputSatuan} name_component={"Satuan"} idComponent={"satuan"} />
-                                    <InputCheckBoxFilterType event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Y"} in_name_2={"N"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
-                                    <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputBarcode} in_value={IN_BARCODE} />
-                                    <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Kode Gerai"} idComponent={"kode_gerai"} />
+                                    <InputCheckBoxFilterType event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
+                                    {
+									    Title.includes("Form Add") ? 
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBarcode} in_value={IN_BARCODE} />
+                                            <ButtonAdd in_classname={'btn btn-outline-primary rounded-full text-xs mt-4'} idComponent={"btn_generate_barcode"} isLoading={false} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Generate Barcode'} HandleClick={GenerateBarcode} />
+                                        </div>
+                                        :
+                                        <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputBarcode} in_value={IN_BARCODE} />
+                                    }
+                                   
+                                    
+                                    <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Store Code"} idComponent={"kode_gerai"} />
 
                                 </div>
                                 <div className="flex items-center justify-end gap-3 mt-8">
