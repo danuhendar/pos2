@@ -390,6 +390,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     setIN_GROSS(data_body[0].GROSS)
                     setIN_QTY('1')
                     AddList(data_body[0].KODE_BARANG,data_body[0].SATUAN,data_body[0].CONTENT,'1',data_body[0].HPP,data_body[0].GROSS,'0');
+                    setIN_KODE_BARANG('')
+                    setIN_DESKRIPSI('')
+                    setIN_SATUAN('')
+                    setIN_QTY('')
+                    setIN_HPP('')
+                    setIN_GROSS('')
+                    setIN_BARCODE('')
+                    input1Ref.current.focus();
                 }else if(data_body.length > 1){
                         MySwal.fire({
                         title: t("Data Item More Than 1, Check Item or Select Item Manually"),
@@ -1450,6 +1458,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             handlePrint()
         }
     }
+     
     const handlePrint = useReactToPrint({
         content: () => receiptRef.current,
     });

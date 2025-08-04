@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { setHost, setHostRnd, setisHuman, setPageTitle, setPortAdministasi, setPortListener, setVersiApp, toggleRTL } from '../store/themeConfigSlice';
+import { setHost, setHostRnd, setIsAuthenticated, setisHuman, setPageTitle, setPortAdministasi, setPortListener, setVersiApp, toggleRTL } from '../store/themeConfigSlice';
 import BlankLayout from '@/components/Layouts/BlankLayout';
 import Link from 'next/link';
 import { IRootState } from '@/store';
@@ -16,10 +16,14 @@ import {eye} from 'react-icons-kit/feather/eye';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
 import AntiScrapedShieldComponent from '@/components/shield/AntiScrapedShieldComponent';
-import { GetID } from '@/lib/global';
+import { encryptString, get_data_local_storage, GetID, GetToken, handleSave } from '@/lib/global';
 import IconUser from '@/components/Icon/IconUser';
+import InputTextType from '@/components/form/InputTypeText';
+import ButtonAdd from '@/components/button/ButtonAdd';
+import { Posts } from '@/lib/post';
+import IconUsers from '@/components/Icon/IconUsers';
 
-const LoginCover = () => {
+const Verification = () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const [Username, setUsername] = useState('');
@@ -35,7 +39,13 @@ const LoginCover = () => {
     const versi_app = useSelector((state: IRootState) => state.themeConfig.versi_app);
     const [getnavigator,setnavigator] = useState(false)
     const MySwal = withReactContent(Swal);
-
+    const [LoadingButton, setLoadingButton] = useState(false);
+    const [IN_CODE, setIN_CODE] = useState('');
+    const [IN_HOST, setIN_HOST] = useState(host);
+    const [IN_PORT, setIN_PORT] = useState(port_listener);
+    const [IN_USERNAME, setIN_USERNAME] = useState('');
+    const { t, i18n } = useTranslation();
+    const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const setLocale = (flag: string) => {
         setFlag(flag);
@@ -46,7 +56,26 @@ const LoginCover = () => {
         }
     };
     const [flag, setFlag] = useState('');
-    useEffect(() => {
+    const FormInputCode = (e: any) => {
+        const value = e.target.value;
+        if (value.length <= 6) {
+            setIN_CODE(value);
+        }else {
+            MySwal.fire({
+                title: t("Code must be 6 digits"),
+                toast: true,
+                position: isRtl ? 'top-start' : 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                showCloseButton: true,
+                customClass: {
+                    popup: `color-warning`,
+                },
+            });
+        }
+    };
+
+     useEffect(() => {
         dispatch(setPageTitle('POS'))
         setLocale(localStorage.getItem('i18nextLng') || themeConfig.locale);
         const msgauth = themeConfig.MessageAuth
@@ -70,6 +99,9 @@ const LoginCover = () => {
             dispatch(setHostRnd(hostrnd))
             dispatch(setPortAdministasi(port_administrasi))
             dispatch(setVersiApp(versi_app))
+            setIN_HOST(host)
+            setIN_PORT(port_administrasi)
+            
         }
         setnavigator(navigator.webdriver)
         const handleMouseMove = () => {
@@ -86,16 +118,101 @@ const LoginCover = () => {
             document.removeEventListener('mousemove', handleMouseMove);
         };
     }, []);
-    const { t, i18n } = useTranslation();
-    const handleToggle = () => {
-        if (type==='password'){
-           setIcon(eye);
-           setType('text')
-        } else {
-           setIcon(eyeOff)
-           setType('password')
+
+    const GetVerifiy = async () => {
+        setLoadingButton(true);
+        const in_code = IN_CODE;
+        if (in_code.length < 6 || in_code.length > 6) {
+            MySwal.fire({
+                title: t("Code must be 6 digits"),
+                toast: true,
+                position: isRtl ? 'top-start' : 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                showCloseButton: true,
+                customClass: {
+                    popup: `color-warning`,
+                },
+            });
+            setLoadingButton(false);
+        }else{
+            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/verify`
+            const IN_USERNAME = get_data_local_storage('nik')
+            let param = {"IN_USERNAME":IN_USERNAME,"IN_TOKEN":IN_CODE,"IN_FROM":"POS"}
+            const Token = GetToken()
+            setLoadingButton(true)
+            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                const res_data = response;
+                console.log('data_verifikasi : '+JSON.stringify(res_data))
+                var code = res_data.code;
+                var msg = res_data.msg;
+                if(parseFloat(code) === 200){
+                    var data_body = res_data.data;
+                    console.log('data_body : '+JSON.stringify(data_body))
+                    const en_token = encryptString(data_body.TOKEN,'IDMC0mmandMustbeSetFor5ecr3t@3DP','R4h451A_3DP@4MaN')
+                    const en_refresh_token = encryptString(data_body.REFRESH_TOKEN,'IDMC0mmandMustbeSetFor5ecr3t@3DP','R4h451A_3DP@4MaN')
+                    handleSave('ot',en_token,false)
+                    handleSave('rot',en_refresh_token,false)
+                    handleSave('lmenu',JSON.stringify(data_body.MENU),false)
+                    handleSave('nik',data_body.NIK,false)
+                    handleSave('nama',data_body.NAMA,false)
+                    handleSave('unit',data_body.UNIT,false)
+                    handleSave('bagian',data_body.BAGIAN,false)
+                    handleSave('id_periode',data_body.ID_PERIODE,false)
+                    handleSave('is_gerai',data_body.IS_GERAI,false)
+                    handleSave('kode_gerai',data_body.KODE_GERAI,false)
+                    handleSave('menu','horizontal',false)
+                    dispatch(setIsAuthenticated());
+                    router.push('/utama');
+                    setLoadingButton(false)
+                }else if(code.toString().substring(0,1) === '4'){
+                    if(code === 401 && msg.includes("Invalid")){
+                        
+                    }else{
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: ""+parseFloat(code)+"-"+msg,
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    }
+                    setLoadingButton(false)
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                    setLoadingButton(false)
+                }
+            }).catch((error) => {
+                Swal.fire({
+                    title: t("Warning"),
+                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButton(false)
+            });
         }
     }
+   
+   
+    
+    // const handleToggle = () => {
+    //     if (type==='password'){
+    //        setIcon(eye);
+    //        setType('text')
+    //     } else {
+    //        setIcon(eyeOff)
+    //        setType('password')
+    //     }
+    // }
+    
     return (
         <>
         <AntiScrapedShieldComponent in_content={
@@ -121,44 +238,14 @@ const LoginCover = () => {
                                 </div>
                             </div>
                             <div className="relative flex w-full flex-col items-center justify-center gap-6 px-4 pb-16 pt-6 sm:px-6 lg:max-w-[667px]">
-                                <div className="flex items-center w-full gap-2 lg:absolute lg:end-6 lg:top-6 lg:max-w-full">
-                                    <Link href="/" className="items-end block w-48 lg:hidden">
-                                        <img src="/assets/images/segaricon logo (sementara).svg" alt="Logo" className="w-full" />
-                                    </Link>
-                                </div>
+                               
                                 <div className="w-full max-w-[440px] lg:mt-13">
                                     <div className="mb-10">
-                                        <h1 className="text-3xl font-extrabold uppercase !leading-snug text-green-700 text-center md:text-4xl">Point of Sales</h1>
-                                        <p className="text-base font-bold leading-normal text-center text-white-dark">{t('Enter username and password your HRIS Account')}</p>
+                                        <h1 className="text-3xl font-extrabold uppercase !leading-snug text-green-700 text-center md:text-4xl">Verify 2FA</h1>
+                                        <p className="text-base font-bold leading-normal text-center text-white-dark">{t('Enter Code from Google Authenticator')}</p>
                                     </div>
-                                    <div>
-                                        <label htmlFor="Email" className="text-center">{t('Username')}</label>
-                                        <div className="relative text-white-dark">
-                                            <input onChange={e => { setUsername(e.currentTarget.value); } } value={Username} type="text" placeholder="Input NIK" className="text-center form-input ps-10 placeholder:text-white-dark rounded-xl" />
-                                            <span className="absolute -translate-y-1/2 start-4 top-1/2">
-                                                <IconUser fill={true} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="mt-3">
-                                        <label htmlFor="Password" className="text-center">{t('Password')}</label>
-                                        <div className="relative text-white-dark">
-                                            <input onChange={e => { setPassword(e.currentTarget.value); } } value={Password} type={type} placeholder="Input Password" className="text-center form-input ps-10 placeholder:text-white-dark rounded-xl" />
-                                            <span className="absolute -translate-y-1/2 start-4 top-1/2">
-                                                <IconLockDots fill={true} />
-                                            </span>
-                                            <span className="absolute mt-2 end-9" onClick={handleToggle}>
-                                                <Icon className="absolute mr-10" icon={icon} size={25} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <ButtonLogin url={`http://${host}:${port_login}/api/v2/LoginGoogleAuthenticator`} param={JSON.stringify({ "IN_USERNAME":Username,"IN_PASSWORD":Password,"IN_FROM":'POS',"IN_TOKEN":""})} idComponent={GetID()} idAlert={'alert_login'} isBot={getnavigator} />
-                                    <div className="text-center dark:text-white">
-                                        {/* {t('Download User Guide IDMConsoleV2')}&nbsp;
-                                        <Link href={'/file/JUKLAK_IDMCONSOLEV2.rar'} className="underline transition text-primary hover:text-black dark:hover:text-white">
-                                            {t('Here')} !
-                                        </Link> */}
-                                    </div>
+                                   <InputTextType in_title={"Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputCode} in_value={IN_CODE} />
+                                   <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={false} in_icon={<IconUsers />} in_title_button={'Verify'} HandleClick={GetVerifiy} />
                                 </div>
                                 <p className="absolute w-full text-xs text-center bottom-6 dark:text-white">© 2025.Point of Sales V{versi_app}</p>
                             </div>
@@ -170,7 +257,7 @@ const LoginCover = () => {
         </>
     );
 };
-LoginCover.getLayout = (page: any) => {
+Verification.getLayout = (page: any) => {
     return <BlankLayout>{page}</BlankLayout>;
 };
-export default LoginCover;
+export default Verification;

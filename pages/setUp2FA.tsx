@@ -6,20 +6,19 @@ import BlankLayout from '@/components/Layouts/BlankLayout';
 import Link from 'next/link';
 import { IRootState } from '@/store';
 import { useTranslation } from 'react-i18next';
-import IconMail from '@/components/Icon/IconMail';
-import IconLockDots from '@/components/Icon/IconLockDots';
-import ButtonLogin from '@/components/ButtonLogin';
-
-import {Icon} from 'react-icons-kit';
 import {eyeOff} from 'react-icons-kit/feather/eyeOff';
-import {eye} from 'react-icons-kit/feather/eye';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
 import AntiScrapedShieldComponent from '@/components/shield/AntiScrapedShieldComponent';
-import { GetID } from '@/lib/global';
-import IconUser from '@/components/Icon/IconUser';
+import { get_data_local_storage, GetID, GetToken } from '@/lib/global';
+import InputTextType from '@/components/form/InputTypeText';
+import ButtonAdd from '@/components/button/ButtonAdd';
+import { Posts } from '@/lib/post';
+import IconUsers from '@/components/Icon/IconUsers';
+import IconDownload from '@/components/Icon/IconDownload';
+import IconChecks from '@/components/Icon/IconChecks';
 
-const LoginCover = () => {
+const SetUp2FA = () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const [Username, setUsername] = useState('');
@@ -35,7 +34,14 @@ const LoginCover = () => {
     const versi_app = useSelector((state: IRootState) => state.themeConfig.versi_app);
     const [getnavigator,setnavigator] = useState(false)
     const MySwal = withReactContent(Swal);
-
+    const [LoadingButton, setLoadingButton] = useState(false);
+    const [IN_CODE, setIN_CODE] = useState('');
+    const [IN_HOST, setIN_HOST] = useState(host);
+    const [IN_PORT, setIN_PORT] = useState(port_listener);
+    const [IN_USERNAME, setIN_USERNAME] = useState('');
+    const [IN_IMAGE, setIN_IMAGE] = useState('');
+    const { t, i18n } = useTranslation();
+    const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const setLocale = (flag: string) => {
         setFlag(flag);
@@ -46,7 +52,26 @@ const LoginCover = () => {
         }
     };
     const [flag, setFlag] = useState('');
-    useEffect(() => {
+    const FormInputCode = (e: any) => {
+        const value = e.target.value;
+        if (value.length <= 6) {
+            setIN_CODE(value);
+        }else {
+            MySwal.fire({
+                title: t("Code must be 6 digits"),
+                toast: true,
+                position: isRtl ? 'top-start' : 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                showCloseButton: true,
+                customClass: {
+                    popup: `color-warning`,
+                },
+            });
+        }
+    };
+
+     useEffect(() => {
         dispatch(setPageTitle('POS'))
         setLocale(localStorage.getItem('i18nextLng') || themeConfig.locale);
         const msgauth = themeConfig.MessageAuth
@@ -70,6 +95,9 @@ const LoginCover = () => {
             dispatch(setHostRnd(hostrnd))
             dispatch(setPortAdministasi(port_administrasi))
             dispatch(setVersiApp(versi_app))
+            setIN_HOST(host)
+            setIN_PORT(port_administrasi)
+            SetUp2FA(host,port_administrasi);
         }
         setnavigator(navigator.webdriver)
         const handleMouseMove = () => {
@@ -86,16 +114,94 @@ const LoginCover = () => {
             document.removeEventListener('mousemove', handleMouseMove);
         };
     }, []);
-    const { t, i18n } = useTranslation();
-    const handleToggle = () => {
-        if (type==='password'){
-           setIcon(eye);
-           setType('text')
+
+    const SetUp2FA = (host:string,in_port_administrasi:string) => {
+        setLoadingButton(true);
+       
+        let url = `http://${host}:${in_port_administrasi}/api/v2/SetUp2FA`
+        const IN_USERNAME = get_data_local_storage('nik')
+        let param = {"IN_USERNAME":IN_USERNAME}
+        const Token = GetToken()
+        setLoadingButton(true)
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            console.log(res_data)
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                setIN_IMAGE(data_body)
+                setLoadingButton(false)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoadingButton(false)
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButton(false)
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoadingButton(false)
+        });
+        
+    }
+
+    const DirectVerification = () => {
+        router.push('/Verification');
+    }
+
+    const DownloadGoogleAuthenticator = () => {
+        const userAgent = navigator.userAgent || navigator.vendor;
+
+        if (/android/i.test(userAgent)) {
+            // Android
+            window.location.href = "https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2";
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+            // iOS
+            window.location.href = "https://apps.apple.com/app/google-authenticator/id388497605";
         } else {
-           setIcon(eyeOff)
-           setType('password')
+            // Fallback
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Please open this page on your mobile device to download the app.",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
         }
     }
+    // const handleToggle = () => {
+    //     if (type==='password'){
+    //        setIcon(eye);
+    //        setType('text')
+    //     } else {
+    //        setIcon(eyeOff)
+    //        setType('password')
+    //     }
+    // }
+    
     return (
         <>
         <AntiScrapedShieldComponent in_content={
@@ -121,44 +227,16 @@ const LoginCover = () => {
                                 </div>
                             </div>
                             <div className="relative flex w-full flex-col items-center justify-center gap-6 px-4 pb-16 pt-6 sm:px-6 lg:max-w-[667px]">
-                                <div className="flex items-center w-full gap-2 lg:absolute lg:end-6 lg:top-6 lg:max-w-full">
-                                    <Link href="/" className="items-end block w-48 lg:hidden">
-                                        <img src="/assets/images/segaricon logo (sementara).svg" alt="Logo" className="w-full" />
-                                    </Link>
-                                </div>
+                               
                                 <div className="w-full max-w-[440px] lg:mt-13">
                                     <div className="mb-10">
-                                        <h1 className="text-3xl font-extrabold uppercase !leading-snug text-green-700 text-center md:text-4xl">Point of Sales</h1>
-                                        <p className="text-base font-bold leading-normal text-center text-white-dark">{t('Enter username and password your HRIS Account')}</p>
+                                        <h1 className="text-3xl font-extrabold uppercase !leading-snug text-green-700 text-center md:text-4xl">SetUp 2FA</h1>
+                                        <p className="text-base font-bold leading-normal text-center text-white-dark">{t('Scan QRCode with Google Authenticator')}</p>
                                     </div>
-                                    <div>
-                                        <label htmlFor="Email" className="text-center">{t('Username')}</label>
-                                        <div className="relative text-white-dark">
-                                            <input onChange={e => { setUsername(e.currentTarget.value); } } value={Username} type="text" placeholder="Input NIK" className="text-center form-input ps-10 placeholder:text-white-dark rounded-xl" />
-                                            <span className="absolute -translate-y-1/2 start-4 top-1/2">
-                                                <IconUser fill={true} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="mt-3">
-                                        <label htmlFor="Password" className="text-center">{t('Password')}</label>
-                                        <div className="relative text-white-dark">
-                                            <input onChange={e => { setPassword(e.currentTarget.value); } } value={Password} type={type} placeholder="Input Password" className="text-center form-input ps-10 placeholder:text-white-dark rounded-xl" />
-                                            <span className="absolute -translate-y-1/2 start-4 top-1/2">
-                                                <IconLockDots fill={true} />
-                                            </span>
-                                            <span className="absolute mt-2 end-9" onClick={handleToggle}>
-                                                <Icon className="absolute mr-10" icon={icon} size={25} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <ButtonLogin url={`http://${host}:${port_login}/api/v2/LoginGoogleAuthenticator`} param={JSON.stringify({ "IN_USERNAME":Username,"IN_PASSWORD":Password,"IN_FROM":'POS',"IN_TOKEN":""})} idComponent={GetID()} idAlert={'alert_login'} isBot={getnavigator} />
-                                    <div className="text-center dark:text-white">
-                                        {/* {t('Download User Guide IDMConsoleV2')}&nbsp;
-                                        <Link href={'/file/JUKLAK_IDMCONSOLEV2.rar'} className="underline transition text-primary hover:text-black dark:hover:text-white">
-                                            {t('Here')} !
-                                        </Link> */}
-                                    </div>
+                                   
+                                    <img src={IN_IMAGE} alt="2FA" className="w-1/2 mb-4 ml-28 h-100" />
+                                   <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-warning w-full rounded-full text-xs mt-3'} idComponent={"btn_download"} isLoading={LoadingButton} isDisabled={false} in_icon={<IconDownload />} in_title_button={'Download Google Authenticator'} HandleClick={DownloadGoogleAuthenticator} />
+                                   <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={false} in_icon={<IconChecks />} in_title_button={'Verify'} HandleClick={DirectVerification} />
                                 </div>
                                 <p className="absolute w-full text-xs text-center bottom-6 dark:text-white">© 2025.Point of Sales V{versi_app}</p>
                             </div>
@@ -170,7 +248,7 @@ const LoginCover = () => {
         </>
     );
 };
-LoginCover.getLayout = (page: any) => {
+SetUp2FA.getLayout = (page: any) => {
     return <BlankLayout>{page}</BlankLayout>;
 };
-export default LoginCover;
+export default SetUp2FA;
