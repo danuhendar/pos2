@@ -1020,11 +1020,11 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                                     {
 									    Title.includes("Form Add") ? 
                                         <div className="flex items-center gap-2 mb-3">
-                                            <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBarcode} in_value={IN_BARCODE} />
+                                            <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputBarcode} in_value={IN_BARCODE} />
                                             <ButtonAdd in_classname={'btn btn-outline-primary rounded-full text-xs mt-4'} idComponent={"btn_generate_barcode"} isLoading={false} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Generate Barcode'} HandleClick={GenerateBarcode} />
                                         </div>
                                         :
-                                        <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputBarcode} in_value={IN_BARCODE} />
+                                        <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBarcode} in_value={IN_BARCODE} />
                                     }
                                    
                                     
