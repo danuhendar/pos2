@@ -95,6 +95,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [TotalBelanja,setTotalBelanja] = useState('0')
     const [TotalPPN,setTotalPPN] = useState('0')
     const [BiayaOngkir,setBiayaOngkir] = useState('0')
+    const [DiskonMarketPlace,setDiskonMarketPlace] = useState('0')
     const [TotalDiscount,setTotalDiscount] = useState('0')
     const [GrandTotal,setGrandTotal] = useState('0')
     const [IN_DISKON,setIN_DISKON] = useState('0')
@@ -176,14 +177,50 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     };
     const FormInputKodeBarang = (value: any) => {var val = value.target.value;setIN_KODE_BARANG(val); };
     const FormInputTotalBelanja = (value: any) => {var val = value.target.value;setIN_TOTAL_BELANJA(val); };
+    const FormInputDiskonMarketPlace = (value: any) => {
+        var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setDiskonMarketPlace(val_currency);
+        const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
+                                        - parseFloat(TotalDiscount.split(',').join(''))
+                                        - parseFloat((val === '' ? '0' : val.split(',').join('') ) )
+                                        + parseFloat((BiayaOngkir === '' ? '0' : BiayaOngkir.split(',').join('') ) )
+        setGrandTotal(isNaN(res_grand_total_final) ? '0' : GetFormatCurrency(res_grand_total_final.toString()));
+    }
     const FormInputBiayaOngkir = (value: any) => {
         var val = value.target.value;
         const validate_number = validateNumber(val);
         const val_currency = GetFormatCurrency(validate_number);
-        setBiayaOngkir(val_currency);
-        const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) - parseFloat(TotalDiscount.split(',').join('')) + parseFloat(val.split(',').join(''))
-        //console.log('res_grand_total_final : '+res_grand_total_final)
-        setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()));
+        console.log(val_currency);
+        setBiayaOngkir(val_currency === '' ? '0' : val_currency);
+        const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
+                                        - parseFloat(TotalDiscount.split(',').join('')) 
+                                        - parseFloat(DiskonMarketPlace.split(',').join('')) 
+                                        + parseFloat(val.split(',').join(''))
+
+        setGrandTotal(isNaN(res_grand_total_final) ? '0' : GetFormatCurrency(res_grand_total_final.toString()));
+        //-- calculate bayar --//
+        const bayar = parseFloat(IN_BAYAR.split(',').join(''))
+        const grand_total = parseFloat(GrandTotal.split(',').join(''))
+        if(bayar < grand_total){
+            MySwal.fire({
+                title: t("Payment must be greater than or equal to the Grand Total"),
+                toast: true,
+                position: isRtl ? 'top-start' : 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                showCloseButton: true,
+                customClass: {
+                    popup: `color-warning`,
+                },
+            });
+            setIN_KEMBALIAN('0');
+            setisDisabledButtonPayment(true)
+            return;
+        }else{
+            const res_kembalian = bayar - grand_total;
+            //console.log('res_kembalian : '+res_kembalian)
+            setIN_KEMBALIAN(GetFormatCurrency(res_kembalian.toString()));
+            setisDisabledButtonPayment(false)
+        }
     }
     const FormInputBayar = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number);
         setIN_BAYAR(val_currency); 
@@ -1729,13 +1766,16 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
                                     <>
                                     <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                        <div  className="col-span-2 sm:grid-cols-1">
-                                        <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={input4Ref} in_event_keydown={null}/>
+                                        <div className="sm:grid-cols-1">
+                                        <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={null}/>
+                                        </div>
+                                        <div  className="sm:grid-cols-1">
+                                        <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={null} in_event_keydown={null}/>
                                         </div>
                                         <div  className="sm:grid-cols-1">
                                         <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
                                         </div>
-                                        <div  className="m:grid-cols-1">
+                                        <div  className="sm:grid-cols-1">
                                         <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
                                         </div>
                                     </div>
