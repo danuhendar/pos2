@@ -28,7 +28,7 @@ import DropDownGlobal from "../dropdown/DropDownGlobal";
 import Image from "next/image";
 import IconBox from "../Icon/IconBox";
 import IconShoppingBag from "../Icon/IconShoppingBag";
-import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your library of choice here// Install this package: npm install export-to-csv
+// import { generateCsv, download, mkConfig } from 'export-to-csv'; //or use your library of choice here// Install this package: npm install export-to-csv
 interface FormMasterProdukProps {
     url: string,
     command: string,
@@ -953,12 +953,12 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         setIN_BARCODE(generate)
     }
 
-    const csvConfig = mkConfig({fieldSeparator: ',',decimalSeparator: '.',useKeysAsHeaders: true,filename: (Tabs === 'produk' ? 'Master_produk_'+get_format_tanggal_jam() : 'Master_kategori_'+get_format_tanggal_jam()),fileExtension: 'csv'});
+    // const csvConfig = mkConfig({fieldSeparator: ',',decimalSeparator: '.',useKeysAsHeaders: true,filename: (Tabs === 'produk' ? 'Master_produk_'+get_format_tanggal_jam() : 'Master_kategori_'+get_format_tanggal_jam()),fileExtension: 'csv'});
     
-    const handleExportCSV = () => {
-        const csv = generateCsv(csvConfig)(data_rows);
-        download(csvConfig)(csv);
-    }
+    // const handleExportCSV = () => {
+    //     const csv = generateCsv(csvConfig)(data_rows);
+    //     download(csvConfig)(csv);
+    // }
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -1032,9 +1032,9 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         {
                             data_rows.length > 0 ?
                             <>
-                            <button className="mt-6 rounded-full btn btn-success" onClick={handleExportCSV}>
+                            {/* <button className="mt-6 rounded-full btn btn-success" onClick={handleExportCSV}>
                                 Export to CSV
-                            </button>
+                            </button> */}
                             <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
                             </>
                             :
