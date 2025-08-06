@@ -416,6 +416,92 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         });
     }
 
+    const def_Column_HistoryInventory = () => {
+        var cols = [
+                
+                {
+                    accessor: 'TANGGAL',
+                    title: 'DATE',
+                    sortable: true,
+                    render: ({ TANGGAL }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{TANGGAL}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'KODE_TRANSAKSI',
+                    title: 'TRANSACTION CODE',
+                    sortable: true,
+                    render: ({ KODE_TRANSAKSI }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_TRANSAKSI}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'JENIS_TRANSAKSI',
+                    title: 'TRANSACTION TYPE',
+                    sortable: true,
+                    render: ({ JENIS_TRANSAKSI }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{JENIS_TRANSAKSI}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'KETERANGAN',
+                    title: 'DESCRIPTION',
+                    sortable: true,
+                    render: ({ KETERANGAN }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KETERANGAN}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'ASAL',
+                    title: 'SOURCE',
+                    sortable: true,
+                    render: ({ ASAL }) => (
+                        <div className="flex items-center gap-2">
+                            {/* <div>
+                                <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
+                            </div> */}
+                            <div className="font-semibold">{ASAL}</div>
+                            
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'TUJUAN',
+                    title: 'DESTINATION',
+                    sortable: true,
+                    render: ({ TUJUAN }) => (
+                        <div className="flex items-center gap-2">
+                            {/* <div>
+                                <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
+                            </div> */}
+                            <div className="font-semibold">{TUJUAN}</div>
+                        </div>
+                    ),
+                },
+        
+                {
+                    accessor: 'NAMA',
+                    title: 'NAME',
+                    sortable: true,
+                    render: ({ NAMA }) => (
+                        <div className="flex items-center gap-2">
+                           <div className="font-semibold">{NAMA}</div>
+                        </div>
+                    ),
+                },
+               
+            ];
+            return  cols;
+    }
+
     const Def_Column_HistorySales = () => {
         var cols = [
                 {
@@ -578,9 +664,9 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             return  cols;
     }
 
-    const GetHistorySales = () => {
+    const GetHistory = () => {
         setLoadawal(false)
-        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistorySales`
+        let url = ''
         const rdate = date2
         let in_periode_awal = ''
         let in_periode_akhir = ''
@@ -591,7 +677,14 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             in_periode_awal = ConvertDateFormat(rdate,false)
             in_periode_akhir = ConvertDateFormat(rdate,false)
         }
-        const param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
+        let param = {}
+        if(IDReport === 'History Sales'){
+            url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistorySales`
+            param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
+        }else if(IDReport === 'History Inventory'){
+            url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistoryInventory`
+            param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
+        }
         const Token = GetToken()
         setLoadingButton(true)
         setisDisabled(true)
@@ -603,7 +696,12 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             if(parseFloat(code) === 200){
                 var data_body = res_data.data;
                 setData_rows(data_body)
-                var cols = Def_Column_HistorySales()
+                var cols = [] 
+                if(IDReport === 'History Sales'){
+                    cols = Def_Column_HistorySales()
+                }else if(IDReport === 'History Inventory'){
+                    cols = def_Column_HistoryInventory()
+                }
                 setData_columns(cols)
                 setLoadingButton(false)
                 setisDisabled(false)
@@ -672,7 +770,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                             <DatePicker is_time_24hr={false} in_mode={'range'} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input rounded-lg"} event={(date2) => setDate2(date2)} name_component={"Date"} idComponent={"txt_date"} isRtl={isRtl} in_date={date2} isEnableTime={false} date_format={"Y-m-d"} />
                             </div>
                             <div className="lg:mt-8 md:mt-8">
-                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Filter'} HandleClick={GetHistorySales} />    
+                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Filter'} HandleClick={GetHistory} />    
                             </div>
                         </div>
                       </>

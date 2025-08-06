@@ -125,6 +125,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [dummyData, setDummyData] = useState({
         items: []
     });
+
+    const [isEnabledContentSales, setIsEnabledContentSales] = useState(false);
+    
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -591,6 +594,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     if(data_body.length > 0){
                        setIN_KODE_INITIAL(data_body[0].KODE_INITIAL)
                        setIN_SHIFT(data_body[0].SHIFT)
+                       setIsEnabledContentSales(true)
                     }else{
                         Swal.fire({
                             title: t("Warning"),
@@ -640,6 +644,17 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 },
                             });
                         }
+                        router.push('/apps/sales/closing_shift/')
+                        setIsEnabledContentSales(false)
+                        
+                    }else{
+                        // Swal.fire({
+                        //     title: t("Warning"),
+                        //     text: ""+parseFloat(code)+"-"+msg,
+                        //     icon: "warning",
+                        //     padding: '2em',
+                        //     customClass: 'sweet-alerts'
+                        // });
                     }
                     
                     setLoadingButton(false)
@@ -817,30 +832,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         </div>
                     ),
                 },
-                // {
-                //     accessor: 'SINGKATAN',
-                //     title: 'SINGKATAN',
-                //     sortable: true,
-                //     render: ({ SINGKATAN }) => (
-                //         <div className="flex items-center gap-2">
-                //             {/* <div>
-                //                 <a onClick={()=> CopyText(NO_HP)}><IconCopy className="text-primary"/></a>
-                //             </div> */}
-                //             <div className="font-semibold">{SINGKATAN}</div>
-                            
-                //         </div>
-                //     ),
-                // },
-                // {
-                //     accessor: 'GROSS',
-                //     title: 'PRICE',
-                //     sortable: true,
-                //     render: ({ GROSS }) => (
-                //         <div className="flex items-center gap-2">
-                //             <div className="font-semibold">{GetFormatCurrency(GROSS)}</div>
-                //         </div>
-                //     ),
-                // },
                 {
                     accessor: 'SATUAN',
                     title: 'SATUAN',
@@ -1684,147 +1675,154 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             </>
                             :
                             <>
-                            <div className="grid grid-cols-3 grid-rows-2 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
-                                <div className="col-span-2 row-span-2">
-                                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
-                                    <>
-                                    <div className="mt-3 datatables">
-                                        <DataTable
-                                            noRecordsText="No results match your search query"
-                                            highlightOnHover
-                                            className="table-hover whitespace-nowrap"
-                                            records={data_rows}
-                                            columns={data_columns}
-                                            minHeight={200}
-                                        />
-                                    </div>
-                                    <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
-                                            <div className="space-y-2 ltr:text-right rtl:text-left">
-                                                <div className="flex items-center text-lg">
-                                                    <div className="flex-1">Subtotal :</div>
-                                                    <div className="w-[37%]">{TotalBelanja}</div>
-                                                </div>
-                                                <div className="flex items-center text-lg">
-                                                    <div className="flex-1">Tax :</div>
-                                                    <div className="w-[37%]">{TotalPPN}</div>
-                                                </div>
-                                                <div className="flex items-center text-lg">
-                                                    <div className="flex-1">Discount :</div>
-                                                    <div className="w-[37%]">{TotalDiscount}</div>
-                                                </div>
-                                                <div className="flex items-center text-lg">
-                                                    <div className="flex-1">Shipping :</div>
-                                                    <div className="w-[37%]">{BiayaOngkir}</div>
-                                                </div>
-                                                <div className="flex items-center text-xl font-semibold">
-                                                    <div className="flex-1">Grand Total :</div>
-                                                    <div className="w-[37%]">{GrandTotal}</div>
-                                                </div>
+                            {
+                                isEnabledContentSales ? 
+                                <>
+                                <div className="grid grid-cols-3 grid-rows-2 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
+                                    <div className="col-span-2 row-span-2">
+                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
+                                        <>
+                                        <div className="mt-3 datatables">
+                                            <DataTable
+                                                noRecordsText="No results match your search query"
+                                                highlightOnHover
+                                                className="table-hover whitespace-nowrap"
+                                                records={data_rows}
+                                                columns={data_columns}
+                                                minHeight={200}
+                                            />
                                         </div>
-                                    </div> 
-                                    <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
-                                        <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_buat_sales_baru"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Create New Order'} HandleClick={CreateNewOrder} />
+                                        <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
+                                                <div className="space-y-2 ltr:text-right rtl:text-left">
+                                                    <div className="flex items-center text-lg">
+                                                        <div className="flex-1">Subtotal :</div>
+                                                        <div className="w-[37%]">{TotalBelanja}</div>
+                                                    </div>
+                                                    <div className="flex items-center text-lg">
+                                                        <div className="flex-1">Tax :</div>
+                                                        <div className="w-[37%]">{TotalPPN}</div>
+                                                    </div>
+                                                    <div className="flex items-center text-lg">
+                                                        <div className="flex-1">Discount :</div>
+                                                        <div className="w-[37%]">{TotalDiscount}</div>
+                                                    </div>
+                                                    <div className="flex items-center text-lg">
+                                                        <div className="flex-1">Shipping :</div>
+                                                        <div className="w-[37%]">{BiayaOngkir}</div>
+                                                    </div>
+                                                    <div className="flex items-center text-xl font-semibold">
+                                                        <div className="flex-1">Grand Total :</div>
+                                                        <div className="w-[37%]">{GrandTotal}</div>
+                                                    </div>
+                                            </div>
+                                        </div> 
+                                        <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
+                                            <div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_buat_sales_baru"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Create New Order'} HandleClick={CreateNewOrder} />
+                                            </div>
+                                            <div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={InsPendingSales} />
+                                            </div>
+                                            <div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSend />} in_title_button={'Submit Payment'} HandleClick={SubmitPayment} />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_pending"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSave />} in_title_button={'Pending Sales'} HandleClick={InsPendingSales} />
-                                        </div>
-                                        <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_add_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSend />} in_title_button={'Submit Payment'} HandleClick={SubmitPayment} />
-                                        </div>
-                                    </div>
-                                    </>
-                                }
-                                />
-                                </div>
-                                <div>
-                                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
-                                    <>
-                                    <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
-                                        <div className="col-span-2">
-                                        <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} />
-                                        </div>
-                                        <div className="sm:grid-cols-1">
-                                        <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
-                                        <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />    
-                                        </div>
-                                        <div className="sm:grid-cols-1">
-                                        <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
-                                        </div>
-                                        <div className="sm:col-span-1">
-                                        <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
-                                        </div>
-                                        
-                                        <div className="sm:col-span-1">
-                                        <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyItem} />
-                                        </div>
-                                        <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
-                                        <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
+                                        </>
+                                    }
+                                    />
                                     </div>
                                     <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
+                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
+                                        <>
+                                        <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
+                                            <div className="col-span-2">
+                                            <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} />
+                                            </div>
+                                            <div className="sm:grid-cols-1">
+                                            <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
+                                            <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />    
+                                            </div>
+                                            <div className="sm:grid-cols-1">
+                                            <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
+                                            </div>
+                                            <div className="sm:col-span-1">
+                                            <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
+                                            </div>
+                                            
+                                            <div className="sm:col-span-1">
+                                            <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyItem} />
+                                            </div>
+                                            <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
+                                            <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
+                                        </div>
+                                        <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
+                                        </div>
+                                        </>
+                                    } />
                                     </div>
-                                    </>
+                                    {/* INPUT PAYMENT */}
+                                    <div className="-mt-1">
+                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
+                                        <>
+                                        <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                            <div className="sm:grid-cols-1">
+                                            <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={null}/>
+                                            </div>
+                                            <div  className="sm:grid-cols-1">
+                                            <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={null} in_event_keydown={null}/>
+                                            </div>
+                                            <div  className="sm:grid-cols-1">
+                                            <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
+                                            </div>
+                                            <div  className="sm:grid-cols-1">
+                                            <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                            <div>
+                                            <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
+                                            </div>
+                                            <div>
+                                            <DropDownGlobal  in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Payment via"} idComponent={"payment_via"} />
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                            <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
+                                            </div>
+                                            <div>
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
+                                            </div>
+                                            <div className="hidden">
+                                                <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={TotalBelanja} in_tanggal_struk={get_format_tanggal_jam_format_indo()} in_total_diskon_item={TotalDiscount} in_total_diskon_market_place={DiskonMarketPlace} in_total_biaya_ongkir={BiayaOngkir} in_grand_total={GrandTotal} />
+                                            </div>
+                                        </div>
+                                        </>
+                                    } />
+                                    </div>
+                                </div>
+                                {/* OPEN MODAL MASTER PRODUK */}
+                                <ModalComponent in_size_modal={`panel animate__animated my-7 w-full overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                                    <div className="p-2">
+                                        <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_refresh"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Refresh'} HandleClick={GetMasterProdukByKodeGerai} />
+                                        <div className="mb-5">
+                                            {
+                                                data_rows_produk.length > 0 ?
+                                                <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows_produk} DataColumns={data_columns_produk} />
+                                                :
+                                                ''
+                                            }
+                                        </div>
+                                        <div className="flex items-center justify-end gap-3 mt-8">
+                                            <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                        </div>
+                                    </div>
                                 } />
-                                </div>
-                                {/* INPUT PAYMENT */}
-                                <div className="-mt-1">
-                                <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
-                                    <>
-                                    <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                        <div className="sm:grid-cols-1">
-                                        <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={null}/>
-                                        </div>
-                                        <div  className="sm:grid-cols-1">
-                                        <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={null} in_event_keydown={null}/>
-                                        </div>
-                                        <div  className="sm:grid-cols-1">
-                                        <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
-                                        </div>
-                                        <div  className="sm:grid-cols-1">
-                                        <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
-                                        </div>
-                                    </div>
-                                    <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                        <div>
-                                        <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
-                                        </div>
-                                        <div>
-                                        <DropDownGlobal  in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Payment via"} idComponent={"payment_via"} />
-                                        </div>
-                                    </div>
-                                    <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                        <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
-                                        </div>
-                                        <div>
-                                        <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
-                                        </div>
-                                        <div className="hidden">
-                                            <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={TotalBelanja} in_tanggal_struk={get_format_tanggal_jam_format_indo()} in_total_diskon_item={TotalDiscount} in_total_diskon_market_place={DiskonMarketPlace} in_total_biaya_ongkir={BiayaOngkir} in_grand_total={GrandTotal} />
-                                        </div>
-                                    </div>
-                                    </>
-                                } />
-                                </div>
-                            </div>
-                            {/* OPEN MODAL MASTER PRODUK */}
-                            <ModalComponent in_size_modal={`panel animate__animated my-7 w-full overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
-                                <div className="p-2">
-                                    <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_refresh"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Refresh'} HandleClick={GetMasterProdukByKodeGerai} />
-                                    <div className="mb-5">
-                                        {
-                                            data_rows_produk.length > 0 ?
-                                            <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows_produk} DataColumns={data_columns_produk} />
-                                            :
-                                            ''
-                                        }
-                                    </div>
-                                    <div className="flex items-center justify-end gap-3 mt-8">
-                                        <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
-                                    </div>
-                                </div>
-                            } />
+                                </>
+                                :
+                                ``
+                            }
                             </>
                         }        
                         

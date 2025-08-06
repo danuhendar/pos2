@@ -157,6 +157,7 @@ const [data_rows, setData_rows] = useState([]);
                 setIN_NET_SALES(GetFormatCurrency(data_body[0].SALESNET))
                 setLoadingButton(false)
                 setisDisabled(false)
+                setisDisabledClosing(false)
             }else if(code.toString().substring(0,1) === '4'){
                 if(code === 401 && msg.includes("Invalid")){
                     
@@ -179,7 +180,7 @@ const [data_rows, setData_rows] = useState([]);
                 setIN_GROSS_SALES('')
                 setIN_DISKON('')
                 setIN_NET_SALES('')
-               
+                setisDisabledClosing(true)
             }else{
                 Swal.fire({
                     title: t("Warning"),
@@ -190,6 +191,7 @@ const [data_rows, setData_rows] = useState([]);
                 });
                 setLoadingButton(false)
                 setisDisabled(false)
+                setisDisabledClosing(true)
             }
         }).catch((error) => {
             console.log(error)
@@ -202,6 +204,7 @@ const [data_rows, setData_rows] = useState([]);
             });
             setLoadingButton(false)
             setisDisabled(false)
+            setisDisabledClosing(true)
         });
     }
     const ClosingShift = () => {
@@ -391,6 +394,7 @@ const [data_rows, setData_rows] = useState([]);
                         setIN_GROSS_SALES(GetFormatCurrency(data_body[0].SALES))
                         setIN_DISKON(GetFormatCurrency(data_body[0].DISKON))
                         setIN_NET_SALES(GetFormatCurrency(data_body[0].SALESNET))
+                        setisDisabledClosing(false)
                     }else{
                         Swal.fire({
                             title: t("Warning"),
@@ -399,7 +403,7 @@ const [data_rows, setData_rows] = useState([]);
                             padding: '2em',
                             customClass: 'sweet-alerts'
                         });
-                        
+                        setisDisabledClosing(true)
                     }
                     
                     setLoadingButton(false)
@@ -453,7 +457,7 @@ const [data_rows, setData_rows] = useState([]);
                             },
                         });
                     }
-                    
+                    setisDisabledClosing(true)
                     setLoadingButton(false)
                     setisDisabled(false)
                 }else{
@@ -466,6 +470,7 @@ const [data_rows, setData_rows] = useState([]);
                     });
                     setLoadingButton(false)
                     setisDisabled(false)
+                    setisDisabledClosing(true)
                 }
             }).catch((error) => {
                 console.log(error)
@@ -478,6 +483,7 @@ const [data_rows, setData_rows] = useState([]);
                 });
                 setLoadingButton(false)
                 setisDisabled(false)
+                setisDisabledClosing(true)
             });
         }catch(Ex){
             Swal.fire({
@@ -487,6 +493,7 @@ const [data_rows, setData_rows] = useState([]);
                 padding: '2em',
                 customClass: 'sweet-alerts'
             });
+            setisDisabledClosing(true)
         }
             
     }

@@ -28,6 +28,7 @@ import DropDownGlobal from "../dropdown/DropDownGlobal";
 import Image from "next/image";
 import IconBox from "../Icon/IconBox";
 import IconShoppingBag from "../Icon/IconShoppingBag";
+import { mkConfig, generateCsv, download } from 'export-to-csv'; //or use your library of choice here// Install this package: npm install export-to-csv
 interface FormMasterProdukProps {
     url: string,
     command: string,
@@ -81,6 +82,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const [isCheck_4,setisCheck_4] = useState(false)
 
     const MySwal = withReactContent(Swal);
+    
     
     useEffect(() => {
         const res_host = themeConfig.host
@@ -951,6 +953,13 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         setIN_BARCODE(generate)
     }
 
+    const csvConfig = mkConfig({fieldSeparator: ',',decimalSeparator: '.',useKeysAsHeaders: true,filename: (Tabs === 'produk' ? 'Master_produk_'+get_format_tanggal_jam() : 'Master_kategori_'+get_format_tanggal_jam()),fileExtension: 'csv'});
+    
+    const handleExportCSV = () => {
+        const csv = generateCsv(csvConfig)(data_rows);
+        download(csvConfig)(csv);
+    }
+
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     return (
@@ -1022,7 +1031,12 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         </div>
                         {
                             data_rows.length > 0 ?
+                            <>
+                            <button className="mt-6 rounded-full btn btn-success" onClick={handleExportCSV}>
+                                Export to CSV
+                            </button>
                             <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt"} Datarow={data_rows} DataColumns={data_columns} />
+                            </>
                             :
                             ''
                         }
@@ -1051,10 +1065,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                                         :
                                         <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBarcode} in_value={IN_BARCODE} />
                                     }
-                                   
-                                    
                                     <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Store Code"} idComponent={"kode_gerai"} />
-
                                 </div>
                                 <div className="flex items-center justify-end gap-3 mt-8">
                                     <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
