@@ -189,7 +189,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         var val = value.target.value;
         const validate_number = validateNumber(val);
         const val_currency = GetFormatCurrency(validate_number);
-        console.log(val_currency);
+        //console.log(val_currency);
         setBiayaOngkir(val_currency === '' ? '0' : val_currency);
         const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
                                         - parseFloat(TotalDiscount.split(',').join('')) 
@@ -901,7 +901,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_BANK('')
         setIN_METODE_PEMBAYARAN('')
         setIN_SHIFT('')
-        //setIN_KODE_INITIAL('')
+        setDiskonMarketPlace('0')
         setIN_BARCODE('')
         setIN_GENERATE_KODE_TRANSAKSI_INVENTORY('')
         try{
@@ -1171,6 +1171,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
                                             "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
                                             "IN_DISKON_MARKET_PLACE": DiskonMarketPlace.split(',').join(''),
+                                            "IN_BIAYA_ONGKIR": BiayaOngkir.split(',').join(''),
                                             "IN_BAYAR": IN_BAYAR.split(',').join(''),
                                             "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
                                             "IN_IS_STATUS": 1,
@@ -1796,7 +1797,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
                                         </div>
                                         <div className="hidden">
-                                            <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} in_tanggal_struk={get_format_tanggal_jam_format_indo()} />
+                                            <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={TotalBelanja} in_tanggal_struk={get_format_tanggal_jam_format_indo()} in_total_diskon_item={TotalDiscount} in_total_diskon_market_place={DiskonMarketPlace} in_total_biaya_ongkir={BiayaOngkir} in_grand_total={GrandTotal} />
                                         </div>
                                     </div>
                                     </>

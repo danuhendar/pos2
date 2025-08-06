@@ -28,11 +28,15 @@ type ReceiptProps = {
   in_kembali: string;
   in_no_struk:string;
   in_total_belanja: string;
+  in_total_diskon_item:string;
+  in_total_diskon_market_place:string;
+  in_total_biaya_ongkir:string;
+  in_grand_total:string;
   in_tanggal_struk: string; // Optional, if you want to include the date on the receipt
 };
 
 const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
-  const { data, in_kode_gerai,in_name_gerai, in_alamat,in_nama,in_shift,in_bayar,in_kembali,in_no_struk,in_total_belanja,in_tanggal_struk } = props;
+  const { data, in_kode_gerai,in_name_gerai, in_alamat,in_nama,in_shift,in_bayar,in_kembali,in_no_struk,in_total_belanja,in_total_diskon_item,in_total_diskon_market_place,in_total_biaya_ongkir,in_grand_total,in_tanggal_struk } = props;
   // console.log("======== Receipt Data ========")
   // console.log("in_kode_gerai : "+in_kode_gerai)
   // console.log("in_name_gerai : "+in_name_gerai)
@@ -147,7 +151,30 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
           <div className='text-right'>
             <label>{in_total_belanja}</label>
           </div>
-          
+          <div className="col-span-3 text-right">
+            <label>Diskon Item :</label>
+          </div>
+          <div className='text-right'>
+            <label>{in_total_diskon_item}</label>
+          </div>
+          <div className="col-span-3 text-right">
+            <label>Diskon MarketPlace :</label>
+          </div>
+          <div className='text-right'>
+            <label>{in_total_diskon_market_place}</label>
+          </div>
+          <div className="col-span-3 text-right">
+            <label>Biaya Ongkir :</label>
+          </div>
+          <div className='text-right'>
+            <label>{in_total_biaya_ongkir}</label>
+          </div>
+          <div className="col-span-3 text-right">
+            <label>GrandTotal :</label>
+          </div>
+          <div className='text-right'>
+            <label>{in_grand_total}</label>
+          </div>
         </div>
         <div className="grid grid-cols-4 gap-3">
           <div className="col-span-3 text-right">

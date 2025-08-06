@@ -59,6 +59,10 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const [IN_TANGGAL_STRUK,setIN_TANGGAL_STRUK] = useState('')
     const [IN_GENERATE_KODE_TRANSAKSI_INVENTORY,setIN_GENERATE_KODE_TRANSAKSI_INVENTORY] = useState('')
     const [GrandTotal,setGrandTotal] = useState('0');
+    const [TotalBelanja,setTotalBelanja] = useState('0');
+    const [TotalDiskonItem,setTotalDiskonItem] = useState('0');
+    const [TotalDiskonMarketPlace,setTotalDiskonMarketPlace] = useState('0');
+
     const receiptRef = useRef();
     const [dummyData, setDummyData] = useState({
         items: []
@@ -134,7 +138,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         content: () => receiptRef.current,
     });
 
-    const GetHandlePrint = (no_struk:string,total_belanja:number,bayar:number,kembalian:number) => {
+    const GetHandlePrint = (no_struk:string,total_belanja:number,diskon_market_place:number,diskon_item:number,bayar:number,kembalian:number) => {
         setLoadingButtonReprint(true)
         const in_bayar = GetFormatCurrency(""+bayar)
         console.log("in_bayar : "+in_bayar)
@@ -156,13 +160,17 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             if(parseFloat(code) === 200){
                 var data_body = res_data.data;
                 var summary = data_body[0].SUMMARY;
-                console.log(JSON.stringify(summary))
-                console.log('nama_pembuat : '+summary[0].NAMA_PEMBUAT)
+                //console.log(JSON.stringify(summary))
+                //console.log('nama_pembuat : '+summary[0].NAMA_PEMBUAT)
                 setIN_NAMA_PEMBUAT(summary[0].NAMA_PEMBUAT)
                 setIN_SHIFT(summary[0].SHIFT)
-                console.log('shift : '+summary[0].SHIFT)
+                //console.log('shift : '+summary[0].SHIFT)
                 setIN_TANGGAL_STRUK(summary[0].TANGGAL)
-                console.log('tanggal : '+summary[0].TANGGAL)
+                //console.log('tanggal : '+summary[0].TANGGAL)
+                setTotalBelanja(GetFormatCurrency(""+summary[0].TOTAL_BELANJA))
+                setTotalDiskonItem(GetFormatCurrency(""+summary[0].TOTAL_DISKON_ITEM))
+                setTotalDiskonMarketPlace(GetFormatCurrency(""+summary[0].TOTAL_DISKON_MARKET_PLACE))
+
                 var rdetail = data_body[0].DETAIL;
                 var detail = [];
                 for(var i = 0;i<rdetail.length;i++){
@@ -191,7 +199,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(in_no_struk)
                     setIN_BAYAR(in_bayar)
                     setIN_KEMBALIAN(in_kembali)
-                    setGrandTotal(in_total_belanja)
+                    setTotalBelanja(in_total_belanja)
                     setTimeout(() => {
                         if(receiptRef.current){
                             console.log("handlePrint()")
@@ -263,11 +271,11 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     accessor: 'NO_STRUK',
                     title: '#',
                     sortable: true,
-                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN,STATUS }) => (
+                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,DISKON_MARKET_PLACE,DISKON_ITEM,BAYAR,KEMBALIAN,STATUS }) => (
                         <div className="flex items-center gap-2">
                             {
                                STATUS === 'OK' ?
-                               <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,BAYAR,KEMBALIAN)}>
+                               <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,DISKON_MARKET_PLACE,DISKON_ITEM,BAYAR,KEMBALIAN)}>
                                     {
                                         isLoadingButtonReprint ? 
                                         t('Please wait...')
@@ -522,7 +530,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                     ''
                                 }
                                 <div className="hidden">
-                                    <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} />
+                                    <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_grand_total={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} in_total_belanja={TotalBelanja} in_total_diskon_item={TotalDiskonItem} in_total_diskon_market_place={TotalDiskonMarketPlace} in_total_biaya_ongkir={""} />
                                 </div>
                                 </>
                             } />
