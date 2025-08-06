@@ -1170,6 +1170,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             "IN_BULAN": bulan,
                                             "IN_METODE_BAYAR": IN_METODE_PEMBAYARAN,
                                             "IN_TOTAL_BELANJA": GrandTotal.split(',').join(''),
+                                            "IN_DISKON_MARKET_PLACE": DiskonMarketPlace.split(',').join(''),
                                             "IN_BAYAR": IN_BAYAR.split(',').join(''),
                                             "IN_KEMBALIAN": IN_KEMBALIAN.split(',').join(''),
                                             "IN_IS_STATUS": 1,
