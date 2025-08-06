@@ -204,6 +204,7 @@ const FormVoidTransaksiInventory: React.FC<FormVoidTransaksiInventoryProps> = ({
                                 setIN_TUJUAN('')
                                 setIN_TANGGAL_TRANSAKSI('')
                                 setIN_NIK_PEMBUAT('')
+                                setIN_KODE_TRANSAKSI('')
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
                                     Swal.fire({

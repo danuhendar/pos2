@@ -33,20 +33,20 @@ type ReceiptProps = {
 
 const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
   const { data, in_kode_gerai,in_name_gerai, in_alamat,in_nama,in_shift,in_bayar,in_kembali,in_no_struk,in_total_belanja,in_tanggal_struk } = props;
-  console.log("======== Receipt Data ========")
-  console.log("in_kode_gerai : "+in_kode_gerai)
-  console.log("in_name_gerai : "+in_name_gerai)
-  console.log("in_alamat : "+in_alamat)
-  console.log("in_nama : "+in_nama)
-  console.log("in_shift : "+in_shift)
-  console.log("in_bayar : "+in_bayar)
-  console.log("in_kembali : "+in_kembali)
-  console.log("in_no_struk : "+in_no_struk)
-  console.log("in_total_belanja : "+in_total_belanja)
-  console.log("in_tanggal_struk : "+in_tanggal_struk)
-  console.log("data.items : ", JSON.stringify(data.items))
-  console.log("data.items length : "+data.items.length)
-  console.log("======== End Receipt Data ========")
+  // console.log("======== Receipt Data ========")
+  // console.log("in_kode_gerai : "+in_kode_gerai)
+  // console.log("in_name_gerai : "+in_name_gerai)
+  // console.log("in_alamat : "+in_alamat)
+  // console.log("in_nama : "+in_nama)
+  // console.log("in_shift : "+in_shift)
+  // console.log("in_bayar : "+in_bayar)
+  // console.log("in_kembali : "+in_kembali)
+  // console.log("in_no_struk : "+in_no_struk)
+  // console.log("in_total_belanja : "+in_total_belanja)
+  // console.log("in_tanggal_struk : "+in_tanggal_struk)
+  // console.log("data.items : ", JSON.stringify(data.items))
+  // console.log("data.items length : "+data.items.length)
+  // console.log("======== End Receipt Data ========")
   const { t, i18n } = useTranslation();
   const [IN_SUB_FOOTER_1, setIN_SUB_FOOTER_1] = useState('');
   const [IN_SUB_FOOTER_2, setIN_SUB_FOOTER_2] = useState(''); 

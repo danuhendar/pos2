@@ -52,6 +52,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
 	const [OptionBranch,setOptionBranch] = useState([])
     const [IN_ALAMAT,setIN_ALAMAT] = useState('')
     const [IN_KATEGORI_STORE,setIN_KATEGORI_STORE] = useState('')
+    const [isCheck_1,setisCheck_1] = useState(false)
+    const [isCheck_2,setisCheck_2] = useState(false)
     
     useEffect(() => {
         const res_host = themeConfig.host
@@ -92,15 +94,19 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         var val = event.target.value;
         if(val === 'M'){
             setIN_KATEGORI_STORE('M')
+            setisCheck_1(true)
+            setisCheck_2(false)
         }else if(val === 'R'){
             setIN_KATEGORI_STORE('R')
+            setisCheck_1(false)
+            setisCheck_2(true)
         }
     }
 
     const GenerateKodeGerai = () => {
         const generate = generateAlphanumeric(3,false);
         const kategori = IN_KATEGORI_STORE
-        const res_store_code = kategori+ generate;
+        const res_store_code = kategori+generate;
         setIN_STORE(res_store_code);
     }
     const FormInputKodeGerai = (event: { target: { value: any; }; }) => {
@@ -327,6 +333,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                             customClass: 'sweet-alerts'
                         });
                         GetData(IN_HOST,IN_PORT)
+                        setisCheck_1(false)
+                        setisCheck_2(false)
                         CloseModal()
                     }else if(code.toString().substring(0,1) === '4'){
                         if(code === 401 && msg.includes("Invalid")){
@@ -1004,7 +1012,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                                 {
                                     Title.includes("Form Add") ?
                                     <>
-                                    <InputCheckBoxFilterType event={FormInputSelectKategori} in_title={"Category"} in_value_1={"M"} in_value_2={"R"} in_name_1={"MarketPlace"} in_name_2={"Retail"} in_name_component_1={"kategori"} in_name_component_2={"kategori"} />                
+                                    <InputCheckBoxFilterType isCheck_1={isCheck_1} isCheck_2={isCheck_2}  event={FormInputSelectKategori} in_title={"Category"} in_value_1={"M"} in_value_2={"R"} in_name_1={"MarketPlace"} in_name_2={"Retail"} in_name_component_1={"kategori"} in_name_component_2={"kategori"} />                
                                     <div className="flex items-center justify-between mb-3">
                                         <InputTextType   in_title={"Store"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGerai} in_value={IN_STORE} />
                                         <ButtonAdd in_classname={'btn btn-outline-primary rounded-full text-xs mt-1'} idComponent={"btn_generate_kode_gerai"} isLoading={false} isDisabled={isDisabled} in_icon={<IconRefresh />} in_title_button={'Generate'} HandleClick={GenerateKodeGerai} />

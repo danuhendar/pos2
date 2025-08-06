@@ -21,6 +21,7 @@ import InputCheckBoxFilterType from "../form/InputCheckBoxFilterType";
 import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
 import { DataTable } from "mantine-datatable";
 import IconSave from "../Icon/IconSave";
+import { set } from 'lodash';
 interface FormReturProps {
     url: string,
     jenis: string,
@@ -58,6 +59,10 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
     const [IN_RESULT_SCAN_DESKRIPSI,setIN_RESULT_SCAN_DESKRIPSI] = useState('')
     const [IN_RESULT_SCAN_SATUAN,setIN_RESULT_SCAN_SATUAN] = useState('')
     const [arr_input_item,setarr_input_item] = useState([])
+    const [isCheck1,setisCheck1] = useState(false)
+    const [isCheck2,setisCheck2] = useState(false)
+    const [isCheck3,setisCheck3] = useState(false)
+    const [isCheck4,setisCheck4] = useState(false)
 
     const MySwal = withReactContent(Swal);
     useEffect(() => {
@@ -85,8 +90,26 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
     const FormInputNikPembuat = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NIK_PEMBUAT(val);  };
     const FormInputItem = (value: any) => {var val = value.value;setIN_RESULT_SELECTED_MANUAL(val);   };
     const FormInputDC = (value: any) => {var val = value.value;setIN_ASAL(val);  };
-    const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_METODE(val);  };
-    const FormInputSelectMetodeRetur = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_METODE_RETUR(val);  };
+    const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;setIN_METODE(val); 
+        if(val === '1'){
+            setisCheck3(true)
+            setisCheck4(false)
+        } else if(val === '0'){
+            setisCheck3(false)
+            setisCheck4(true)
+        }
+    };
+    const FormInputSelectMetodeRetur = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;setIN_METODE_RETUR(val);  
+        if(val === '9'){
+            setisCheck1(true)
+            setisCheck2(false)
+        }else if(val === '8'){
+            setisCheck1(false)
+            setisCheck2(true)
+        }
+    };
     const input1Ref = useRef(null);
     const input2Ref = useRef(null);
     const KeyDown = (e: { key: string; }) => {
@@ -541,6 +564,10 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                                 setIN_RESULT_SCAN_SATUAN('')
                                 setIN_RESULT_SELECTED_MANUAL('')
                                 setarr_input_item([])
+                                setisCheck1(false)
+                                setisCheck2(false)
+                                setisCheck3(false)
+                                setisCheck4(false)
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
                                     Swal.fire({
@@ -609,7 +636,7 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                         <InputTextType   in_title={"Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
                     
-                        <InputCheckBoxFilterType event={FormInputSelectMetodeRetur} in_title={"Type Retur"} in_value_1={"9"} in_value_2={"8"} in_name_1={"Retur to Supplier"} in_name_2={"Retur to Distribution Center"} in_name_component_1={"is_tipe_retur"} in_name_component_2={"is_tipe_retur"} />                
+                        <InputCheckBoxFilterType isCheck_1={isCheck1} isCheck_2={isCheck2}  event={FormInputSelectMetodeRetur} in_title={"Type Retur"} in_value_1={"9"} in_value_2={"8"} in_name_1={"Retur to Supplier"} in_name_2={"Retur to Distribution Center"} in_name_component_1={"is_tipe_retur"} in_name_component_2={"is_tipe_retur"} />                
                         
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
@@ -634,7 +661,7 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                             <InputTextType in_title={"Operator"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNikPembuat} in_value={IN_NIK_PEMBUAT} />
                             </div>
                         </div>
-                        <InputCheckBoxFilterType event={FormInputSelectMetodeItem} in_title={"Metode Input"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Scan"} in_name_2={"Select Item"} in_name_component_1={"is_metode"} in_name_component_2={"is_metode"} />                
+                        <InputCheckBoxFilterType isCheck_1={isCheck3} isCheck_2={isCheck4}  event={FormInputSelectMetodeItem} in_title={"Metode Input"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Scan"} in_name_2={"Select Item"} in_name_component_1={"is_metode"} in_name_component_2={"is_metode"} />                
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div className={IN_METODE === '1' ? "" : "hidden"}>
                             <InputTextTypeKeyDown in_title={"Scan Barcode"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputScanBarcode} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyDown} />

@@ -89,18 +89,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [IN_BAYAR,setIN_BAYAR] = useState('')
     const [IN_KEMBALIAN,setIN_KEMBALIAN] = useState('')
     const [IN_GENERATE_KODE_TRANSAKSI_INVENTORY,setIN_GENERATE_KODE_TRANSAKSI_INVENTORY] = useState('')
-    const [OptionBank,setOptionBank] = useState([
-        { value: 'BCA', label: 'BCA' },
-        { value: 'BNI', label: 'BNI' },
-        { value: 'BRI', label: 'BRI' },
-        { value: 'MANDIRI', label: 'MANDIRI' },
-        { value: 'BSI', label: 'BSI' },
-        { value: 'DANA', label: 'DANA' },
-        { value: 'OVO', label: 'OVO' },
-        { value: 'GOPAY', label: 'GOPAY' },
-        { value: 'SPAY', label: 'SPAY' },
-        { value: 'LINKAJA', label: 'LINKAJA' }
-    ]);
+    const [OptionBank,setOptionBank] = useState([])
+
     const [IN_BANK,setIN_BANK] = useState('')
     const [TotalBelanja,setTotalBelanja] = useState('0')
     const [TotalPPN,setTotalPPN] = useState('0')
@@ -159,17 +149,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         const columns = Def_Column_Transaksi_Inventory()
         setData_columns(columns)
         GetMasterGerai(res_host,res_PORT_LOGIN)
-        const OptionMetodePembayaran = [
-            { value: 'CASH', label: 'CASH' },
-            { value: 'DEBIT', label: 'DEBIT' },
-            { value: 'KREDIT', label: 'KREDIT' },
-            { value: 'TRANSFER', label: 'TRANSFER' },
-            { value: 'QRIS', label: 'QRIS' }
-        ];
-        setOptionMetodePembayaran(OptionMetodePembayaran)
+        GetMasterKategoriPembayaran(res_host,res_PORT_LOGIN);
         const column_master_produk = Def_Column_Master_Produk()
         setData_columns_produk(column_master_produk)
-       
     },[]);
 
    
@@ -183,6 +165,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const FormInputHPP = (value: any) => {var val = value.target.value;setIN_HPP(val); };
     const FormInputGross = (value: any) => {var val = value.target.value;setIN_GROSS(val); };
     const FormInputMetodePembayaran = (value: any) => {var val = value.value;setIN_METODE_PEMBAYARAN(val);
+        GetMasterPembayaran(val);
         if(val === 'CASH'){
             // Do something for cash payment
             setIN_IS_CASH(true)
@@ -278,6 +261,104 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         });
     }
 
+    const GetMasterPembayaran = (in_val:string) => {
+        setOptionBank([])
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterPembayaran`
+        let param = {"IN_KODE_KATEGORI":in_val,"IN_KODE_BAYAR":"%"}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS;
+                var arr_ = []
+                for(var i = 0;i<rows.length;i++){
+                    const obj = {"label":rows[i].CONTENT,"value":rows[i].CONTENT}
+                    arr_.push(obj)
+                }
+                setOptionBank(arr_)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
+    const GetMasterKategoriPembayaran = (in_host:string,in_port:number) => {
+        setOptionMetodePembayaran([])
+        let url = `http://${in_host}:${in_port}/api/v2/GetMasterKategoriPembayaran`
+        let param = {"IN_KODE_KATEGORI":"%"}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS;
+                var arr_ = []
+                for(var i = 0;i<rows.length;i++){
+                    const obj = {"label":rows[i].CONTENT,"value":rows[i].KODE_KATEGORI}
+                    arr_.push(obj)
+                }
+                setOptionMetodePembayaran(arr_)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptionsGerai([])
         let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
@@ -389,7 +470,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     setIN_HPP(data_body[0].HPP)
                     setIN_GROSS(data_body[0].GROSS)
                     setIN_QTY('1')
-                    AddList(data_body[0].KODE_BARANG,data_body[0].SATUAN,data_body[0].CONTENT,'1',data_body[0].HPP,data_body[0].GROSS,'0');
+                    AddList(data_body[0].KODE_BARANG,data_body[0].SATUAN,data_body[0].CONTENT,'1',data_body[0].HPP,data_body[0].GROSS,IN_DISKON === '' ? '0' : IN_DISKON.split(',').join(''));
                     setIN_KODE_BARANG('')
                     setIN_DESKRIPSI('')
                     setIN_SATUAN('')
@@ -397,6 +478,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     setIN_HPP('')
                     setIN_GROSS('')
                     setIN_BARCODE('')
+                    setIN_DISKON('')
                     input1Ref.current.focus();
                 }else if(data_body.length > 1){
                         MySwal.fire({
@@ -558,10 +640,51 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         }
     }   
+
+    const recalculateTotals = (IN_DATA_ROWS:any) => {
+        
+            //-- summary --//
+            // Filter hanya data dengan PRICE valid
+            const valid_price = IN_DATA_ROWS.filter((item: { PRICE: number; }) => item.PRICE !== null && !isNaN(item.PRICE));
+            // Hitung total harga (PRICE * QTY)
+            const res_grand_total = valid_price.reduce((acc: number, item: { PRICE: string; }) => {
+                const price = parseFloat(item.PRICE);
+                return acc + price;
+            }, 0);
+            console.log('res_grand_total : ',res_grand_total)
+            // Hitung total diskon
+            const valid_diskon = IN_DATA_ROWS.filter((item: { DISKON: number; }) => item.DISKON !== null && !isNaN(item.DISKON));
+            const res_total_diskon = valid_diskon.reduce((acc: number, item: { DISKON: string; }) => {
+                const diskon = parseFloat(item.DISKON);
+                return acc + diskon;
+            }, 0);
+            console.log('res_total_diskon : ',res_total_diskon)
+            const res_subtotal =  res_grand_total + res_total_diskon
+            const res_grand_total_final = res_grand_total + parseFloat(BiayaOngkir.split(',').join(''))
+            console.log('res_subtotal : ',res_subtotal)
+            setTotalBelanja(GetFormatCurrency(res_subtotal.toString()))
+            setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
+            setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
+        
+        // const newGrandTotal = IN_DATA_ROWS.reduce((sum: number, IN_DATA_ROWS: any) => sum + IN_DATA_ROWS.QTY * IN_DATA_ROWS.PRICE, 0);
+        // const newDiscount = IN_DATA_ROWS.reduce((sum: number, IN_DATA_ROWS: any) => sum + IN_DATA_ROWS.DISKON, 0);
+        // const newSubtotal = newGrandTotal - newDiscount;
+
+        // console.log('newGrandTotal : '+newGrandTotal)
+        // console.log('newSubtotal : '+newSubtotal)
+        // console.log('newDiscount : '+newDiscount)
+        
+
+        // setTotalBelanja(GetFormatCurrency(newSubtotal.toString()));
+        // setTotalDiscount(GetFormatCurrency(newDiscount));
+        // setGrandTotal(GetFormatCurrency(newGrandTotal.toString()));
+    };
     const deleteRow = (idToRemove: number) => {
-        console.log('deleteRow : '+idToRemove)
-        setData_rows((prev) => prev.filter((data_rows) => data_rows.id !== idToRemove));
-        console.log('row now : '+JSON.stringify(data_rows))
+        setData_rows((prev) => {
+            const updated = prev.filter((row) => row.id !== idToRemove);
+            recalculateTotals(updated); // recalculate after filtering
+            return updated;
+        });
     };    
     const Def_Column_Transaksi_Inventory = () => {
         var cols = [
@@ -725,26 +848,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         </div>
                     ),
                 },
-                // {
-                //     accessor: 'IS_FIXED',
-                //     title: 'IS_FIXED',
-                //     sortable: true,
-                //     render: ({ IS_FIXED }) => (
-                //         <div className="flex items-center gap-2">
-                //             <span className={`text-${IS_FIXED === 1 ? 'success' : 'danger'} `}>{(IS_FIXED === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
-                //         </div>
-                //     ),
-                // },
-                // {
-                //     accessor: 'IS_RETUR_SUPPLIER',
-                //     title: 'IS_RETUR_SUPPLIER',
-                //     sortable: true,
-                //     render: ({ IS_RETUR_SUPPLIER }) => (
-                //         <div className="flex items-center gap-2">
-                //             <span className={`text-${IS_RETUR_SUPPLIER === 1 ? 'success' : 'danger'} `}>{(IS_RETUR_SUPPLIER === 1 ? <IconCircleCheck /> : <IconXCircle /> )}</span>
-                //         </div>
-                //     ),
-                // },
             ];
             return  cols;
     }
@@ -1611,11 +1714,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
                                         </div>
                                         <div className="sm:col-span-1">
-                                        <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyAddList} />
+                                        <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
                                         </div>
                                         
                                         <div className="sm:col-span-1">
-                                        <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyAddList} />
+                                        <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyItem} />
                                         </div>
                                         <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
                                         <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
@@ -1646,7 +1749,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
                                         </div>
                                         <div>
-                                        <DropDownGlobal  in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Bank"} idComponent={"bank"} />
+                                        <DropDownGlobal  in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Payment via"} idComponent={"payment_via"} />
                                         </div>
                                     </div>
                                     <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
@@ -1664,7 +1767,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 } />
                                 </div>
                             </div>
-
                             {/* OPEN MODAL MASTER PRODUK */}
                             <ModalComponent in_size_modal={`panel animate__animated my-7 w-full overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
                                 <div className="p-2">

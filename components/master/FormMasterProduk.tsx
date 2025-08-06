@@ -75,6 +75,10 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const [options8,setOptions8] = useState([])
     const [OptionSatuan,setOptionSatuan] = useState([])
     const [Tabs,setTabs] = useState<string>('kategori');
+    const [isCheck_1,setisCheck_1] = useState(false)
+    const [isCheck_2,setisCheck_2] = useState(false)
+    const [isCheck_3,setisCheck_3] = useState(false)
+    const [isCheck_4,setisCheck_4] = useState(false)
 
     const MySwal = withReactContent(Swal);
     
@@ -99,8 +103,26 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const FormInputSatuan = (value: any) => {var val = value.value;setIN_SATUAN(val);  };
     const FormInputVarian= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_VARIAN(val);  };
     const FormInputBarcode= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_BARCODE(val);  };
-    const FormInputIS_Fixed= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_IS_FIXED(val); console.log(val)  };
-    const FormInputIS_Retur_Supplier = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_IS_RETUR_SUPPLIER(val);  };
+    const FormInputIS_Fixed= (event: { target: { value: any; }; }) => {
+        var val = event.target.value;setIN_IS_FIXED(val);
+        if(val === '1'){
+            setisCheck_3(true)
+            setisCheck_4(false)
+        }else if(val === '0'){
+            setisCheck_3(false)
+            setisCheck_4(true)
+        }  
+    };
+    const FormInputIS_Retur_Supplier = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;setIN_IS_RETUR_SUPPLIER(val);
+        if(val === '1'){
+            setisCheck_1(true)
+            setisCheck_2(false)
+        }else if(val === '0'){
+            setisCheck_1(false)
+            setisCheck_2(true)
+        }
+    };
     const FormInputKodeKategori = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KODE_KATEGORI(val);  };
     const FormInputContentKategori = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_CONTENT_KATEGORI(val);  };
 
@@ -514,6 +536,10 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                             customClass: 'sweet-alerts'
                         });
                         GetData(IN_HOST,IN_PORT)
+                        setisCheck_1(false)
+                        setisCheck_2(false)
+                        setisCheck_3(false)
+                        setisCheck_4(false)
                         CloseModal()
                     }else if(code.toString().substring(0,1) === '4'){
                         if(code === 401 && msg.includes("Invalid")){
@@ -1012,11 +1038,10 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                                     <InputTextType   in_title={"Gross"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputGross} in_value={IN_GROSS} />
                                     
                                     
-                                    <InputCheckBoxFilterType event={FormInputIS_Retur_Supplier} in_title={"IS Retur Supplier"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_retur_supplier"} in_name_component_2={"is_retur_supplier"} />
+                                    <InputCheckBoxFilterType isCheck_1={isCheck_1} isCheck_2={isCheck_2}  event={FormInputIS_Retur_Supplier} in_title={"IS Retur Supplier"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_retur_supplier"} in_name_component_2={"is_retur_supplier"} />
                                     <InputTextType   in_title={"Varian"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputVarian} in_value={IN_VARIAN} />
-                                    {/* <InputCheckBoxFilterType event={FormInputSatuan} in_title={"Satuan"} in_value_1={"KARTON"} in_value_2={"PCS"} in_name_1={"KARTON"} in_name_2={"PCS"} in_name_component_1={"satuan"} in_name_component_2={"satuan"} /> */}
                                     <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionSatuan} isSearchable={true} isMulti={false} event={FormInputSatuan} name_component={"Satuan"} idComponent={"satuan"} />
-                                    <InputCheckBoxFilterType event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
+                                    <InputCheckBoxFilterType isCheck_1={isCheck_3} isCheck_2={isCheck_4}  event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
                                     {
 									    Title.includes("Form Add") ? 
                                         <div className="flex items-center gap-2 mb-3">

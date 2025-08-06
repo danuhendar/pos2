@@ -23,6 +23,7 @@ import { DataTable } from "mantine-datatable";
 import IconSave from "../Icon/IconSave";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
+import { set } from 'lodash';
 
 interface FormTerimaBarangMasukProps {
     url: string,
@@ -59,6 +60,8 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const [IN_RESULT_SCAN_DESKRIPSI,setIN_RESULT_SCAN_DESKRIPSI] = useState('')
     const [IN_RESULT_SCAN_SATUAN,setIN_RESULT_SCAN_SATUAN] = useState('')
     const [arr_input_item,setarr_input_item] = useState([])
+    const [isCheck_1,setisCheck_1] = useState(false)
+    const [isCheck_2,setisCheck_2] = useState(false)
 
     const MySwal = withReactContent(Swal);
     useEffect(() => {
@@ -82,7 +85,17 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const FormInputSupplier = (value: any) => {var val = value.value;setIN_ASAL(val);  };
     const FormInputNikPembuat = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NIK_PEMBUAT(val);  };
     const FormInputItem = (value: any) => {var val = value.value;setIN_RESULT_SELECTED_MANUAL(val);   };
-    const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_METODE(val);  };
+    const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;setIN_METODE(val);
+        console.log(val)  
+        if(val === '1'){
+            setisCheck_1(true)
+            setisCheck_2(false)
+        }else{
+            setisCheck_1(false)
+            setisCheck_2(true)
+        }
+    };
     const input1Ref = useRef(null);
     const input2Ref = useRef(null);
     const KeyDown = (e: { key: string; }) => {
@@ -487,10 +500,13 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                                 setIN_RESULT_SCAN_SATUAN('')
                                 setIN_RESULT_SELECTED_MANUAL('')
                                 setIN_KETERANGAN('')
-                                setDate2('')
+                                setDate2(curdate)
                                 setIN_QTY('')
                                 setIN_BARCODE('')
                                 setarr_input_item([])
+                                setIN_METODE('')
+                                setisCheck_1(false)
+                                setisCheck_2(false)
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
                                     Swal.fire({
@@ -596,7 +612,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                             <InputTextType in_title={"Operator"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNikPembuat} in_value={IN_NIK_PEMBUAT} />
                             </div>
                         </div>
-                        <InputCheckBoxFilterType event={FormInputSelectMetodeItem} in_title={"Metode Input"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Scan"} in_name_2={"Select Item"} in_name_component_1={"is_metode"} in_name_component_2={"is_metode"} />                
+                        <InputCheckBoxFilterType isCheck_1={isCheck_1} isCheck_2={isCheck_2}  event={FormInputSelectMetodeItem} in_title={"Metode Input"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Scan"} in_name_2={"Select Item"} in_name_component_1={"is_metode"} in_name_component_2={"is_metode"} />                
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div className={IN_METODE === '1' ? "" : "hidden"}>
                             <InputTextTypeKeyDown in_title={"Scan Barcode"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputScanBarcode} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyDown} />
