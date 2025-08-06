@@ -643,46 +643,37 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     const recalculateTotals = (IN_DATA_ROWS:any) => {
         
-            //-- summary --//
-            // Filter hanya data dengan PRICE valid
-            const valid_price = IN_DATA_ROWS.filter((item: { PRICE: number; }) => item.PRICE !== null && !isNaN(item.PRICE));
-            // Hitung total harga (PRICE * QTY)
-            const res_grand_total = valid_price.reduce((acc: number, item: { PRICE: string; }) => {
-                const price = parseFloat(item.PRICE);
-                return acc + price;
-            }, 0);
-            console.log('res_grand_total : ',res_grand_total)
-            // Hitung total diskon
-            const valid_diskon = IN_DATA_ROWS.filter((item: { DISKON: number; }) => item.DISKON !== null && !isNaN(item.DISKON));
-            const res_total_diskon = valid_diskon.reduce((acc: number, item: { DISKON: string; }) => {
-                const diskon = parseFloat(item.DISKON);
-                return acc + diskon;
-            }, 0);
-            console.log('res_total_diskon : ',res_total_diskon)
-            const res_subtotal =  res_grand_total + res_total_diskon
-            const res_grand_total_final = res_grand_total + parseFloat(BiayaOngkir.split(',').join(''))
-            console.log('res_subtotal : ',res_subtotal)
-            setTotalBelanja(GetFormatCurrency(res_subtotal.toString()))
-            setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
-            setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
-        
-        // const newGrandTotal = IN_DATA_ROWS.reduce((sum: number, IN_DATA_ROWS: any) => sum + IN_DATA_ROWS.QTY * IN_DATA_ROWS.PRICE, 0);
-        // const newDiscount = IN_DATA_ROWS.reduce((sum: number, IN_DATA_ROWS: any) => sum + IN_DATA_ROWS.DISKON, 0);
-        // const newSubtotal = newGrandTotal - newDiscount;
-
-        // console.log('newGrandTotal : '+newGrandTotal)
-        // console.log('newSubtotal : '+newSubtotal)
-        // console.log('newDiscount : '+newDiscount)
-        
-
-        // setTotalBelanja(GetFormatCurrency(newSubtotal.toString()));
-        // setTotalDiscount(GetFormatCurrency(newDiscount));
-        // setGrandTotal(GetFormatCurrency(newGrandTotal.toString()));
+        //-- summary --//
+        // Filter hanya data dengan PRICE valid
+        const valid_price = IN_DATA_ROWS.filter((item: { PRICE: number; }) => item.PRICE !== null && !isNaN(item.PRICE));
+        // Hitung total harga (PRICE * QTY)
+        const res_grand_total = valid_price.reduce((acc: number, item: { PRICE: string; }) => {
+            const price = parseFloat(item.PRICE);
+            return acc + price;
+        }, 0);
+        //console.log('res_grand_total : ',res_grand_total)
+        // Hitung total diskon
+        const valid_diskon = IN_DATA_ROWS.filter((item: { DISKON: number; }) => item.DISKON !== null && !isNaN(item.DISKON));
+        const res_total_diskon = valid_diskon.reduce((acc: number, item: { DISKON: string; }) => {
+            const diskon = parseFloat(item.DISKON);
+            return acc + diskon;
+        }, 0);
+        //console.log('res_total_diskon : ',res_total_diskon)
+        const res_subtotal =  res_grand_total + res_total_diskon
+        const res_grand_total_final = res_grand_total + parseFloat(BiayaOngkir.split(',').join(''))
+        //console.log('res_subtotal : ',res_subtotal)
+        setTotalBelanja(GetFormatCurrency(res_subtotal.toString()))
+        setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
+        setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
     };
     const deleteRow = (idToRemove: number) => {
         setData_rows((prev) => {
             const updated = prev.filter((row) => row.id !== idToRemove);
             recalculateTotals(updated); // recalculate after filtering
+            return updated;
+        });
+        setarr_input_item((prev) => {
+            const updated = prev.filter((item) => item.id !== idToRemove); 
             return updated;
         });
     };    
@@ -873,7 +864,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_BANK('')
         setIN_METODE_PEMBAYARAN('')
         setIN_SHIFT('')
-        setIN_KODE_INITIAL('')
+        //setIN_KODE_INITIAL('')
         setIN_BARCODE('')
         setIN_GENERATE_KODE_TRANSAKSI_INVENTORY('')
         try{
@@ -881,19 +872,23 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         }catch(Ex){
             console.log('input1Ref not found')
         }
+        MySwal.fire({
+            title: t("Please, Input New Order!"),
+            toast: true,
+            position: isRtl ? 'top-start' : 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            showCloseButton: true,
+            customClass: {
+                popup: `color-success`,
+            },
+        });
         
     }
 
     const AddList = (res_kode_barang:string,res_satuan:string,res_deskripsi:string,res_qty:string,res_hpp:string,res_gross:string,res_diskon:string) => {
         try{
             //-- scan barcode --//
-            // res_kode_barang = IN_KODE_BARANG
-            // res_satuan = IN_SATUAN
-            // res_deskripsi = IN_DESKRIPSI
-            // res_qty = IN_QTY === '' ? '0' : IN_QTY.split(',').join('')
-            // res_hpp = IN_HPP
-            // res_gross = IN_GROSS
-            // res_diskon = IN_DISKON === '' ? '0' : IN_DISKON.split(',').join('')
             const objIndex = data_rows.findIndex(((obj: { KODE_BARANG: any; }) => obj.KODE_BARANG == res_kode_barang));
             var qty_before = 0
             try{
@@ -913,6 +908,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 if(res_kode_barang !== '' || res_satuan !== '' || res_deskripsi !== '' || res_qty !== '' || res_hpp !== '' || res_gross !== ''){
                     const obj = {"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty,"DISKON":res_diskon,"PRICE":res_amount,"GROSS":res_gross}
                     arr_input_item.push(obj)
+                    console.log(JSON.stringify(arr_input_item))
                 }else{
 
                 }
@@ -1036,7 +1032,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         input1Ref.current.focus();
         try{
             const text = await navigator.clipboard.readText();
-            console.log('text : '+text)
             if(text !== ''){
                 setIN_BARCODE(text);
                 setIN_DESKRIPSI('')
