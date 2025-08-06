@@ -994,7 +994,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
             setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
         }catch(Ex){
-            console.log(Ex)
             Swal.fire({
                 title: t("Warning"),
                 text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
@@ -1191,9 +1190,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 var code = res_data.code;
                                 var msg = res_data.msg;
                                 if(parseFloat(code) === 200){
-                                    var data_body = res_data.data;
-                                
-                                
                                     Swal.fire({
                                         title: t("Information"),
                                         text: ""+parseFloat(code)+"-"+msg,
@@ -1242,6 +1238,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                 },
                                             });
                                         }
+                                    }else{
+                                        Swal.fire({
+                                            title: t("Warning"),
+                                            text: ""+parseFloat(code)+"-"+msg,
+                                            icon: "warning",
+                                            padding: '2em',
+                                            customClass: 'sweet-alerts'
+                                        });
                                     }
                                     
                                     setLoadingButtonPayment(false)

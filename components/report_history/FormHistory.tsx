@@ -27,6 +27,14 @@ import IconLoader from "../Icon/IconLoader";
 import IconWheel from "../Icon/IconWheel";
 import IconBox from "../Icon/IconBox";
 
+import dynamic from "next/dynamic";
+// import html2pdf from 'html2pdf.js';
+// import html2pdf from 'html2pdf.js';
+// const html2pdf = dynamic(() => import('html2pdf.js'), { ssr: false });
+// We'll import html2pdf dynamically inside the function instead of here.
+import IconDownload from "../Icon/IconDownload";
+
+
 interface FormHistoryProps {
     url: string,
     command: string,
@@ -59,6 +67,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const [IN_TANGGAL_STRUK,setIN_TANGGAL_STRUK] = useState('')
     const [IN_GENERATE_KODE_TRANSAKSI_INVENTORY,setIN_GENERATE_KODE_TRANSAKSI_INVENTORY] = useState('')
     const [GrandTotal,setGrandTotal] = useState('0');
+    const [BiayaOngkir,setBiayaOngkir] = useState('0');
     const [TotalBelanja,setTotalBelanja] = useState('0');
     const [TotalDiskonItem,setTotalDiskonItem] = useState('0');
     const [TotalDiskonMarketPlace,setTotalDiskonMarketPlace] = useState('0');
@@ -137,17 +146,20 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const handlePrint = useReactToPrint({
         content: () => receiptRef.current,
     });
+    const GetDownloadStruk = async (no_struk:string,total_belanja:number,grand_total:number,diskon_market_place:number,diskon_item:number,biaya_ongkir:number,bayar:number,kembalian:number) => {
+        // Dynamically import html2pdf.js here
+        const html2pdfModule = await import('html2pdf.js');
+        const html2pdf = html2pdfModule.default || html2pdfModule;
 
-    const GetHandlePrint = (no_struk:string,total_belanja:number,diskon_market_place:number,diskon_item:number,bayar:number,kembalian:number) => {
         setLoadingButtonReprint(true)
         const in_bayar = GetFormatCurrency(""+bayar)
-        console.log("in_bayar : "+in_bayar)
+        //console.log("in_bayar : "+in_bayar)
         const in_kembali = GetFormatCurrency(""+kembalian)
-        console.log("in_kembali : "+in_kembali)
+        //console.log("in_kembali : "+in_kembali)
         const in_no_struk = no_struk
-        console.log("in_no_struk : "+in_no_struk)
+        //console.log("in_no_struk : "+in_no_struk)
         const in_total_belanja = GetFormatCurrency(""+total_belanja)
-        console.log("in_total_belanja : "+in_total_belanja)
+        //console.log("in_total_belanja : "+in_total_belanja)
         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
         const param = {"IN_NO_STRUK":no_struk,"IN_IS_STATUS":"1"}
         const Token = GetToken()
@@ -167,9 +179,150 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 //console.log('shift : '+summary[0].SHIFT)
                 setIN_TANGGAL_STRUK(summary[0].TANGGAL)
                 //console.log('tanggal : '+summary[0].TANGGAL)
-                setTotalBelanja(GetFormatCurrency(""+summary[0].TOTAL_BELANJA))
-                setTotalDiskonItem(GetFormatCurrency(""+summary[0].TOTAL_DISKON_ITEM))
-                setTotalDiskonMarketPlace(GetFormatCurrency(""+summary[0].TOTAL_DISKON_MARKET_PLACE))
+                setGrandTotal(GetFormatCurrency(""+grand_total))
+                setBiayaOngkir(GetFormatCurrency(""+biaya_ongkir))
+                setTotalBelanja(GetFormatCurrency(""+total_belanja))
+                setTotalDiskonItem(GetFormatCurrency(""+diskon_item))
+                setTotalDiskonMarketPlace(GetFormatCurrency(""+diskon_market_place))
+
+                var rdetail = data_body[0].DETAIL;
+                var detail = [];
+                for(var i = 0;i<rdetail.length;i++){
+                    const obj = {
+                        "IN_KODE_BARANG": rdetail[i].KODE_BARANG,
+                        "IN_DESKRIPSI": rdetail[i].DESKRIPSI,
+                        "IN_SATUAN": rdetail[i].SATUAN,
+                        "IN_HPP": rdetail[i].GROSS,
+                        "IN_PPN": "0",
+                        "IN_GROSS": rdetail[i].GROSS,
+                        "IN_QTY": rdetail[i].QTY,
+                        "IN_DISKON": rdetail[i].DISKON,
+                        "IN_PRICE": rdetail[i].PRICE,
+                        "IN_IS_HADIAH": 0,
+                        "IN_KODE_PROMO": 0,
+                        "IN_IS_RETUR_ITEM": 0
+                    }
+                    detail.push(obj)
+                }
+                if(detail.length > 0){ 
+                    const r = {
+                        items: detail,
+                    };
+                    console.log(JSON.stringify(r))
+                    setDummyData(r);
+                    setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(in_no_struk)
+                    setIN_BAYAR(in_bayar)
+                    setIN_KEMBALIAN(in_kembali)
+                    setTotalBelanja(in_total_belanja)
+                    setTimeout(() => {
+                        if(receiptRef.current){
+                            console.log("Download PDF")
+                                 
+
+                                const timestamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 14);
+                                const filename = `${no_struk}_${timestamp}.pdf`;
+
+                                const opt = {
+                                    margin:       0.5,
+                                    filename:     filename,
+                                    image:        { type: 'jpeg', quality: 0.98 },
+                                    html2canvas:  { scale: 2 },
+                                    jsPDF:        { unit: 'p', format: 'a4', orientation: 'portrait' },
+                                };
+                                //html2pdf().set(opt).from(receiptRef.current).save();
+                                html2pdf().set(opt).from(receiptRef.current).save(filename);
+                        }else{
+                            console.log("receiptRef.current is null")
+                        }
+                    }, 3000);        
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: "Data tidak ditemukan!",
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoadingButton(false)
+                setisDisabled(false)   
+                setLoadingButtonReprint(false)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                setLoadingButton(false)
+                setisDisabled(false)
+                setLoadingButtonReprint(false)
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButton(false)
+                setisDisabled(false)
+                setLoadingButtonReprint(false)
+            }
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoadingButton(false)
+            setisDisabled(false)
+            setLoadingButtonReprint(false)
+        });
+    } 
+    const GetHandlePrint = (no_struk:string,total_belanja:number,grand_total:number,diskon_market_place:number,diskon_item:number,biaya_ongkir:number,bayar:number,kembalian:number) => {
+        setLoadingButtonReprint(true)
+        const in_bayar = GetFormatCurrency(""+bayar)
+        //console.log("in_bayar : "+in_bayar)
+        const in_kembali = GetFormatCurrency(""+kembalian)
+        //console.log("in_kembali : "+in_kembali)
+        const in_no_struk = no_struk
+        //console.log("in_no_struk : "+in_no_struk)
+        const in_total_belanja = GetFormatCurrency(""+total_belanja)
+        //console.log("in_total_belanja : "+in_total_belanja)
+        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
+        const param = {"IN_NO_STRUK":no_struk,"IN_IS_STATUS":"1"}
+        const Token = GetToken()
+        setLoadingButton(true)
+        setisDisabled(true)
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var summary = data_body[0].SUMMARY;
+                //console.log(JSON.stringify(summary))
+                //console.log('nama_pembuat : '+summary[0].NAMA_PEMBUAT)
+                setIN_NAMA_PEMBUAT(summary[0].NAMA_PEMBUAT)
+                setIN_SHIFT(summary[0].SHIFT)
+                //console.log('shift : '+summary[0].SHIFT)
+                setIN_TANGGAL_STRUK(summary[0].TANGGAL)
+                //console.log('tanggal : '+summary[0].TANGGAL)
+                setGrandTotal(GetFormatCurrency(""+grand_total))
+                setBiayaOngkir(GetFormatCurrency(""+biaya_ongkir))
+                setTotalBelanja(GetFormatCurrency(""+total_belanja))
+                setTotalDiskonItem(GetFormatCurrency(""+diskon_item))
+                setTotalDiskonMarketPlace(GetFormatCurrency(""+diskon_market_place))
 
                 var rdetail = data_body[0].DETAIL;
                 var detail = [];
@@ -261,8 +414,6 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             setisDisabled(false)
             setLoadingButtonReprint(false)
         });
-       
-
     }
 
     const Def_Column_HistorySales = () => {
@@ -271,11 +422,13 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     accessor: 'NO_STRUK',
                     title: '#',
                     sortable: true,
-                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,DISKON_MARKET_PLACE,DISKON_ITEM,BAYAR,KEMBALIAN,STATUS }) => (
+                    render: ({ TANGGAL,NO_STRUK,TOTAL_BELANJA,GRAND_TOTAL,DISKON_MARKET_PLACE,DISKON_ITEM,BIAYA_ONGKIR,BAYAR,KEMBALIAN,STATUS }) => (
                         <div className="flex items-center gap-2">
                             {
                                STATUS === 'OK' ?
-                               <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,DISKON_MARKET_PLACE,DISKON_ITEM,BAYAR,KEMBALIAN)}>
+                               <>
+                               <div className="flex flex-row gap-2">
+                                <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,GRAND_TOTAL,DISKON_MARKET_PLACE,DISKON_ITEM,BIAYA_ONGKIR,BAYAR,KEMBALIAN)}>
                                     {
                                         isLoadingButtonReprint ? 
                                         t('Please wait...')
@@ -283,6 +436,17 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                         <IconPrinter />
                                     }
                                 </button>
+                                <button className="rounded-full btn btn-warning btn-sm" onClick={() => GetDownloadStruk(NO_STRUK,TOTAL_BELANJA,GRAND_TOTAL,DISKON_MARKET_PLACE,DISKON_ITEM,BIAYA_ONGKIR,BAYAR,KEMBALIAN)}>
+                                    {
+                                        isLoadingButtonReprint ? 
+                                        t('Please wait...')
+                                        :
+                                        <IconDownload />
+                                    }
+                                </button>
+                               </div>
+                               </>
+                             
                                :
                                STATUS === 'PENDING' ?
                                  <span className="text-warning">{'Pending'}</span>
@@ -418,10 +582,16 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         setLoadawal(false)
         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistorySales`
         const rdate = date2
-        const in_periode_awal = ConvertDateFormat(rdate[0],false)
-        const in_periode_akhir = ConvertDateFormat(rdate[1],false)
+        let in_periode_awal = ''
+        let in_periode_akhir = ''
+        if(rdate.length === 2){
+           in_periode_awal = ConvertDateFormat(rdate[0],false)
+           in_periode_akhir = ConvertDateFormat(rdate[1],false)
+        }else{
+            in_periode_awal = ConvertDateFormat(rdate,false)
+            in_periode_akhir = ConvertDateFormat(rdate,false)
+        }
         const param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
-        console.log(JSON.stringify(param))
         const Token = GetToken()
         setLoadingButton(true)
         setisDisabled(true)
@@ -479,7 +649,6 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             setLoadingContent(false)
         });
     }
-
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     return (
@@ -530,7 +699,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                     ''
                                 }
                                 <div className="hidden">
-                                    <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_grand_total={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} in_total_belanja={TotalBelanja} in_total_diskon_item={TotalDiskonItem} in_total_diskon_market_place={TotalDiskonMarketPlace} in_total_biaya_ongkir={""} />
+                                    <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_grand_total={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} in_total_belanja={TotalBelanja} in_total_diskon_item={TotalDiskonItem} in_total_diskon_market_place={TotalDiskonMarketPlace} in_total_biaya_ongkir={BiayaOngkir} />
                                 </div>
                                 </>
                             } />

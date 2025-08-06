@@ -144,12 +144,12 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
         </table>    
        
         
-        <div className="grid grid-cols-4 gap-3 mt-1 border-b border-black border-dotted font-semi-bold">
+        <div className="grid grid-cols-4 gap-0 mt-1 border-b border-black border-dotted font-semi-bold">
           <div className="col-span-3 text-right">
             <label>Total :</label>
           </div>
           <div className='text-right'>
-            <label>{in_total_belanja}</label>
+            <label>{in_grand_total}</label>
           </div>
           <div className="col-span-3 text-right">
             <label>Diskon Item :</label>
@@ -173,7 +173,7 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
             <label>GrandTotal :</label>
           </div>
           <div className='text-right'>
-            <label>{in_grand_total}</label>
+            <label>{in_total_belanja}</label>
           </div>
         </div>
         <div className="grid grid-cols-4 gap-3">
@@ -183,7 +183,6 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
           <div className='text-right'>
             <label>{in_bayar}</label>
           </div>
-          
         </div> 
         <div className="grid grid-cols-4 gap-3">
           <div className="col-span-3 text-right">
@@ -196,12 +195,12 @@ const Receipt = forwardRef<HTMLDivElement, ReceiptProps>((props, ref) => {
         </div> 
       </div>
       {/* FOOTER */}
-      <div className="grid grid-cols-4 gap-2 mt-4">
+      <div className="grid grid-cols-4 gap-1 mt-4">
         <div className="col-span-3">
-            <h2 className="text-[9px] font-semi-bold text-center -mt-1">{IN_SUB_FOOTER_1}</h2>
-            <h2 className="text-[9px] font-semi-bold text-center -mt-1">{IN_SUB_FOOTER_2}</h2>
-            <h2 className="text-[9px] font-semi-bold text-center -mt-1">{IN_SUB_FOOTER_3}</h2>
-            <h2 className="text-[9px] font-semi-bold text-center -mt-1">{IN_SUB_FOOTER_4}</h2>
+            <h2 className="text-[9px] font-semi-bold text-left -mt-1">{IN_SUB_FOOTER_1}</h2>
+            <h2 className="text-[9px] font-semi-bold text-left -mt-1">{IN_SUB_FOOTER_2}</h2>
+            <h2 className="text-[9px] font-semi-bold text-left -mt-1">{IN_SUB_FOOTER_3}</h2>
+            <h2 className="text-[9px] font-semi-bold text-left -mt-1">{IN_SUB_FOOTER_4}</h2>
         </div>
         <div className="text-right">
             {
