@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 const Index = () => {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setPageTitle('POS'));
+        dispatch(setPageTitle('Point Of Sales'));
     });
     const [isMounted, setIsMounted] = useState(false);
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);

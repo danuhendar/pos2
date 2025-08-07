@@ -159,7 +159,22 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     },[]);
 
    
-    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value; var sp_val = val.split('|'); var kode_gerai = sp_val[0]; setIN_KODE_GERAI(kode_gerai); var nama_gerai = sp_val[1]; setIN_NAMA_GERAI(nama_gerai); var alamat = sp_val[2]; setIN_ALAMAT(alamat); GetPosInitialByKodeGerai(IN_HOST,IN_PORT,kode_gerai)};
+    const FormInputKodeGeraiMutasi  = (value: any) => {
+        var val = value.value; 
+        var sp_val = val.split('|'); 
+        var kode_gerai = sp_val[0]; 
+        setIN_KODE_GERAI(kode_gerai); 
+        var nama_gerai = sp_val[1]; 
+        setIN_NAMA_GERAI(nama_gerai); 
+        var alamat = sp_val[2]; 
+        setIN_ALAMAT(alamat); 
+        if(IDReport === 'Initial'){
+
+        }else{
+            GetPosInitialByKodeGerai(IN_HOST,IN_PORT,kode_gerai)
+        }
+        
+    };
     const FormInputInitialCode = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_KODE_INITIAL(val); };
     const FormInputAlamat  = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_ALAMAT(val); };
     const FormInputItem = (value: any) => {var val = value.target.value;setIN_BARCODE(val); };

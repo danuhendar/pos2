@@ -47,7 +47,7 @@ const LoginCover = () => {
     };
     const [flag, setFlag] = useState('');
     useEffect(() => {
-        dispatch(setPageTitle('POS'))
+        dispatch(setPageTitle('Point Of Sales'))
         setLocale(localStorage.getItem('i18nextLng') || themeConfig.locale);
         const msgauth = themeConfig.MessageAuth
         if(msgauth !== ''){
