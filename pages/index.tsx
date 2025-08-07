@@ -115,7 +115,7 @@ const LoginCover = () => {
                                 <div className="absolute inset-y-0 w-8 from-primary/10 via-transparent to-transparent ltr:-right-10 ltr:bg-gradient-to-r rtl:-left-10 rtl:bg-gradient-to-l xl:w-16 ltr:xl:-right-20 rtl:xl:-left-20"></div>
                                 <div className="ltr:xl:-skew-x-[20deg] rtl:xl:skew-x-[20deg] mb-14">
                                     <Link href="/" className="block w-48 ms-10 lg:w-72">
-                                        <img src="/assets/images/logo_label.svg" alt="Logo" className="w-full" />
+                                        <img src="/assets/images/pusat_layanan.png" alt="Logo" className="w-full" />
                                         {/* <p className="mt-2 text-sm font-bold leading-normal text-center text-primary">"Ceria Melayani Semangat Berprestasi"</p> */}
                                     </Link>
                                 </div>
