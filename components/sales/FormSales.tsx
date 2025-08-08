@@ -659,7 +659,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 },
                             });
                         }
-                        router.push('/apps/sales/closing_shift/')
+                        //router.push('/apps/sales/closing_shift/')
                         setIsEnabledContentSales(false)
                         
                     }else{
