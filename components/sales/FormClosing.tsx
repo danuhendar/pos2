@@ -54,7 +54,8 @@ const [data_rows, setData_rows] = useState([]);
     const [IN_DISKON, setIN_DISKON] = useState('')
     const [IN_NET_SALES, setIN_NET_SALES] = useState('')
     const [LoadingButtonClosing,setLoadingButtonClosing] = useState(false)
-    const [isDisabledClosing,setisDisabledClosing] = useState(false)    
+    const [isDisabledClosing,setisDisabledClosing] = useState(false)   
+    const [InputNik, setInputNik] = useState(''); 
     const MySwal = withReactContent(Swal);
      
     
@@ -70,6 +71,8 @@ const [data_rows, setData_rows] = useState([]);
         }else{
             setIN_KODE_GERAI(kode_gerai)    
         }
+        const nik = get_data_local_storage('nik')
+        setInputNik(nik)
         const op = [{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]
         setOptionsShift(op)
     },[]);
@@ -137,7 +140,7 @@ const [data_rows, setData_rows] = useState([]);
 
     const GetPosInitialByKodeGeraiTanggalShift = () => {
         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosInitialByKodeGeraiTanggalShift`
-        const param = {"IN_TANGGAL":ConvertDateFormat(date2,false),"IN_SHIFT":IN_SHIFT,"IN_KODE_GERAI":IN_KODE_GERAI}
+        const param = {"IN_TANGGAL":ConvertDateFormat(date2,false),"IN_SHIFT":IN_SHIFT,"IN_KODE_GERAI":IN_KODE_GERAI,"IN_NIK":InputNik}
         const Token = GetToken()
         setLoadingButton(true)
         setisDisabled(true)
