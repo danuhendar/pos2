@@ -66,10 +66,11 @@ const [data_rows, setData_rows] = useState([]);
         setPORT(res_PORT_LOGIN)
         
         const kode_gerai = get_data_local_storage('kode_gerai')
+        setIN_KODE_GERAI(kode_gerai)   
         if(kode_gerai === '%'){
             GetMasterGerai(res_host,res_PORT_LOGIN)
         }else{
-            setIN_KODE_GERAI(kode_gerai)    
+            //setIN_KODE_GERAI(kode_gerai)    
         }
         const nik = get_data_local_storage('nik')
         setInputNik(nik)
