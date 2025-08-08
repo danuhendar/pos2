@@ -519,7 +519,7 @@ const [data_rows, setData_rows] = useState([]);
                         <>
                         <div className="grid gap-3 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-1 xs:grid-cols-1">
                             {
-                                IN_KODE_GERAI  !== '%' ?
+                                IN_KODE_GERAI  === '%' ?
                                 <div>
                                 <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
