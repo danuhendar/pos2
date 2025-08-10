@@ -31,12 +31,10 @@ import IconSend from "../Icon/IconSend";
 import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
 import { Input } from "postcss";
 import IconDollarSignCircle from "../Icon/IconDollarSignCircle";
-import IconMenuTodo from "../Icon/Menu/IconMenuTodo";
 import { set } from "lodash";
 import ModalComponent from "../modal/ModalComponent";
 import ComponentsDatatablesAdvanced from "../table/ComponentsDatatablesAdvanced";
 import IconXCircle from "../Icon/IconXCircle";
-import IconCircleCheck from "../Icon/IconCircleCheck";
 import IconCopy from "../Icon/IconCopy";
 import IconTrash from "../Icon/IconTrash";
 import { useReactToPrint } from 'react-to-print';
@@ -127,7 +125,10 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     });
 
     const [isEnabledContentSales, setIsEnabledContentSales] = useState(false);
-    
+    const [is_clear_metode_pembayaran, setIsClearMetodePembayaran] = useState(true);
+    const [is_clear_bank, setIsClearBank] = useState(true);
+    const [IN_NO_WHATSAPP,setIN_NO_WHATSAPP] = useState('')
+
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -183,15 +184,24 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const FormInputQty  = (event: { target: { value: any; }; }) => {var val = event.target.value;const validate_number = validateNumber(val);setIN_QTY(validate_number);  };
     const FormInputHPP = (value: any) => {var val = value.target.value;setIN_HPP(val); };
     const FormInputGross = (value: any) => {var val = value.target.value;setIN_GROSS(val); };
-    const FormInputMetodePembayaran = (value: any) => {var val = value.value;setIN_METODE_PEMBAYARAN(val);
-        GetMasterPembayaran(val);
-        if(val === 'CASH'){
-            // Do something for cash payment
-            setIN_IS_CASH(true)
-            setIN_BANK('')
+    const FormInputMetodePembayaran = (value: any) => {
+        console.log('val metode pembayaran : '+value.value)
+        var val = value.value;
+       
+        if(val === null){
+            console.log('kondisi null')
         }else{
-            setIN_IS_CASH(false)
+            setIN_METODE_PEMBAYARAN(val);
+            GetMasterPembayaran(val);
+            if(val === 'CASH'){
+                // Do something for cash payment
+                setIN_IS_CASH(true)
+                setIN_BANK('CASH')
+            }else{
+                setIN_IS_CASH(false)
+            }
         }
+        
     };
     const FormInputKodeBarang = (value: any) => {var val = value.target.value;setIN_KODE_BARANG(val); };
     const FormInputTotalBelanja = (value: any) => {var val = value.target.value;setIN_TOTAL_BELANJA(val); };
@@ -275,6 +285,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const FormInputUangModal = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setIN_UANG_MODAL(val_currency); };
     const FormInputUangLaci = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number);setIN_UANG_LACI(val_currency); };
     const FormInputShiftInitial = (value: any) => {var val = value.value;setIN_SHIFT_INITIAL(val); };
+    const FormInputNoWhatsApp = (value: any) => {var val = value.target.value;setIN_NO_WHATSAPP(val); };
     const SubmitPayment = () => {
         input4Ref.current.focus();
     }
@@ -285,22 +296,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             GetMasterProdukByBarcode();
         }
     }
-    const KeyAddList = (e: { key: string; }) => {
-        if (e.key === 'Enter') {
-            // Move focus to input 3
-            input1Ref.current.focus();
-            AddList(IN_KODE_BARANG,IN_SATUAN,IN_DESKRIPSI,IN_QTY,IN_HPP,IN_GROSS,(IN_DISKON === '' ? '0' : IN_DISKON.split(',').join('')));
-            setIN_BARCODE('')
-            setIN_KODE_BARANG('')
-            setIN_DESKRIPSI('')
-            setIN_SATUAN('')
-            setIN_QTY('')
-            setIN_HPP('')
-            setIN_GROSS('')
-            setIN_DISKON('')
-        }
-    }
-
     const CopyText = (Text:string) => {
         navigator.clipboard.writeText(Text);
         MySwal.fire({
@@ -378,6 +373,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 var data_body = res_data.data;
                 var rows = data_body[0].ROWS;
                 var arr_ = []
+                arr_.push({"label":"-- Select Option --","value":null})
                 for(var i = 0;i<rows.length;i++){
                     const obj = {"label":rows[i].CONTENT,"value":rows[i].KODE_KATEGORI}
                     arr_.push(obj)
@@ -888,6 +884,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     const CreateNewOrder = () => {
         setarr_input_item([])
+        setIN_METODE_PEMBAYARAN(null)
         setData_rows([])
         setIN_BARCODE('')
         setIN_KODE_BARANG('')
@@ -1203,7 +1200,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         padding: '2em',
                                         customClass: 'sweet-alerts'
                                     });
-                                    handlePrint()
+                                    
+                                    //handlePrint()
                                     CreateNewOrder()
                                     
                                     setLoadingButtonPayment(false)
@@ -1627,7 +1625,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 IN_IS_GERAI === '0' ?
                                 <>
                                 <div>
-                                <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
                                 <div>
                                 <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
@@ -1663,7 +1661,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             {
                                 IDReport === 'Initial' ?
                                 <div>
-                                <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionShift} isSearchable={true} isMulti={false} event={FormInputShiftInitial} name_component={"Shift Initial"} idComponent={"ShiftInitial"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionShift} isSearchable={true} isMulti={false} event={FormInputShiftInitial} name_component={"Shift Initial"} idComponent={"ShiftInitial"} />
                                 </div>
                                 :
                                 ''
@@ -1746,7 +1744,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     }
                                     />
                                     </div>
-                                    <div>
+                                    
                                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
                                         <>
                                         <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
@@ -1773,12 +1771,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         <div>
                                             <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
                                         </div>
+                                    
                                         </>
                                     } />
-                                    </div>
+                                     
                                     {/* INPUT PAYMENT */}
-                                    <div className="-mt-1">
-                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl"} in_judul={"Input Payment"} in_content={
+                                    <div className="">
+                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl h-auto"} in_judul={"Input Payment"} in_content={
                                         <>
                                         <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
                                             <div className="sm:grid-cols-1">
@@ -1796,10 +1795,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         </div>
                                         <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
                                             <div>
-                                            <DropDownGlobal  in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
+                                            <DropDownGlobal in_is_clear={is_clear_metode_pembayaran} in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
                                             </div>
                                             <div>
-                                            <DropDownGlobal  in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Payment via"} idComponent={"payment_via"} />
+                                            <DropDownGlobal in_is_clear={is_clear_bank} in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Payment via"} idComponent={"payment_via"} />
+                                            </div>
+                                            <div className="col-span-2">
+                                            <InputTextType   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
                                             </div>
                                         </div>
                                         <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">

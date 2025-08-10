@@ -615,13 +615,13 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         <>
                         <div className="flex flex-row items-start gap-3 mb-3">
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahun} name_component={"Year"} idComponent={"tahun"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahun} name_component={"Year"} idComponent={"tahun"} />
                             </div>
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulan} name_component={"Month"} idComponent={"bulan"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulan} name_component={"Month"} idComponent={"bulan"} />
                             </div>
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                             </div>
                             <div>
                             <label>&nbsp;</label>
@@ -639,13 +639,13 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         <>
                         <div className="flex flex-row items-start gap-3 mb-3">
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahunMutasi} name_component={"Year"} idComponent={"tahunmutasi"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahunMutasi} name_component={"Year"} idComponent={"tahunmutasi"} />
                             </div>
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulanMutasi} name_component={"Month"} idComponent={"bulanmutasi"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulanMutasi} name_component={"Month"} idComponent={"bulanmutasi"} />
                             </div>
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"geraimutasi"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"geraimutasi"} />
                             </div>
                             <div>
                             <label>&nbsp;</label>

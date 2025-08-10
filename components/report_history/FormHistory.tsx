@@ -759,7 +759,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                             {
                                 IN_KODE_GERAI  !== '%' ?
                                 <div>
-                                <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
                                 :
                                 <div>

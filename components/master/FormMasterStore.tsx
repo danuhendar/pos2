@@ -1004,7 +1004,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                             <div className="mb-5">
 								{
 									Title.includes("Form Add") ? 
-									<DropDownGlobal  in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionBranch} isSearchable={true} isMulti={false} event={FormSelectBranch} name_component={"Branch"} idComponent={"branch"} />
+									<DropDownGlobal in_is_clear={false} in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionBranch} isSearchable={true} isMulti={false} event={FormSelectBranch} name_component={"Branch"} idComponent={"branch"} />
 									:
 									<InputTextType    in_title={"Branch"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBranch} in_value={IN_BRANCH} />
 								}

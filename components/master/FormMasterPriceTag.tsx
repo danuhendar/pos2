@@ -241,7 +241,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
                             {
                                 ISCOMBO_GERAI ?
                                 <div>
-                                <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
                                 :
                                 <div>
@@ -249,7 +249,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
                                 </div>
                             }
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputKategori} name_component={"Category"} idComponent={"kategori"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputKategori} name_component={"Category"} idComponent={"kategori"} />
                             </div>
                             <div className="lg:mt-8 md:mt-8">
                             <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Filter'} HandleClick={GetMasterProdukByKodeKategori} />    

@@ -1,5 +1,6 @@
 'use client'
 import { GetID } from "@/lib/global";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import Select from 'react-select';
 
@@ -11,11 +12,13 @@ interface DropDownGlobalProps{
     isMulti:boolean,
     event:any,
     name_component:string,
-    idComponent:string
+    idComponent:string,
+    in_is_clear:boolean,
 }
 
-const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_classname_content,data_options,isSearchable,isMulti,event,name_component,idComponent}) => {
+const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_classname_content,data_options,isSearchable,isMulti,event,name_component,idComponent,in_is_clear}) => {
     const { t, i18n } = useTranslation();
+    const [selectedOption, setSelectedOption] = useState(data_options[0]);
     return (
         <>
             {
@@ -31,6 +34,7 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                             options={data_options}
                             isMulti={isMulti}
                             isSearchable={isSearchable}
+                            isClearable={in_is_clear}
                         />
                     </div>
                 </div>
@@ -43,6 +47,7 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                     options={data_options}
                     isMulti={isMulti}
                     isSearchable={isSearchable}
+                    isClearable={in_is_clear}
                 />
             }
             

@@ -501,7 +501,7 @@ const FormToolsCommand: React.FC<FormToolsCommandProps> = ({ url, command, IDRep
                                       <DropDownBranch in_classname_title={"mb-1"} in_classname_content={'w-full'} data_options={options5} isSearchable={true} isMulti={false} event={userSelectKodeCabang} />
                                     </div>
                                     <div>
-                                        <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={'w-full'} data_options={optionsLokasi} isSearchable={true} isMulti={false} event={userSelectLokasi} name_component={'Location'} idComponent={''} />
+                                        <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={'w-full'} data_options={optionsLokasi} isSearchable={true} isMulti={false} event={userSelectLokasi} name_component={'Location'} idComponent={''} />
                                     </div>
                                     <div>
                                         <InputTextType   in_title={'IP'} in_classname_title={'mb-1'} in_classname_content={'w-full'} in_classname_sub_content={'text-sm rounded-lg form-input'} data_options={[]} isDisabled={false} event={FormInputIP} in_value={IN_DETAIL_IP} />

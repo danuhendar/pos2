@@ -1136,7 +1136,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                         </div>
                                         </div>
                                         <DropDownBranch in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options5} isSearchable={true} isMulti={true} event={userSelectKodeCabang} />
-                                        <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={userSelectTarget} name_component={"Target"} idComponent={""} />
+                                        <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={userSelectTarget} name_component={"Target"} idComponent={""} />
                                         <div className="mb-3">
                                             <div className="grid grid-cols-8 gap-3 mt-4 mb-4 sm:grid-cols-2">
                                                 <ButtonFilter in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_filter"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconSearch />} in_title_button={"Filter"} HandleClick={HandleClick} />
@@ -1158,7 +1158,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                             </div>
                                             {
                                             Isinput ?   
-                                            <DropDownGlobal in_classname_title={""} in_classname_content={""} data_options={options5} isSearchable={true} isMulti={false} event={userSelectBranch} name_component={"Select Branch Code"} idComponent={"cmb_kode_cabang_input"} />        
+                                            <DropDownGlobal in_is_clear={false}in_classname_title={""} in_classname_content={""} data_options={options5} isSearchable={true} isMulti={false} event={userSelectBranch} name_component={"Select Branch Code"} idComponent={"cmb_kode_cabang_input"} />        
                                             :
                                             <InputTextType   in_title={""} in_classname_title={""} in_classname_content={""} in_classname_sub_content={"text-xs form-input ltr:rounded-l-none rtl:rounded-r-none"} data_options={undefined} isDisabled={false} event={userSelectCmbBranchCoverage} in_value={IN_DETAIL_CMB_BRANCH_COVERAGE} /> 
                                             }
@@ -1201,7 +1201,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                                 <div className="bg-[#eee] flex justify-center items-center ltr:rounded-l-md rtl:rounded-r-md px-3 font-semibold border ltr:border-r-0 rtl:border-l-0 border-white-light dark:border-[#17263c] dark:bg-[#1b2e4b]">
                                                     <IconCpuBolt />
                                                 </div>
-                                                <DropDownGlobal in_classname_title={""} in_classname_content={""} data_options={options8} isSearchable={true} isMulti={false} event={userSelectTarget} name_component={""} idComponent={""} />
+                                                <DropDownGlobal in_is_clear={false}in_classname_title={""} in_classname_content={""} data_options={options8} isSearchable={true} isMulti={false} event={userSelectTarget} name_component={""} idComponent={""} />
                                             </div>
                                     </div>
                                     {
@@ -1278,7 +1278,7 @@ const FormPassword: React.FC<FormPasswordProps> = ({IDReport,target,jenis}) => {
                                                 </div>
                                             </div>
                                             <DropDownBranch in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options10} isSearchable={true} isMulti={false} event={userSelectKodeCabangTargetBC} />
-                                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={userSelectTargetBC} name_component={"Station"} idComponent={""} />
+                                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={userSelectTargetBC} name_component={"Station"} idComponent={""} />
                                             {
                                                 IsValMulti ? 
                                                 ''

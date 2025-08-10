@@ -1170,7 +1170,7 @@ const FormDeviceServer: React.FC<FormDeviceServerProps> = ({ url, command, IDRep
                             </div>
                             </div>
                             <DropDownBranch in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options5} isSearchable={true} isMulti={false} event={userSelectKodeCabang} />
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userSelectDevice} name_component={"Select Device"} idComponent={""} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userSelectDevice} name_component={"Select Device"} idComponent={""} />
                             <div className="mb-3">
                                 <div className="flex">
                                     <button id="btn_filter" disabled={!active} onClick={() => {

@@ -576,10 +576,10 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
                             </div>
                             <div>
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Store"} idComponent={"gerai"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Store"} idComponent={"gerai"} />
                             </div>
                         </div>
 
@@ -618,7 +618,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                             <InputTextTypeKeyDown in_title={"Scan Barcode"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputScanBarcode} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyDown} />
                             </div>
                             <div className={IN_METODE === '0' ? "" : "hidden"}>
-                            <DropDownGlobal in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsItem} isSearchable={true} isMulti={false} event={FormInputItem} name_component={"Item"} idComponent={"item"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsItem} isSearchable={true} isMulti={false} event={FormInputItem} name_component={"Item"} idComponent={"item"} />
                             </div>
                             <div className={IN_METODE === '' ? "hidden" : ""}>
                                 <InputTextTypeKeyDown in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyDownQty} />                        

@@ -867,13 +867,13 @@ const FormMonitoringConfigWDCP: React.FC<FormMonitoringConfigWDCPProps> = ({url,
                         {station === 'RBWDCP' ?
                             <div className="grid grid-cols-1 gap-1">
                                 <div>
-                                    <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userFormSelectTimeZone} name_component={"Time Zone Router"} idComponent={"cmb_timezone"} />
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userFormSelectTimeZone} name_component={"Time Zone Router"} idComponent={"cmb_timezone"} />
                                 </div>
                             </div>
                             :
                             <div className="grid grid-cols-2 gap-1">
                                 <div>
-                                    <DropDownGlobal in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userFormSelectTimeZone} name_component={"Time Zone Router"} idComponent={"cmb_timezone"} />
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={userFormSelectTimeZone} name_component={"Time Zone Router"} idComponent={"cmb_timezone"} />
                                 </div>
                                 <div>
                                     <InputTextType   in_title={"IP Routing CDC"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark rounded-xl"} data_options={undefined} isDisabled={false} event={FormInputRoutingIPCDC} in_value={FormIp_Routing_CDC} />
