@@ -3,7 +3,7 @@ import {   useEffect,  useRef,  useState } from "react";
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import {   AddID, GenerateUniqNumber, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, get_format_tanggal_jam_format_indo, GetFormatCurrency, GetToken, groupByValueAndCount, summarizeJSONObjectByValue, validateNumber} from "@/lib/global";
+import {   AddID, GenerateUniqNumber, get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, get_format_tanggal_jam_format_indo, GetFormatCurrency, GetID, GetToken, groupByValueAndCount, summarizeJSONObjectByValue, validateNumber} from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -40,6 +40,7 @@ import IconTrash from "../Icon/IconTrash";
 import { useReactToPrint } from 'react-to-print';
 import Receipt from "./PrintReceipt";
 import IconPrinter from "../Icon/IconPrinter";
+import Select from 'react-select';
 
 interface FormSalesProps {
     url: string,
@@ -129,6 +130,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [is_clear_bank, setIsClearBank] = useState(true);
     const [IN_NO_WHATSAPP,setIN_NO_WHATSAPP] = useState('')
 
+    const defaultOption = { value: "", label: "-- Select Method --" }; // Your default
+    const [selectedOption, setSelectedOption] = useState(defaultOption);
+    const defaultOptionVia = { value: "", label: "-- Select Via --" }; // Your default
+    const [selectedBankOption, setSelectedBankOption] = useState(defaultOptionVia);
+
+
+
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -191,6 +199,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         if(val === null){
             console.log('kondisi null')
         }else{
+            setSelectedOption(value);
             setIN_METODE_PEMBAYARAN(val);
             GetMasterPembayaran(val);
             if(val === 'CASH'){
@@ -278,7 +287,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
        
     }
     const FormInputKembalian = (value: any) => {var val = value.target.value;setIN_KEMBALIAN(val); };
-    const FormInputBank = (value: any) => {var val = value.value;setIN_BANK(val); };
+    const FormInputBank = (value: any) => {
+        var val = value.value;
+        setIN_BANK(val); 
+        setSelectedBankOption(value);
+    };
     const FormInputDiskon = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setIN_DISKON(val_currency); };
     const FormInputNikInitial = (value: any) => {var val = value.target.value;setIN_NIK_INITIAL(val); };
     const FormInputNamaInitial = (value: any) => {var val = value.target.value;setIN_NAMA_INITIAL(val); };
@@ -324,6 +337,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 var data_body = res_data.data;
                 var rows = data_body[0].ROWS;
                 var arr_ = []
+                arr_.push({"label":"-- Select Option --","value":""})
                 for(var i = 0;i<rows.length;i++){
                     const obj = {"label":rows[i].CONTENT,"value":rows[i].CONTENT}
                     arr_.push(obj)
@@ -373,7 +387,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 var data_body = res_data.data;
                 var rows = data_body[0].ROWS;
                 var arr_ = []
-                arr_.push({"label":"-- Select Option --","value":null})
+                arr_.push({"label":"-- Select Option --","value":""})
                 for(var i = 0;i<rows.length;i++){
                     const obj = {"label":rows[i].CONTENT,"value":rows[i].KODE_KATEGORI}
                     arr_.push(obj)
@@ -884,7 +898,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     const CreateNewOrder = () => {
         setarr_input_item([])
-        setIN_METODE_PEMBAYARAN(null)
+        //setIN_METODE_PEMBAYARAN(null)
+        setSelectedOption(defaultOption); // 🔹 reset state
+        setSelectedBankOption(defaultOptionVia);
         setData_rows([])
         setIN_BARCODE('')
         setIN_KODE_BARANG('')
@@ -1116,6 +1132,40 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         });   
     }
+    const GenerateReceiptStruk = (in_no_struk:string) => {
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
+        let param = {"IN_NO_STRUK": in_no_struk}
+        const Token = GetToken()
+        //console.log(JSON.stringify(param))
+        setLoadingButtonPayment(true)
+        setisDisabledButtonPayment(true)
+        Posts(url,JSON.stringify(param),false,Token).then(async (response) => {
+ 
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = 'receipt_'+get_format_tanggal_jam_format_indo().split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setLoadingButtonPayment(false)
+            setisDisabledButtonPayment(false)
+        
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoadingButtonPayment(false)
+            setisDisabledButtonPayment(false)
+        });
+    }
     const InsPosTransaksiSales = () => {
         Swal.fire({
             icon: "question",
@@ -1182,6 +1232,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             "IN_BANK": IN_BANK,
                                             "IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,
                                             "IN_KODE_TRANSAKSI_INVENTORY":kode_transaksi_inventory,
+                                            "IN_NO_WHATSAPP":IN_NO_WHATSAPP,
                                             "IN_DETAIL":detail
                                         }
                             const Token = GetToken()
@@ -1193,6 +1244,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 var code = res_data.code;
                                 var msg = res_data.msg;
                                 if(parseFloat(code) === 200){
+                                    //-- generate struk online --//
+                                    var res_no_struk = res_data.data;
+                                   
                                     Swal.fire({
                                         title: t("Information"),
                                         text: ""+parseFloat(code)+"-"+msg,
@@ -1200,10 +1254,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         padding: '2em',
                                         customClass: 'sweet-alerts'
                                     });
-                                    
-                                    //handlePrint()
+                                    console.log('res_no_struk :'+res_no_struk)
+                                    GenerateReceiptStruk(res_no_struk)
                                     CreateNewOrder()
-                                    
                                     setLoadingButtonPayment(false)
                                     setisDisabledButtonPayment(false)
                                 }else if(code.toString().substring(0,1) === '4'){
@@ -1589,24 +1642,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             }
         });
     }
-    
-    const GetHandlePrint = () => {
-        if(IN_BAYAR === null || IN_BAYAR === '' || IN_BAYAR === '0' || IN_BAYAR === '0.00'){
-            Swal.fire({
-                title: t("Warning"),
-                text: "401-Error : Receipt not found, please check your data input!",
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
-            });
-        }else{
-            handlePrint()
-        }
-    }
-     
-    const handlePrint = useReactToPrint({
-        content: () => receiptRef.current,
-    });
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     return (
@@ -1795,25 +1830,73 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         </div>
                                         <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
                                             <div>
-                                            <DropDownGlobal in_is_clear={is_clear_metode_pembayaran} in_classname_title={"mb-1 mt-5 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionMetodePembayaran} isSearchable={true} isMulti={false} event={FormInputMetodePembayaran} name_component={"Method"} idComponent={"metode_pembayaran"} />
+                                            {/* <DropDownGlobal 
+                                                in_is_clear={is_clear_metode_pembayaran} 
+                                                in_classname_title={"mb-1 mt-5 text-xs"} 
+                                                in_classname_content={"w-full text-xs"} 
+                                                data_options={OptionMetodePembayaran} 
+                                                isSearchable={true} 
+                                                isMulti={false} 
+                                                event={FormInputMetodePembayaran} 
+                                                name_component={"Method"} 
+                                                idComponent={"metode_pembayaran"} />
+                                            */}
+                                                <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Method")}</label></div>
+                                                <div className="mb-3">
+                                                    <div className={"w-full text-xs"}>
+                                                        <Select
+                                                            onChange={FormInputMetodePembayaran}
+                                                            id={"metode_pembayaran"}
+                                                            placeholder={t("Select Method")}
+                                                            options={OptionMetodePembayaran}
+                                                            isMulti={false}
+                                                            isSearchable={true}
+                                                            isClearable={false}
+                                                            value={selectedOption}
+                                                            //defaultValue={defaultOption}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div>
-                                            <DropDownGlobal in_is_clear={is_clear_bank} in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} data_options={OptionBank} isSearchable={true} isMulti={false} event={FormInputBank} name_component={"Payment via"} idComponent={"payment_via"} />
+                                            {/* <DropDownGlobal 
+                                                in_is_clear={is_clear_bank} 
+                                                in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} 
+                                                in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} 
+                                                data_options={OptionBank} 
+                                                isSearchable={true} 
+                                                isMulti={false} 
+                                                event={FormInputBank} 
+                                                name_component={"Payment via"} 
+                                                idComponent={"payment_via"} /> */}
+                                                <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Payment via")}</label></div>
+                                                <div className="mb-3">
+                                                    <div className={"w-full text-xs"}>
+                                                        <Select
+                                                            onChange={FormInputBank}
+                                                            id={"payment_via"}
+                                                            placeholder={t("Select Via")}
+                                                            options={OptionBank}
+                                                            isMulti={false}
+                                                            isSearchable={true}
+                                                            isClearable={false}
+                                                            value={selectedBankOption}
+                                                            //defaultValue={defaultOption}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="col-span-2">
                                             <InputTextType   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
                                             </div>
                                         </div>
-                                        <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                        <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
                                             <div>
                                             <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
                                             </div>
-                                            <div>
+                                            {/* <div>
                                             <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
-                                            </div>
-                                            <div className="hidden">
-                                                <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_total_belanja={TotalBelanja} in_tanggal_struk={get_format_tanggal_jam_format_indo()} in_total_diskon_item={TotalDiscount} in_total_diskon_market_place={DiskonMarketPlace} in_total_biaya_ongkir={BiayaOngkir} in_grand_total={GrandTotal} />
-                                            </div>
+                                            </div> */}
                                         </div>
                                         </>
                                     } />
