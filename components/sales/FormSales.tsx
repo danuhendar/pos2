@@ -7,7 +7,7 @@ import {   AddID, GenerateUniqNumber, get_data_local_storage, get_dateTimeDiff_s
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
-import { Posts } from "@/lib/post";
+import { Posts, PostsDownload } from "@/lib/post";
 import ButtonAdd from "../button/ButtonAdd";
 import IconRefresh from "../Icon/IconRefresh";
 import withReactContent from "sweetalert2-react-content";
@@ -154,7 +154,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         const kode_gerai = get_data_local_storage('kode_gerai');
         setIN_KODE_GERAI(kode_gerai)
         if(is_gerai === '1'){
-            GetPosInitialByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai)
+            GetPosInitialByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai,InputNikPemohon)
             GetMasterGeraiByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai);
         }else{
            
@@ -180,7 +180,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         if(IDReport === 'Initial'){
 
         }else{
-            GetPosInitialByKodeGerai(IN_HOST,IN_PORT,kode_gerai)
+            GetPosInitialByKodeGerai(IN_HOST,IN_PORT,kode_gerai,IN_NIK_PEMBUAT)
         }
         
     };
@@ -602,10 +602,10 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         });
     }
-    const GetPosInitialByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string) => {
+    const GetPosInitialByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string,in_nik:string) => {
         try{
             let url = `http://${in_host}:${in_port}/api/v2/GetPosInitialByKodeGerai`
-            let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT,"IN_TANGGAL":get_format_tanggal_jam().substring(0,10)}
+            let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT,"IN_TANGGAL":get_format_tanggal_jam().substring(0,10),"IN_NIK":in_nik}
             const Token = GetToken()
             setLoadingButton(true)
             setisDisabled(true)
@@ -923,6 +923,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setDiskonMarketPlace('0')
         setIN_BARCODE('')
         setIN_GENERATE_KODE_TRANSAKSI_INVENTORY('')
+        setIN_NO_WHATSAPP('')
         try{
             input1Ref.current.focus();
         }catch(Ex){
@@ -1132,27 +1133,29 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             });
         });   
     }
-    const GenerateReceiptStruk = (in_no_struk:string) => {
+    const GenerateReceiptStruk = (
+        in_no_struk:string
+    ) => {
+        // let in_no_struk = "202508130004"
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
         let param = {"IN_NO_STRUK": in_no_struk}
         const Token = GetToken()
         //console.log(JSON.stringify(param))
         setLoadingButtonPayment(true)
         setisDisabledButtonPayment(true)
-        Posts(url,JSON.stringify(param),false,Token).then(async (response) => {
- 
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = 'receipt_'+get_format_tanggal_jam_format_indo().split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
+        const NameFile = 'receipt_'+get_format_tanggal_jam_format_indo().split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
+        PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
+            if(response){
+                Swal.fire({
+                    title: t("Success"),
+                    text: t("Struk Online Berhasil dibuat!"),
+                    icon: "success",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
             setLoadingButtonPayment(false)
             setisDisabledButtonPayment(false)
-        
         }).catch((error) => {
             console.log(error)
             Swal.fire({
@@ -1254,7 +1257,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         padding: '2em',
                                         customClass: 'sweet-alerts'
                                     });
-                                    console.log('res_no_struk :'+res_no_struk)
+                                    //console.log('res_no_struk :'+res_no_struk)
                                     GenerateReceiptStruk(res_no_struk)
                                     CreateNewOrder()
                                     setLoadingButtonPayment(false)
@@ -1895,7 +1898,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
                                             </div>
                                             {/* <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GetHandlePrint} />
+                                            <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GenerateReceiptStruk} />
                                             </div> */}
                                         </div>
                                         </>
