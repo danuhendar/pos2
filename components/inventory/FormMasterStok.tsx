@@ -321,8 +321,10 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'DESKRIPSI',
                     title: 'CONTENT',
                     sortable: true,
+                    width: 120, // fixed width
                     render: ({ DESKRIPSI }) => (
-                        <div className="flex items-center gap-2">
+                        
+                        <div className="flex items-center gap-2" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                             <div className="font-semibold">{DESKRIPSI}</div>
                         </div>
                     ),
@@ -339,7 +341,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'SALDO_AWAL',
-                    title: 'SALDO_AWAL',
+                    title: 'AWAL',
                     sortable: true,
                     render: ({ SALDO_AWAL }) => (
                         <div className="flex items-center gap-2">
@@ -359,7 +361,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'SALES',
-                    title: 'SALES',
+                    title: 'SLS',
                     sortable: true,
                     render: ({ SALES }) => (
                         <div className="flex items-center gap-2">
@@ -389,7 +391,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'TRANSFER_GERAI',
-                    title: 'TRANSFER_GERAI',
+                    title: 'TF_GERAI',
                     sortable: true,
                     render: ({ TRANSFER_GERAI }) => (
                         <div className="flex items-center gap-2">
@@ -409,7 +411,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'RETUR_SALES',
-                    title: 'RETUR_SALES',
+                    title: 'RETSLS',
                     sortable: true,
                     render: ({ RETUR_SALES }) => (
                         <div className="flex items-center gap-2">
@@ -419,7 +421,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'RETUR_DC',
-                    title: 'RETUR_DC',
+                    title: 'RETDC',
                     sortable: true,
                     render: ({ RETUR_DC }) => (
                         <div className="flex items-center gap-2">
@@ -429,7 +431,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'RETUR_SUPPLIER',
-                    title: 'RETUR_SUPPLIER',
+                    title: 'RETSUP',
                     sortable: true,
                     render: ({ RETUR_SUPPLIER }) => (
                         <div className="flex items-center gap-2">
@@ -439,7 +441,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'VOID_SALES',
-                    title: 'VOID_SALES',
+                    title: 'VOID',
                     sortable: true,
                     render: ({ VOID_SALES }) => (
                         <div className="flex items-center gap-2">
@@ -449,7 +451,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 },
                 {
                     accessor: 'SALDO_AKHIR',
-                    title: 'SALDO_AKHIR',
+                    title: 'AKHIR',
                     sortable: true,
                     render: ({ SALDO_AKHIR }) => (
                         <div className="flex items-center gap-2">

@@ -4,11 +4,11 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import { AddColumn, AddID, ConvertDateFormat, GetFormatCurrency, GetToken,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
+import { AddColumn, AddID, ConvertDateFormat, GetFormatCurrency, GetToken,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, get_format_tanggal_jam_format_indo, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
-import { Posts } from "@/lib/post";
+import { Posts, PostsDownload } from "@/lib/post";
 import ButtonAdd from "../button/ButtonAdd";
 import IconRefresh from "../Icon/IconRefresh";
 import ComponentsDatatablesAdvanced from "../table/ComponentsDatatablesAdvanced";
@@ -157,7 +157,8 @@ const [data_rows, setData_rows] = useState([]);
                 setIN_NIK(data_body[0].NIK)
                 setIN_NAMA(data_body[0].NAMA)
                 setIN_GROSS_SALES(GetFormatCurrency(data_body[0].SALES))
-                setIN_DISKON(GetFormatCurrency(data_body[0].DISKON))
+                const total_diskon = parseFloat(data_body[0].DISKON)+parseFloat(data_body[0].DISKON_MARKET_PLACE)
+                setIN_DISKON(GetFormatCurrency(""+total_diskon))
                 setIN_NET_SALES(GetFormatCurrency(data_body[0].SALESNET))
                 setLoadingButton(false)
                 setisDisabled(false)
@@ -306,18 +307,16 @@ const [data_rows, setData_rows] = useState([]);
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
-                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL}
+                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL}
                         const Token = GetToken()
+                        const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
                         setLoadingButtonClosing(true)
                         setisDisabledClosing(true)
-                        Posts(url,JSON.stringify(param),false,Token).then((response) => {
-                            const res_data = response;
-                            var code = res_data.code;
-                            var msg = res_data.msg;
-                            if(parseFloat(code) === 200){
-                                Swal.fire({ 
+                        PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
+                             if(response){
+                                Swal.fire({
                                     title: t("Success"),
-                                    text: ""+parseFloat(code)+"-"+msg,
+                                    text: t("Closing Harian Berhasil dilakukan, Silahkan Simpan SLIP TUTUP HARIAN ANDA!"),
                                     icon: "success",
                                     padding: '2em',
                                     customClass: 'sweet-alerts'
@@ -332,31 +331,9 @@ const [data_rows, setData_rows] = useState([]);
                                 setIN_GROSS_SALES('')
                                 setIN_DISKON('')
                                 setIN_NET_SALES('')
-                            }else if(code.toString().substring(0,1) === '4'){
-                                if(code === 401 && msg.includes("Invalid")){
-                                    
-                                }else{
-                                    Swal.fire({     
-                                        title: t("Warning"),
-                                        text: ""+parseFloat(code)+"-"+msg,
-                                        icon: "warning",
-                                        padding: '2em',
-                                        customClass: 'sweet-alerts'
-                                    });
-                                }
-                                setLoadingButtonClosing(false)
-                                setisDisabledClosing(false)
-                            }else{
-                                Swal.fire({
-                                    title: t("Warning"),
-                                    text: ""+parseFloat(code)+"-"+msg,
-                                    icon: "warning",
-                                    padding: '2em',
-                                    customClass: 'sweet-alerts'
-                                });
-                                setLoadingButtonClosing(false)
-                                setisDisabledClosing(false)
                             }
+                            
+                             
                         }).catch((error) => {
                             console.log(error)
                             Swal.fire({     
@@ -396,7 +373,9 @@ const [data_rows, setData_rows] = useState([]);
                         setIN_NIK(data_body[0].NIK)
                         setIN_NAMA(data_body[0].NAMA)
                         setIN_GROSS_SALES(GetFormatCurrency(data_body[0].SALES))
-                        setIN_DISKON(GetFormatCurrency(data_body[0].DISKON))
+                        const total_diskon = parseFloat(data_body[0].DISKON)+parseFloat(data_body[0].DISKON_MARKET_PLACE)
+
+                        setIN_DISKON(GetFormatCurrency(""+total_diskon))
                         setIN_NET_SALES(GetFormatCurrency(data_body[0].SALESNET))
                         setisDisabledClosing(false)
                     }else{

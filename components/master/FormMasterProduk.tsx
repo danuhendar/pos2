@@ -699,12 +699,14 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                 {
                     accessor: 'KODE_BARANG',
                     title: 'ITEM CODE',
+                   
                     sortable: true,
                     render: ({ KODE_BARANG }) => (
                         <div className="flex items-center gap-2">
                             <div className="font-semibold">{KODE_BARANG}</div>
                         </div>
                     ),
+                    
                 },
                 {
                     accessor: 'CONTENT',

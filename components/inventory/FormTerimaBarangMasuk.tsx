@@ -44,6 +44,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const [optionsItem,setoptionsItem] = useState([])
     const [optionsGerai,setOptionsGerai] = useState([])
     const [options6,setOptions6] = useState([])
+    const [options7,setOptions7] = useState([])
     const [optionsGeraiMutasi,setOptionsGeraiMutasi] = useState([])
     const [IN_KODE_TRANSAKSI,setIN_KODE_TRANSAKSI] = useState('')
     const [IN_KETERANGAN,setIN_KETERANGAN] = useState('')
@@ -62,6 +63,10 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const [arr_input_item,setarr_input_item] = useState([])
     const [isCheck_1,setisCheck_1] = useState(false)
     const [isCheck_2,setisCheck_2] = useState(false)
+    const [isCheckBPBDC,setisCheckBPBDC] = useState(false)
+    const [isCheckBPBSupplier,setisCheckBPBSupplier] = useState(false)
+    const [MetodeBPB,setMetodeBPB] = useState('')
+    
 
     const MySwal = withReactContent(Swal);
     useEffect(() => {
@@ -75,6 +80,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
         setIN_NIK_PEMBUAT(InputNikPemohon)
         const columns = Def_Column_Terima_Barang()
         setData_columns(columns)
+        GetMasterCabang(res_host,res_PORT_LOGIN)
     },[]);
 
    
@@ -83,11 +89,11 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
 
     const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_TUJUAN(val); GetMasterProdukByKodeProdukAndKodeGerai(val+"%") };
     const FormInputSupplier = (value: any) => {var val = value.value;setIN_ASAL(val);  };
+    const FormInputDC = (value: any) => {var val = value.value;setIN_ASAL(val);  };
     const FormInputNikPembuat = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NIK_PEMBUAT(val);  };
     const FormInputItem = (value: any) => {var val = value.value;setIN_RESULT_SELECTED_MANUAL(val);   };
     const FormInputSelectMetodeItem = (event: { target: { value: any; }; }) => {
         var val = event.target.value;setIN_METODE(val);
-        console.log(val)  
         if(val === '1'){
             setisCheck_1(true)
             setisCheck_2(false)
@@ -122,7 +128,69 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const FormInputResultScanKodeBarang = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_KODE_BARANG(val);  };
     const FormInputResultScanDeskripsi = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_DESKRIPSI(val);  };
     const FormInputResultScanSatuan = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_RESULT_SCAN_SATUAN(val);  };
-     
+    const FormInputSelectMetodeBPB = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;setMetodeBPB(val);
+         if(val === '1'){
+            setisCheckBPBDC(true)
+            setisCheckBPBSupplier(false)
+
+        }else if(val === '11'){
+            setisCheckBPBDC(false)
+            setisCheckBPBSupplier(true)
+        } 
+    }
+
+    const GetMasterCabang = (in_host:string,in_port:number) => {
+        setOptions7([])
+        let url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+        let param = {"":""}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                var rows = data_body[0].ROWS
+                var arr_ = []
+                for(var i = 0;i<rows.length;i++){
+                    const value_result = rows[i].KODE_CABANG
+                    const obj = {"label":rows[i].CONTENT,"value":value_result}
+                    arr_.push(obj)
+                }
+                setOptions7(arr_)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
 
     const GetMasterProdukByKodeProdukAndKodeGerai = (in_kode_gerai:string) => {
         setoptionsItem([])
@@ -474,7 +542,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                         const date = new Date(date2)
                         const tahun = date.getFullYear()
                         const bulan = date.getMonth()
-                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":jenis,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_ASAL,"IN_TUJUAN":IN_TUJUAN,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows}
+                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":MetodeBPB,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_ASAL,"IN_TUJUAN":IN_TUJUAN,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows}
                         console.log(JSON.stringify(param))
                         const Token = GetToken()
                         setLoadingButton(true)
@@ -507,6 +575,9 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                                 setIN_METODE('')
                                 setisCheck_1(false)
                                 setisCheck_2(false)
+                                setisCheckBPBDC(false)
+                                setisCheckBPBSupplier(false)
+                                setMetodeBPB('')
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
                                     Swal.fire({
@@ -572,11 +643,17 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                 <>
                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconBox />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Input Received Item"} in_content={
                         <>
-                        <InputTextType   in_title={"Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
+                        <InputTextType   in_title={"Auto Generate Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
+                        <InputCheckBoxFilterType isCheck_1={isCheckBPBDC} isCheck_2={isCheckBPBSupplier}  event={FormInputSelectMetodeBPB} in_title={"Type BPB"} in_value_1={"1"} in_value_2={"11"} in_name_1={"BPB from Distribution Centre"} in_name_2={"BPB From Supplier"} in_name_component_1={"is_tipe_bpb"} in_name_component_2={"is_tipe_bpb"} />                
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
                             <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
+                                {
+                                    MetodeBPB === '1' ? 
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputDC} name_component={"Distribution Center"} idComponent={"DC"} />
+                                    :
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
+                                }
                             </div>
                             <div>
                             <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Store"} idComponent={"gerai"} />

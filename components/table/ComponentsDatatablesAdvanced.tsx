@@ -70,6 +70,13 @@ const ComponentsDatatablesAdvanced : React.FC<ComponentsDatatablesAdvancedProps>
             <div id={in_id} className="datatables">
                  {isMounted && (
                     <DataTable
+                        fontSize="xs"
+                        sx={{
+                            td: {
+                            whiteSpace: 'normal', // allow wrapping
+                            wordBreak: 'break-word', // break long words
+                            },
+                        }}
                         noRecordsText="No results match your search query"
                         highlightOnHover
                         className="table-hover whitespace-nowrap"

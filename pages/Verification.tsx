@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { setHost, setHostRnd, setIsAuthenticated, setisHuman, setPageTitle, setPortAdministasi, setPortListener, setVersiApp, toggleRTL } from '../store/themeConfigSlice';
@@ -17,11 +17,10 @@ import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
 import AntiScrapedShieldComponent from '@/components/shield/AntiScrapedShieldComponent';
 import { encryptString, get_data_local_storage, GetID, GetToken, handleSave } from '@/lib/global';
-import IconUser from '@/components/Icon/IconUser';
-import InputTextType from '@/components/form/InputTypeText';
 import ButtonAdd from '@/components/button/ButtonAdd';
 import { Posts } from '@/lib/post';
 import IconUsers from '@/components/Icon/IconUsers';
+import InputTextTypeKeyDown from '@/components/form/InputTypeTextKeyDown';
 
 const Verification = () => {
     const dispatch = useDispatch();
@@ -45,6 +44,7 @@ const Verification = () => {
     const [IN_PORT, setIN_PORT] = useState(port_listener);
     const [IN_USERNAME, setIN_USERNAME] = useState('');
     const { t, i18n } = useTranslation();
+    const input1Ref = useRef(null);
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     const themeConfig = useSelector((state: IRootState) => state.themeConfig);
     const setLocale = (flag: string) => {
@@ -74,9 +74,11 @@ const Verification = () => {
             });
         }
     };
+    
 
      useEffect(() => {
         dispatch(setPageTitle('Point Of Sales'))
+        input1Ref.current.focus();
         setLocale(localStorage.getItem('i18nextLng') || themeConfig.locale);
         const msgauth = themeConfig.MessageAuth
         if(msgauth !== ''){
@@ -111,6 +113,7 @@ const Verification = () => {
                 dispatch(setisHuman('1'))
             }
         };
+        
         //document.addEventListener('contextmenu', handleContextMenu);
         document.addEventListener('mousemove', handleMouseMove);
         return () => {
@@ -118,6 +121,12 @@ const Verification = () => {
             document.removeEventListener('mousemove', handleMouseMove);
         };
     }, []);
+
+    const KeyForVerify = (e: { key: string; }) => {
+        if (e.key === 'Enter') {
+            GetVerifiy();
+        }
+    }
 
     const GetVerifiy = async () => {
         setLoadingButton(true);
@@ -244,7 +253,7 @@ const Verification = () => {
                                         <h1 className="text-3xl font-extrabold uppercase !leading-snug text-green-700 text-center md:text-4xl">Verify 2FA</h1>
                                         <p className="text-base font-bold leading-normal text-center text-white-dark">{t('Enter Code from Google Authenticator')}</p>
                                     </div>
-                                   <InputTextType in_title={"Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputCode} in_value={IN_CODE} />
+                                   <InputTextTypeKeyDown in_title={"Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputCode} in_value={IN_CODE} in_ref={input1Ref} in_event_keydown={KeyForVerify} />
                                    <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={false} in_icon={<IconUsers />} in_title_button={'Verify'} HandleClick={GetVerifiy} />
                                 </div>
                                 <p className="absolute w-full text-xs text-center bottom-6 dark:text-white">© 2025.Point of Sales V{versi_app}</p>
