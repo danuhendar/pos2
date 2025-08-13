@@ -53,6 +53,7 @@ const [data_rows, setData_rows] = useState([]);
     const [IN_GROSS_SALES, setIN_GROSS_SALES] = useState('')
     const [IN_DISKON, setIN_DISKON] = useState('')
     const [IN_NET_SALES, setIN_NET_SALES] = useState('')
+    const [IN_UANG_FISIK, setIN_UANG_FISIK] = useState('')
     const [LoadingButtonClosing,setLoadingButtonClosing] = useState(false)
     const [isDisabledClosing,setisDisabledClosing] = useState(false)   
     const [InputNik, setInputNik] = useState(''); 
@@ -88,6 +89,7 @@ const [data_rows, setData_rows] = useState([]);
     const FormInputGrossSales =(event: { target: { value: any; }; }) => {var val = event.target.value; setIN_GROSS_SALES(val);};
     const FormInputDiskon = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_DISKON(val);};
     const FormInputNetSales = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_NET_SALES(val);};
+    const FormInputUangFisik = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_UANG_FISIK(val);};
 
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
@@ -307,7 +309,7 @@ const [data_rows, setData_rows] = useState([]);
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
-                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL}
+                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK}
                         const Token = GetToken()
                         const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
                         setLoadingButtonClosing(true)
@@ -553,6 +555,9 @@ const [data_rows, setData_rows] = useState([]);
                         </div>
                         <div>
                         <InputTextType   in_title={"Net Sales"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNetSales} in_value={IN_NET_SALES} />
+                        </div>
+                        <div>
+                        <InputTextType   in_title={"Uang Fisik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputUangFisik} in_value={IN_UANG_FISIK} />
                         </div>
                     </div>
                     <div className="lg:mt-8 md:mt-8">
