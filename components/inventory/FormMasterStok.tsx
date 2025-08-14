@@ -350,12 +350,22 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     ),
                 },
                 {
-                    accessor: 'BPB',
-                    title: 'BPB',
+                    accessor: 'BPB_DC',
+                    title: 'BPB_DC',
                     sortable: true,
-                    render: ({ BPB }) => (
+                    render: ({ BPB_DC }) => (
                         <div className="flex items-center gap-2">
-                            <div className={`badge badge-outline-success text-md`}>{BPB}</div>
+                            <div className={`badge badge-outline-success text-md`}>{BPB_DC}</div>
+                        </div>
+                    ),
+                },
+                 {
+                    accessor: 'BPB_SUPPLIER',
+                    title: 'BPB_SUP',
+                    sortable: true,
+                    render: ({ BPB_SUPPLIER }) => (
+                        <div className="flex items-center gap-2">
+                            <div className={`badge badge-outline-success text-md`}>{BPB_SUPPLIER}</div>
                         </div>
                     ),
                 },
@@ -465,16 +475,6 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
 
     const Def_Column_MutasiStok = () => {
         var cols = [
-                // {
-                //     accessor: 'id',
-                //     title: 'ID',
-                //     sortable: true,
-                //     render: ({ id }) => (
-                //         <div className="flex items-center gap-2">
-                //             <div className="font-semibold">{id}</div>
-                //         </div>
-                //     ),
-                // },
                 {
                     accessor: 'TANGGAL',
                     title: 'DATE',

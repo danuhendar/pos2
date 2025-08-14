@@ -8,7 +8,7 @@ import { AddColumn, AddID, ConvertDateFormat, GetFormatCurrency, GetToken,  get_
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
-import { Posts } from "@/lib/post";
+import { Posts, PostsDownload } from "@/lib/post";
 import ButtonAdd from "../button/ButtonAdd";
 import IconRefresh from "../Icon/IconRefresh";
 import ComponentsDatatablesAdvanced from "../table/ComponentsDatatablesAdvanced";
@@ -86,9 +86,12 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         setHOST(res_host)
         setPORT(res_PORT_LOGIN)
         const kode_gerai = get_data_local_storage('kode_gerai')
+        console.log('kode_gerai : '+kode_gerai)
         if(kode_gerai === '%'){
+            console.log('kondisi 1')
             GetMasterGerai(res_host,res_PORT_LOGIN)
         }else{
+            console.log('kondisi 2')
             setIN_KODE_GERAI(kode_gerai)    
         }
     },[]);
@@ -146,276 +149,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const handlePrint = useReactToPrint({
         content: () => receiptRef.current,
     });
-    const GetDownloadStruk = async (no_struk:string,total_belanja:number,grand_total:number,diskon_market_place:number,diskon_item:number,biaya_ongkir:number,bayar:number,kembalian:number) => {
-        // Dynamically import html2pdf.js here
-        const html2pdfModule = await import('html2pdf.js');
-        const html2pdf = html2pdfModule.default || html2pdfModule;
-
-        setLoadingButtonReprint(true)
-        const in_bayar = GetFormatCurrency(""+bayar)
-        //console.log("in_bayar : "+in_bayar)
-        const in_kembali = GetFormatCurrency(""+kembalian)
-        //console.log("in_kembali : "+in_kembali)
-        const in_no_struk = no_struk
-        //console.log("in_no_struk : "+in_no_struk)
-        const in_total_belanja = GetFormatCurrency(""+total_belanja)
-        //console.log("in_total_belanja : "+in_total_belanja)
-        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
-        const param = {"IN_NO_STRUK":no_struk,"IN_IS_STATUS":"1"}
-        const Token = GetToken()
-        setLoadingButton(true)
-        setisDisabled(true)
-        Posts(url,JSON.stringify(param),false,Token).then((response) => {
-            const res_data = response;
-            var code = res_data.code;
-            var msg = res_data.msg;
-            if(parseFloat(code) === 200){
-                var data_body = res_data.data;
-                var summary = data_body[0].SUMMARY;
-                //console.log(JSON.stringify(summary))
-                //console.log('nama_pembuat : '+summary[0].NAMA_PEMBUAT)
-                setIN_NAMA_PEMBUAT(summary[0].NAMA_PEMBUAT)
-                setIN_SHIFT(summary[0].SHIFT)
-                //console.log('shift : '+summary[0].SHIFT)
-                setIN_TANGGAL_STRUK(summary[0].TANGGAL)
-                //console.log('tanggal : '+summary[0].TANGGAL)
-                setGrandTotal(GetFormatCurrency(""+grand_total))
-                setBiayaOngkir(GetFormatCurrency(""+biaya_ongkir))
-                setTotalBelanja(GetFormatCurrency(""+total_belanja))
-                setTotalDiskonItem(GetFormatCurrency(""+diskon_item))
-                setTotalDiskonMarketPlace(GetFormatCurrency(""+diskon_market_place))
-
-                var rdetail = data_body[0].DETAIL;
-                var detail = [];
-                for(var i = 0;i<rdetail.length;i++){
-                    const obj = {
-                        "IN_KODE_BARANG": rdetail[i].KODE_BARANG,
-                        "IN_DESKRIPSI": rdetail[i].DESKRIPSI,
-                        "IN_SATUAN": rdetail[i].SATUAN,
-                        "IN_HPP": rdetail[i].GROSS,
-                        "IN_PPN": "0",
-                        "IN_GROSS": rdetail[i].GROSS,
-                        "IN_QTY": rdetail[i].QTY,
-                        "IN_DISKON": rdetail[i].DISKON,
-                        "IN_PRICE": rdetail[i].PRICE,
-                        "IN_IS_HADIAH": 0,
-                        "IN_KODE_PROMO": 0,
-                        "IN_IS_RETUR_ITEM": 0
-                    }
-                    detail.push(obj)
-                }
-                if(detail.length > 0){ 
-                    const r = {
-                        items: detail,
-                    };
-                    console.log(JSON.stringify(r))
-                    setDummyData(r);
-                    setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(in_no_struk)
-                    setIN_BAYAR(in_bayar)
-                    setIN_KEMBALIAN(in_kembali)
-                    setTotalBelanja(in_total_belanja)
-                    setTimeout(() => {
-                        if(receiptRef.current){
-                            console.log("Download PDF")
-                                 
-
-                                const timestamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 14);
-                                const filename = `${no_struk}_${timestamp}.pdf`;
-
-                                const opt = {
-                                    margin:       0.5,
-                                    filename:     filename,
-                                    image:        { type: 'jpeg', quality: 0.98 },
-                                    html2canvas:  { scale: 2 },
-                                    jsPDF:        { unit: 'p', format: 'a4', orientation: 'portrait' },
-                                };
-                                //html2pdf().set(opt).from(receiptRef.current).save();
-                                html2pdf().set(opt).from(receiptRef.current).save(filename);
-                        }else{
-                            console.log("receiptRef.current is null")
-                        }
-                    }, 3000);        
-                    
-                }else{
-                    Swal.fire({
-                        title: t("Warning"),
-                        text: "Data tidak ditemukan!",
-                        icon: "warning",
-                        padding: '2em',
-                        customClass: 'sweet-alerts'
-                    });
-                }
-                setLoadingButton(false)
-                setisDisabled(false)   
-                setLoadingButtonReprint(false)
-            }else if(code.toString().substring(0,1) === '4'){
-                if(code === 401 && msg.includes("Invalid")){
-                    
-                }else{
-                    Swal.fire({
-                        title: t("Warning"),
-                        text: ""+parseFloat(code)+"-"+msg,
-                        icon: "warning",
-                        padding: '2em',
-                        customClass: 'sweet-alerts'
-                    });
-                }
-                setLoadingButton(false)
-                setisDisabled(false)
-                setLoadingButtonReprint(false)
-            }else{
-                Swal.fire({
-                    title: t("Warning"),
-                    text: ""+parseFloat(code)+"-"+msg,
-                    icon: "warning",
-                    padding: '2em',
-                    customClass: 'sweet-alerts'
-                });
-                setLoadingButton(false)
-                setisDisabled(false)
-                setLoadingButtonReprint(false)
-            }
-        }).catch((error) => {
-            console.log(error)
-            Swal.fire({
-                title: t("Warning"),
-                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
-            });
-            setLoadingButton(false)
-            setisDisabled(false)
-            setLoadingButtonReprint(false)
-        });
-    } 
-    const GetHandlePrint = (no_struk:string,total_belanja:number,grand_total:number,diskon_market_place:number,diskon_item:number,biaya_ongkir:number,bayar:number,kembalian:number) => {
-        setLoadingButtonReprint(true)
-        const in_bayar = GetFormatCurrency(""+bayar)
-        //console.log("in_bayar : "+in_bayar)
-        const in_kembali = GetFormatCurrency(""+kembalian)
-        //console.log("in_kembali : "+in_kembali)
-        const in_no_struk = no_struk
-        //console.log("in_no_struk : "+in_no_struk)
-        const in_total_belanja = GetFormatCurrency(""+total_belanja)
-        //console.log("in_total_belanja : "+in_total_belanja)
-        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
-        const param = {"IN_NO_STRUK":no_struk,"IN_IS_STATUS":"1"}
-        const Token = GetToken()
-        setLoadingButton(true)
-        setisDisabled(true)
-        Posts(url,JSON.stringify(param),false,Token).then((response) => {
-            const res_data = response;
-            var code = res_data.code;
-            var msg = res_data.msg;
-            if(parseFloat(code) === 200){
-                var data_body = res_data.data;
-                var summary = data_body[0].SUMMARY;
-                //console.log(JSON.stringify(summary))
-                //console.log('nama_pembuat : '+summary[0].NAMA_PEMBUAT)
-                setIN_NAMA_PEMBUAT(summary[0].NAMA_PEMBUAT)
-                setIN_SHIFT(summary[0].SHIFT)
-                //console.log('shift : '+summary[0].SHIFT)
-                setIN_TANGGAL_STRUK(summary[0].TANGGAL)
-                //console.log('tanggal : '+summary[0].TANGGAL)
-                setGrandTotal(GetFormatCurrency(""+grand_total))
-                setBiayaOngkir(GetFormatCurrency(""+biaya_ongkir))
-                setTotalBelanja(GetFormatCurrency(""+total_belanja))
-                setTotalDiskonItem(GetFormatCurrency(""+diskon_item))
-                setTotalDiskonMarketPlace(GetFormatCurrency(""+diskon_market_place))
-
-                var rdetail = data_body[0].DETAIL;
-                var detail = [];
-                for(var i = 0;i<rdetail.length;i++){
-                    const obj = {
-                        "IN_KODE_BARANG": rdetail[i].KODE_BARANG,
-                        "IN_DESKRIPSI": rdetail[i].DESKRIPSI,
-                        "IN_SATUAN": rdetail[i].SATUAN,
-                        "IN_HPP": rdetail[i].GROSS,
-                        "IN_PPN": "0",
-                        "IN_GROSS": rdetail[i].GROSS,
-                        "IN_QTY": rdetail[i].QTY,
-                        "IN_DISKON": rdetail[i].DISKON,
-                        "IN_PRICE": rdetail[i].PRICE,
-                        "IN_IS_HADIAH": 0,
-                        "IN_KODE_PROMO": 0,
-                        "IN_IS_RETUR_ITEM": 0
-                    }
-                    detail.push(obj)
-                }
-                if(detail.length > 0){ 
-                    const r = {
-                        items: detail,
-                    };
-                    console.log(JSON.stringify(r))
-                    setDummyData(r);
-                    setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(in_no_struk)
-                    setIN_BAYAR(in_bayar)
-                    setIN_KEMBALIAN(in_kembali)
-                    setTotalBelanja(in_total_belanja)
-                    setTimeout(() => {
-                        if(receiptRef.current){
-                            console.log("handlePrint()")
-                            handlePrint()
-                        }else{
-                            console.log("receiptRef.current is null")
-                        }
-                    }, 3000);        
-                    
-                }else{
-                    Swal.fire({
-                        title: t("Warning"),
-                        text: "Data tidak ditemukan!",
-                        icon: "warning",
-                        padding: '2em',
-                        customClass: 'sweet-alerts'
-                    });
-                }
-                setLoadingButton(false)
-                setisDisabled(false)   
-                setLoadingButtonReprint(false)
-            }else if(code.toString().substring(0,1) === '4'){
-                if(code === 401 && msg.includes("Invalid")){
-                    
-                }else{
-                    Swal.fire({
-                        title: t("Warning"),
-                        text: ""+parseFloat(code)+"-"+msg,
-                        icon: "warning",
-                        padding: '2em',
-                        customClass: 'sweet-alerts'
-                    });
-                }
-                setLoadingButton(false)
-                setisDisabled(false)
-                setLoadingButtonReprint(false)
-            }else{
-                Swal.fire({
-                    title: t("Warning"),
-                    text: ""+parseFloat(code)+"-"+msg,
-                    icon: "warning",
-                    padding: '2em',
-                    customClass: 'sweet-alerts'
-                });
-                setLoadingButton(false)
-                setisDisabled(false)
-                setLoadingButtonReprint(false)
-            }
-        }).catch((error) => {
-            console.log(error)
-            Swal.fire({
-                title: t("Warning"),
-                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
-            });
-            setLoadingButton(false)
-            setisDisabled(false)
-            setLoadingButtonReprint(false)
-        });
-    }
-
+    
     const def_Column_HistoryInventory = () => {
         var cols = [
                 
@@ -502,6 +236,41 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             return  cols;
     }
 
+    const GenerateReceiptStruk = (
+        in_no_struk:string,
+        in_tanggal:string
+    ) => {
+        // let in_no_struk = "202508130004"
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
+        let param = {"IN_NO_STRUK": in_no_struk}
+        const Token = GetToken()
+        //console.log(JSON.stringify(param))
+        setLoadingButtonReprint(true)
+        const NameFile = 'receipt_'+in_tanggal.split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
+        PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
+            if(response){
+                Swal.fire({
+                    title: t("Success"),
+                    text: t("Struk Online Berhasil dibuat!"),
+                    icon: "success",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+           setLoadingButtonReprint(false)
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+            setLoadingButtonReprint(false)
+        });
+    }
+
     const Def_Column_HistorySales = () => {
         var cols = [
                 {
@@ -514,15 +283,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                STATUS === 'OK' ?
                                <>
                                <div className="flex flex-row gap-2">
-                                <button className="rounded-full btn btn-primary btn-sm" onClick={() => GetHandlePrint(NO_STRUK,TOTAL_BELANJA,GRAND_TOTAL,DISKON_MARKET_PLACE,DISKON_ITEM,BIAYA_ONGKIR,BAYAR,KEMBALIAN)}>
-                                    {
-                                        isLoadingButtonReprint ? 
-                                        t('Please wait...')
-                                        :
-                                        <IconPrinter />
-                                    }
-                                </button>
-                                <button className="rounded-full btn btn-warning btn-sm" onClick={() => GetDownloadStruk(NO_STRUK,TOTAL_BELANJA,GRAND_TOTAL,DISKON_MARKET_PLACE,DISKON_ITEM,BIAYA_ONGKIR,BAYAR,KEMBALIAN)}>
+                                <button className="rounded-full btn btn-warning btn-sm" onClick={() => GenerateReceiptStruk(NO_STRUK,TANGGAL)}>
                                     {
                                         isLoadingButtonReprint ? 
                                         t('Please wait...')
@@ -757,7 +518,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                         <>
                         <div className="grid gap-3 lg:grid-cols-3 md:grid-cols-3 sm:grid-cols-1 xs:grid-cols-1">
                             {
-                                IN_KODE_GERAI  !== '%' ?
+                                IN_KODE_GERAI  === '%' || IN_KODE_GERAI === '' ?
                                 <div>
                                 <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>

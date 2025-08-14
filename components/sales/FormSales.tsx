@@ -41,6 +41,8 @@ import { useReactToPrint } from 'react-to-print';
 import Receipt from "./PrintReceipt";
 import IconPrinter from "../Icon/IconPrinter";
 import Select from 'react-select';
+import { Autocomplete, TextField } from "@mui/material";
+import { ref } from "yup";
 
 interface FormSalesProps {
     url: string,
@@ -134,7 +136,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [selectedOption, setSelectedOption] = useState(defaultOption);
     const defaultOptionVia = { value: "", label: "-- Select Via --" }; // Your default
     const [selectedBankOption, setSelectedBankOption] = useState(defaultOptionVia);
-
+    const [ListBarcode,setListBarcode] = useState([])
 
 
     useEffect(() => {
@@ -165,9 +167,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         GetMasterKategoriPembayaran(res_host,res_PORT_LOGIN);
         const column_master_produk = Def_Column_Master_Produk()
         setData_columns_produk(column_master_produk)
+        GetMasterProdukByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai,true)
+        console.log(ListBarcode)
     },[]);
 
-   
+    
     const FormInputKodeGeraiMutasi  = (value: any) => {
         var val = value.value; 
         var sp_val = val.split('|'); 
@@ -186,7 +190,19 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     };
     const FormInputInitialCode = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_KODE_INITIAL(val); };
     const FormInputAlamat  = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_ALAMAT(val); };
-    const FormInputItem = (value: any) => {var val = value.target.value;setIN_BARCODE(val); };
+    const FormInputItem =(event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        console.log('val main: '+val);
+        if(val.includes("-")){
+            var sp_val = val.split("-"); 
+            console.log('sp_val : '+sp_val);
+            setIN_BARCODE(sp_val[0]); 
+        }else{
+            console.log('val : '+val);
+            setIN_BARCODE(val); 
+        }
+        
+    };
     const FormInputDeskripsi = (value: any) => {var val = value.target.value;setIN_DESKRIPSI(val); };
     const FormInputSatuan = (value: any) => {var val = value.target.value;setIN_SATUAN(val); };
     const FormInputQty  = (event: { target: { value: any; }; }) => {var val = event.target.value;const validate_number = validateNumber(val);setIN_QTY(validate_number);  };
@@ -323,6 +339,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             },
         });
     }
+
 
     const GetMasterPembayaran = (in_val:string) => {
         setOptionBank([])
@@ -544,6 +561,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                     setIN_GROSS('')
                     setIN_BARCODE('')
                     setIN_DISKON('')
+                    //setIN_BARCODE(null)
                     input1Ref.current.focus();
                 }else if(data_body.length > 1){
                         MySwal.fire({
@@ -1024,10 +1042,16 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         }
     }
 
-    const GetMasterProdukByKodeGerai = () => {
+    const GetMasterProdukByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string,is_for_barcode:boolean) => {
         setData_rows_produk([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
-        let param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":IN_KODE_GERAI}
+        let url = ''
+        if(is_for_barcode){
+            url = `http://${in_host}:${in_port}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+        }else{
+            url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+        }
+        
+        let param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":in_kode_gerai}
         
         const Token = GetToken()
         setLoadingButton(true)
@@ -1037,8 +1061,18 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             var msg = res_data.msg;
             if(parseFloat(code) === 200){
                 var data_body = res_data.data;
-                var res_rows = AddID(data_body);
-                setData_rows_produk(res_rows);
+                if(is_for_barcode){
+                    const arr_ = []
+                    for(var i = 0;i<data_body.length;i++){
+                        const item = data_body[i].BARCODE+"-"+data_body[i].SINGKATAN+"-"+data_body[i].SATUAN
+                        arr_.push(item)
+                    }
+                    setListBarcode(arr_)
+                }else{
+                    var res_rows = AddID(data_body);
+                    setData_rows_produk(res_rows);
+                }
+              
                 setLoadingButton(false)
             }else if(code.toString().substring(0,1) === '4'){
                 if(code === 401 && msg.includes("Invalid")){
@@ -1107,7 +1141,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     const ShowMasterProduk = () => {
         setModal13(true);
-        GetMasterProdukByKodeGerai()
+        GetMasterProdukByKodeGerai('',0,IN_KODE_GERAI,false)
     }
 
     const GetGenerateKodeTransaksiInventory = () => {
@@ -1782,12 +1816,29 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     }
                                     />
                                     </div>
-                                    
+                                    {/* FORM INPUT ITEM  */}
                                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
                                         <>
                                         <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
                                             <div className="col-span-2">
-                                            <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} />
+                                            {/* <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} /> */}
+                                            <Autocomplete
+                                                options={ListBarcode}
+                                                clearOnEscape={true}
+                                                clearText="Clear"
+                                                onChange={(_event, value) => {
+                                                    // value is the selected option
+                                                    if (value) {
+                                                        FormInputItem({ target: { value } });
+                                                    }
+                                                }}
+                                                onKeyDown={KeyItem}    
+                                                value={IN_BARCODE} 
+                                                ref={input1Ref}           // The list of options
+                                                renderInput={(params) => (
+                                                   <TextField {...params} label="Pilih Item" variant="outlined" className="w-full text-xs rounded-full" placeholder={t("Type Item")}/>
+                                                )}
+                                                />
                                             </div>
                                             <div className="sm:grid-cols-1">
                                             <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
@@ -1797,7 +1848,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
                                             </div>
                                             <div className="sm:col-span-1">
-                                            <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
+                                            <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1 hidden"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs hidden"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
                                             </div>
                                             
                                             <div className="sm:col-span-1">
@@ -1833,17 +1884,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         </div>
                                         <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
                                             <div>
-                                            {/* <DropDownGlobal 
-                                                in_is_clear={is_clear_metode_pembayaran} 
-                                                in_classname_title={"mb-1 mt-5 text-xs"} 
-                                                in_classname_content={"w-full text-xs"} 
-                                                data_options={OptionMetodePembayaran} 
-                                                isSearchable={true} 
-                                                isMulti={false} 
-                                                event={FormInputMetodePembayaran} 
-                                                name_component={"Method"} 
-                                                idComponent={"metode_pembayaran"} />
-                                            */}
                                                 <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Method")}</label></div>
                                                 <div className="mb-3">
                                                     <div className={"w-full text-xs"}>
@@ -1862,16 +1902,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                 </div>
                                             </div>
                                             <div>
-                                            {/* <DropDownGlobal 
-                                                in_is_clear={is_clear_bank} 
-                                                in_classname_title={IN_IS_CASH ? "mb-1 mt-5 text-xs hidden" : "mb-1 mt-5 text-xs"} 
-                                                in_classname_content={IN_IS_CASH ? "w-full text-xs hidden" : "w-full text-xs"} 
-                                                data_options={OptionBank} 
-                                                isSearchable={true} 
-                                                isMulti={false} 
-                                                event={FormInputBank} 
-                                                name_component={"Payment via"} 
-                                                idComponent={"payment_via"} /> */}
                                                 <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Payment via")}</label></div>
                                                 <div className="mb-3">
                                                     <div className={"w-full text-xs"}>

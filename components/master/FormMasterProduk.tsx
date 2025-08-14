@@ -80,7 +80,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const [isCheck_2,setisCheck_2] = useState(false)
     const [isCheck_3,setisCheck_3] = useState(false)
     const [isCheck_4,setisCheck_4] = useState(false)
-
+    const [selectedSupllier, setSelectedSupllier] = useState<any>(null);
     const MySwal = withReactContent(Swal);
     
     
@@ -89,6 +89,11 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
         setHOST(res_host)
         setPORT(res_PORT_LOGIN)
+        
+        GetMasterSupplier(res_host,res_PORT_LOGIN)
+        GetMasterGerai(res_host,res_PORT_LOGIN)
+        GetMasterKategoriProduk(res_host,res_PORT_LOGIN)
+        GetMasterSatuan(res_host,res_PORT_LOGIN)
     },[]);
 
    
@@ -435,11 +440,22 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     }
     const showModal = (IDReport:string,KODE_KATEGORI:string,KODE_GERAI:string,KODE_BARANG:string,CONTENT:string,KODE_SUPPLIER:number,SUPPLIER:string,SINGKATAN:string,HPP:string,HPP_LAST:string,HPP_LAST_2:string,GROSS:string,SATUAN:string,VARIAN:string,BARCODE:string,IS_FIXED:string,IS_RETUR_SUPPLIER:string) => {
         setModal13(true)
+        console.log("OK")
+        // Auto-select the matching option
+        const matchedOption = options6.find(
+            (opt) => opt.value === KODE_SUPPLIER
+        );
+        console.log('KODE_SUPPLIER : '+KODE_SUPPLIER)
+        console.log('SUPPLIER : '+SUPPLIER)
+        console.log('matchedOption : '+JSON.stringify(matchedOption))
+        setSelectedSupllier(matchedOption)
+        setIN_SUPPLIER(SUPPLIER)
+        
         setIN_KODE_KATEGORI(KODE_KATEGORI)
         setIN_KODE_GERAI(KODE_GERAI)
         setIN_KODE_BARANG(KODE_BARANG)
         setIN_CONTENT(CONTENT)
-        setIN_SUPPLIER(SUPPLIER)
+        
         setIN_SINGKATAN(SINGKATAN)
         setIN_HPP(HPP)
         setIN_HPP_LAST(HPP_LAST)
@@ -451,10 +467,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         setIN_IS_FIXED(IS_FIXED)
         setIN_IS_RETUR_SUPPLIER(IS_RETUR_SUPPLIER)
         setTitle('Form : '+IDReport)
-        GetMasterSupplier(IN_HOST,IN_PORT)
-        GetMasterGerai(IN_HOST,IN_PORT)
-        GetMasterKategoriProduk(IN_HOST,IN_PORT)
-        GetMasterSatuan(IN_HOST,IN_PORT)
+    
     }
     
     const InsData = () =>{
@@ -1045,7 +1058,8 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         <ModalComponent in_size_modal={`panel animate__animated my-7 w-2/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
                             <div className="p-2">
                                 <div className="mb-5">
-                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
+                                    {/* <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} /> */}
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={(opt: any) => setSelectedSupllier(opt)} name_component={"Supplier"} idComponent={"supplier"} />
                                     <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={FormInputKodeKategoriProduk} name_component={"Kategori"} idComponent={"kategori"} />                                                             
                                     <InputTextType   in_title={"Kode Barang"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
                                     <InputTextType   in_title={"Item"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
