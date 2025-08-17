@@ -158,11 +158,11 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         });
     }
 
-    const GetPosMasterStok = () => {
+    const GetPosMasterStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string) => {
         setData_rows_Kategori([])
         setData_columns_Kategori([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMasterStok`
-        let param = {"IN_TAHUN":IN_TAHUN,"IN_BULAN":IN_BULAN,"IN_KODE_GERAI":IN_KODE_GERAI}
+        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai}
         const Token = GetToken()
         setLoadingButton(true)
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -226,11 +226,11 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         });
     }
 
-      const GetPosMutasiStok = () => {
+      const GetPosMutasiStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string) => {
         setData_rows([])
         setData_columns([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMutasiStok`
-        let param = {"IN_TAHUN":IN_TAHUN_MUTASI,"IN_BULAN":IN_BULAN_MUTASI,"IN_KODE_GERAI":IN_KODE_GERAI_MUTASI}
+        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai}
         const Token = GetToken()
         setLoadingButton(true)
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -297,16 +297,6 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
 
     const Def_Column_MasterStok = () => {
         var cols = [
-                // {
-                //     accessor: 'id',
-                //     title: 'ID',
-                //     sortable: true,
-                //     render: ({ id }) => (
-                //         <div className="flex items-center gap-2">
-                //             <div className="font-semibold">{id}</div>
-                //         </div>
-                //     ),
-                // },
                 {
                     accessor: 'KODE_BARANG',
                     title: 'CODE',
@@ -573,16 +563,21 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
             if(IN_TAHUN === '' || IN_BULAN === '' || IN_KODE_GERAI === ''){
 
             }else{
-                GetPosMasterStok()
+                GetPosMasterStok(IN_TAHUN, IN_BULAN, IN_KODE_GERAI)
             }
         }else{
-            if(IN_TAHUN_MUTASI  === '' || IN_BULAN_MUTASI  === '' || IN_KODE_GERAI_MUTASI === ''){
+            if(IN_TAHUN === '' || IN_BULAN === '' || IN_KODE_GERAI === ''){
 
             }else{
-                GetPosMutasiStok()
+                GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI)
             }
         }
     };
+
+    const GetData = () => {
+        GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI)
+        GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI)
+    }
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
@@ -590,6 +585,21 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         <>
             <AntiScrapedShieldComponent in_content={
                 <>
+                    <div className="flex flex-row items-start gap-3 mb-3">
+                        <div>
+                        <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahun} name_component={"Year"} idComponent={"tahun"} />
+                        </div>
+                        <div>
+                        <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulan} name_component={"Month"} idComponent={"bulan"} />
+                        </div>
+                        <div>
+                        <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
+                        </div>
+                        <div>
+                        <label>&nbsp;</label>
+                        <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Refresh'} HandleClick={GetData} />
+                        </div>
+                    </div>
                     <div>
                         <ul className="mb-5 overflow-y-auto whitespace-nowrap border-b border-[#ebedf2] font-semibold dark:border-[#191e3a] sm:flex">
                             <li className="inline-block">
@@ -612,24 +622,11 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                             </li>
                         </ul>
                     </div>
+                    
                     {
                         Tabs === 'master' ? 
                         <>
-                        <div className="flex flex-row items-start gap-3 mb-3">
-                            <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahun} name_component={"Year"} idComponent={"tahun"} />
-                            </div>
-                            <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulan} name_component={"Month"} idComponent={"bulan"} />
-                            </div>
-                            <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
-                            </div>
-                            <div>
-                            <label>&nbsp;</label>
-                            <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Refresh'} HandleClick={GetPosMasterStok} />
-                            </div>
-                        </div>
+                        
                         {
                             data_rows_Kategori.length > 0 ?
                             <ComponentsDatatablesAdvanced in_column_sort={'KODE_BARANG'} in_id={"dt1"} Datarow={data_rows_Kategori} DataColumns={data_columns_Kategori} />
@@ -639,7 +636,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         </>
                         : 
                         <>
-                        <div className="flex flex-row items-start gap-3 mb-3">
+                        {/* <div className="flex flex-row items-start gap-3 mb-3">
                             <div>
                             <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahunMutasi} name_component={"Year"} idComponent={"tahunmutasi"} />
                             </div>
@@ -653,7 +650,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                             <label>&nbsp;</label>
                             <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_mutasi"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Refresh'} HandleClick={GetPosMutasiStok} />
                             </div>
-                        </div>
+                        </div> */}
                         {
                             data_rows.length > 0 ?
                             <ComponentsDatatablesAdvanced in_column_sort={'TANGGAL'} in_id={"dt2"} Datarow={data_rows} DataColumns={data_columns} />

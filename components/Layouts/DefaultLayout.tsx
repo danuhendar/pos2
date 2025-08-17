@@ -21,6 +21,12 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
     };
+    
+
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+        alert("Right click disabled 🚫");
+    };
 
     const onScrollHandler = () => {
         if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
@@ -32,13 +38,14 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
 
     useEffect(() => {
         window.addEventListener('scroll', onScrollHandler);
-
+ 
         const screenLoader = document.getElementsByClassName('screen_loader');
         if (screenLoader?.length) {
             setTimeout(() => {
                 setShowLoader(false);
             }, 200);
         }
+        
         return () => {
             window.removeEventListener('onscroll', onScrollHandler);
         };
@@ -46,6 +53,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
 
     useEffect(() => {
         setAnimation(themeConfig.animation);
+        
     }, [themeConfig.animation]);
 
     useEffect(() => {
@@ -57,7 +65,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
     return (
         <App>
             {/* BEGIN MAIN CONTAINER */}
-            <div className="relative">
+            <div className="relative" onContextMenu={handleContextMenu}>
                 {/* screen loader  */}
                 {showLoader && (
                     <div className="screen_loader animate__animated fixed inset-0 z-[60] grid place-content-center bg-[#fafafa] dark:bg-[#060818]">
@@ -73,10 +81,10 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                 )}
                 {/* sidebar menu overlay */}
                 <div className={`${(!themeConfig.sidebar && 'hidden') || ''} fixed inset-0 z-50 bg-[black]/60 lg:hidden`} onClick={() => dispatch(toggleSidebar())}></div>
-                <div className="fixed bottom-6 z-50 ltr:right-6 rtl:left-6">
+                <div className="fixed z-50 bottom-6 ltr:right-6 rtl:left-6">
                     {showTopButton && (
                         <button type="button" className="btn btn-outline-primary animate-pulse rounded-full bg-[#fafafa] p-2 dark:bg-[#060818] dark:hover:bg-primary" onClick={goToTop}>
-                            <svg width="24" height="24" className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg width="24" height="24" className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     opacity="0.5"
                                     fillRule="evenodd"
@@ -99,7 +107,7 @@ const DefaultLayout = ({ children }: PropsWithChildren) => {
                     {/* BEGIN SIDEBAR */}
                     <Sidebar />
                     {/* END SIDEBAR */}
-                    <div className="main-content flex flex-col min-h-screen">
+                    <div className="flex flex-col min-h-screen main-content">
                         {/* BEGIN TOP NAVBAR */}
                         <Header />
                         {/* END TOP NAVBAR */}

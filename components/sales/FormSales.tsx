@@ -1168,11 +1168,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         });   
     }
     const GenerateReceiptStruk = (
-        in_no_struk:string
+        in_no_struk:string,
+        in_flag_send_wa:boolean
+
     ) => {
         // let in_no_struk = "202508130004"
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
-        let param = {"IN_NO_STRUK": in_no_struk}
+        let param = {"IN_NO_STRUK": in_no_struk,"IN_SEND_WA":in_flag_send_wa}
         const Token = GetToken()
         //console.log(JSON.stringify(param))
         setLoadingButtonPayment(true)
@@ -1292,7 +1294,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         customClass: 'sweet-alerts'
                                     });
                                     //console.log('res_no_struk :'+res_no_struk)
-                                    GenerateReceiptStruk(res_no_struk)
+                                    GenerateReceiptStruk(res_no_struk,(IN_NO_WHATSAPP === '' || IN_NO_WHATSAPP === null ? false : true))
                                     CreateNewOrder()
                                     setLoadingButtonPayment(false)
                                     setisDisabledButtonPayment(false)

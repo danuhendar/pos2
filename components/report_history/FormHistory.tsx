@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import { AddColumn, AddID, ConvertDateFormat, GetFormatCurrency, GetToken,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
+import { AddColumn, AddID, ConvertDateFormat, CopyText, GetFormatCurrency, GetToken,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -20,19 +20,16 @@ import IconPaperclip from "../Icon/IconPaperclip";
 import DatePicker from "../datepicker/DatePicker";
 import IconCircleCheck from "../Icon/IconCircleCheck";
 import IconXCircle from "../Icon/IconXCircle";
-import { useReactToPrint } from "react-to-print";
-import Receipt from "../sales/PrintReceipt";
-import { set } from "lodash";
-import IconLoader from "../Icon/IconLoader";
-import IconWheel from "../Icon/IconWheel";
 import IconBox from "../Icon/IconBox";
-
-import dynamic from "next/dynamic";
 // import html2pdf from 'html2pdf.js';
 // import html2pdf from 'html2pdf.js';
 // const html2pdf = dynamic(() => import('html2pdf.js'), { ssr: false });
 // We'll import html2pdf dynamically inside the function instead of here.
 import IconDownload from "../Icon/IconDownload";
+import IconSend from "../Icon/IconSend";
+import IconCopy from "../Icon/IconCopy";
+import ModalComponent from "../modal/ModalComponent";
+import { set } from "lodash";
 
 
 interface FormHistoryProps {
@@ -60,17 +57,10 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
 
     const [IN_NAMA_GERAI,setIN_NAMA_GERAI] = useState('')
     const [IN_ALAMAT,setIN_ALAMAT] = useState('')
-    const [IN_NAMA_PEMBUAT,setIN_NAMA_PEMBUAT] = useState('')
-    const [IN_SHIFT,setIN_SHIFT] = useState('')
-    const [IN_BAYAR,setIN_BAYAR] = useState('')
-    const [IN_KEMBALIAN,setIN_KEMBALIAN] = useState('')
-    const [IN_TANGGAL_STRUK,setIN_TANGGAL_STRUK] = useState('')
-    const [IN_GENERATE_KODE_TRANSAKSI_INVENTORY,setIN_GENERATE_KODE_TRANSAKSI_INVENTORY] = useState('')
-    const [GrandTotal,setGrandTotal] = useState('0');
-    const [BiayaOngkir,setBiayaOngkir] = useState('0');
-    const [TotalBelanja,setTotalBelanja] = useState('0');
-    const [TotalDiskonItem,setTotalDiskonItem] = useState('0');
-    const [TotalDiskonMarketPlace,setTotalDiskonMarketPlace] = useState('0');
+    const [Title,setTitle] = useState('')
+    const [data_rows_detail_transaksi_inventory, setData_rows_detail_transaksi_inventory] = useState([]);
+    const [data_columns_detail_transaksi_inventory, setData_columns_detail_transaksi_inventory] = useState([]);
+    const [modal13,setModal13] = useState(false);
 
     const receiptRef = useRef();
     const [dummyData, setDummyData] = useState({
@@ -145,10 +135,6 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             });
         });
     }
-
-    const handlePrint = useReactToPrint({
-        content: () => receiptRef.current,
-    });
     
     const def_Column_HistoryInventory = () => {
         var cols = [
@@ -169,13 +155,21 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     sortable: true,
                     render: ({ KODE_TRANSAKSI }) => (
                         <div className="flex items-center gap-2">
-                            <div className="font-semibold">{KODE_TRANSAKSI}</div>
+                            <div>
+                                <a onClick={()=> CopyText(KODE_TRANSAKSI,isRtl)}><IconCopy className="text-primary"/></a>
+                            </div>
+                            <div className="font-semibold">
+                                <a onClick={() => {showModalDetailTransaksiInventory('Detail Transaksi Inventory : #'+KODE_TRANSAKSI,KODE_TRANSAKSI)}} data-twe-toggle="tooltip" title="Detail Data Transaksi Inventory" className="text-primary hover:underline">
+                                    {KODE_TRANSAKSI}
+                                </a>
+                            </div>
+                            
                         </div>
                     ),
                 },
                 {
                     accessor: 'JENIS_TRANSAKSI',
-                    title: 'TRANSACTION TYPE',
+                    title: 'TYPE',
                     sortable: true,
                     render: ({ JENIS_TRANSAKSI }) => (
                         <div className="flex items-center gap-2">
@@ -223,7 +217,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         
                 {
                     accessor: 'NAMA',
-                    title: 'NAME',
+                    title: 'STAFF',
                     sortable: true,
                     render: ({ NAMA }) => (
                         <div className="flex items-center gap-2">
@@ -238,25 +232,37 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
 
     const GenerateReceiptStruk = (
         in_no_struk:string,
-        in_tanggal:string
+        in_tanggal:string,
+        in_send_wa:boolean
     ) => {
         // let in_no_struk = "202508130004"
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
-        let param = {"IN_NO_STRUK": in_no_struk}
+        let param = {"IN_NO_STRUK": in_no_struk,"IN_SEND_WA":in_send_wa}
         const Token = GetToken()
         //console.log(JSON.stringify(param))
         setLoadingButtonReprint(true)
         const NameFile = 'receipt_'+in_tanggal.split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
         PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
-            if(response){
-                Swal.fire({
-                    title: t("Success"),
-                    text: t("Struk Online Berhasil dibuat!"),
-                    icon: "success",
-                    padding: '2em',
-                    customClass: 'sweet-alerts'
-                });
-            }
+                console.log(response)
+                if(response.code && response.code.toString().substring(0,1) === '4'){
+                    Swal.fire({
+                        title: t("Error"),
+                        text: response.msg || t("Failed to generate receipt"),
+                        icon: "error",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }else{
+                    Swal.fire({
+                        title: t("Success"),
+                        text: t("Struk Online Berhasil dibuat!"),
+                        icon: "success",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+                
+            
            setLoadingButtonReprint(false)
         }).catch((error) => {
             console.log(error)
@@ -283,12 +289,20 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                STATUS === 'OK' ?
                                <>
                                <div className="flex flex-row gap-2">
-                                <button className="rounded-full btn btn-warning btn-sm" onClick={() => GenerateReceiptStruk(NO_STRUK,TANGGAL)}>
+                                <button className="rounded-full btn btn-warning btn-sm" onClick={() => GenerateReceiptStruk(NO_STRUK,TANGGAL,false)}>
                                     {
                                         isLoadingButtonReprint ? 
                                         t('Please wait...')
                                         :
                                         <IconDownload />
+                                    }
+                                </button>
+                                <button className="rounded-full btn btn-info btn-sm" onClick={() => GenerateReceiptStruk(NO_STRUK,TANGGAL,true)}>
+                                    {
+                                        isLoadingButtonReprint ? 
+                                        t('Please wait...')
+                                        :
+                                        <IconSend />
                                     }
                                 </button>
                                </div>
@@ -469,7 +483,13 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                 setLoadingContent(false)
             }else if(code.toString().substring(0,1) === '4'){
                 if(code === 401 && msg.includes("Invalid")){
-                    
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
                 }else{
                     Swal.fire({
                         title: t("Warning"),
@@ -508,6 +528,121 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
             setLoadingContent(false)
         });
     }
+
+    const Def_Columns_Transaksi_Inventory_Detail = () => {
+        var cols = [
+                {
+                    accessor: 'KODE_TRANSAKSI',
+                    title: 'CODE',
+                    sortable: true,
+                    render: ({ KODE_TRANSAKSI }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_TRANSAKSI}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'KODE_BARANG',
+                    title: 'ITEM CODE',
+                    sortable: true,
+                    render: ({ KODE_BARANG }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_BARANG}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'DESKRIPSI',
+                    title: 'DESCRIPTION',
+                    sortable: true,
+                    render: ({ DESKRIPSI }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{DESKRIPSI}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SATUAN',
+                    title: 'SATUAN',
+                    sortable: true,
+                    render: ({ SATUAN }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{SATUAN}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'QTY',
+                    title: 'QTY',
+                    sortable: true,
+                    render: ({ QTY }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{QTY}</div>
+                        </div>
+                    ),
+                }
+            ];
+            return  cols;
+    }
+
+    const showModalDetailTransaksiInventory = (in_title:string,in_kode_transaksi:string) => {
+        setModal13(true)
+        setTitle(in_title)
+        setData_rows_detail_transaksi_inventory([])
+        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistoryInventoryDetail`
+        let param = {"IN_KODE_TRANSAKSI":in_kode_transaksi}
+        const Token = GetToken()
+        Posts(url,JSON.stringify(param),false,Token).then((response) => {
+            const res_data = response;
+            var code = res_data.code;
+            var msg = res_data.msg;
+            if(parseFloat(code) === 200){
+                var data_body = res_data.data;
+                setData_rows_detail_transaksi_inventory(data_body)
+                var cols = Def_Columns_Transaksi_Inventory_Detail() 
+                setData_columns_detail_transaksi_inventory(cols)
+            }else if(code.toString().substring(0,1) === '4'){
+                if(code === 401 && msg.includes("Invalid")){
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                }
+            }else{
+                Swal.fire({
+                    title: t("Warning"),
+                    text: ""+parseFloat(code)+"-"+msg,
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+            }
+        }).catch((error) => {
+            console.log(error)
+            Swal.fire({
+                title: t("Warning"),
+                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                icon: "warning",
+                padding: '2em',
+                customClass: 'sweet-alerts'
+            });
+        });
+    }
+    const CloseModal = () => {
+        setModal13(false)
+    }
+
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     return (
@@ -557,16 +692,28 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                     :
                                     ''
                                 }
-                                <div className="hidden">
-                                    <Receipt ref={receiptRef} data={dummyData} in_kode_gerai={IN_KODE_GERAI} in_name_gerai={IN_NAMA_GERAI} in_alamat={IN_ALAMAT} in_nama={IN_NAMA_PEMBUAT} in_shift={IN_SHIFT} in_bayar={IN_BAYAR} in_kembali={IN_KEMBALIAN} in_no_struk={IN_GENERATE_KODE_TRANSAKSI_INVENTORY} in_grand_total={GrandTotal} in_tanggal_struk={IN_TANGGAL_STRUK} in_total_belanja={TotalBelanja} in_total_diskon_item={TotalDiskonItem} in_total_diskon_market_place={TotalDiskonMarketPlace} in_total_biaya_ongkir={BiayaOngkir} />
-                                </div>
                                 </>
                             } />
                         }
                         </>
                     }
                     
-
+                    <ModalComponent in_size_modal={`panel animate__animated my-7 w-2/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                            <div className="p-2">
+                                <div className="mb-5">
+                                    {
+                                    data_rows_detail_transaksi_inventory.length > 0 ?
+                                    <ComponentsDatatablesAdvanced in_column_sort={'id'} in_id={"dt1"} Datarow={data_rows_detail_transaksi_inventory} DataColumns={data_columns_detail_transaksi_inventory} />
+                                    :
+                                    ''
+                                    }
+                                    
+                                </div>
+                                <div className="flex items-center justify-end gap-3 mt-8">
+                                    <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
+                                </div>
+                            </div>
+                        } />
                 
                 
                 </>

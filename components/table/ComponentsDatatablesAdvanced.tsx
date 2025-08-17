@@ -21,8 +21,8 @@ const ComponentsDatatablesAdvanced : React.FC<ComponentsDatatablesAdvancedProps>
     const [search, setSearch] = useState('');
     const [sortStatus, setSortStatus] = useState<DataTableSortStatus>(
         {
-        columnAccessor: in_column_sort,
-        direction: 'asc',
+            columnAccessor: in_column_sort,
+            direction: 'asc',
         }
     );
 
@@ -43,7 +43,7 @@ const ComponentsDatatablesAdvanced : React.FC<ComponentsDatatablesAdvancedProps>
 
     useEffect(() => {
         const data = sortBy(initialRecords, sortStatus.columnAccessor);
-        setInitialRecords(sortStatus.direction === 'desc' ? data.reverse() : data);
+        setInitialRecords(sortStatus.direction === 'asc' ? data.reverse() : data);
         setPage(1);
     }, [sortStatus]);
 

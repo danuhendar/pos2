@@ -152,12 +152,12 @@ const Verification = () => {
             setLoadingButton(true)
             Posts(url,JSON.stringify(param),false,Token).then((response) => {
                 const res_data = response;
-                console.log('data_verifikasi : '+JSON.stringify(res_data))
+                //console.log('data_verifikasi : '+JSON.stringify(res_data))
                 var code = res_data.code;
                 var msg = res_data.msg;
                 if(parseFloat(code) === 200){
                     var data_body = res_data.data;
-                    console.log('data_body : '+JSON.stringify(data_body))
+                    //console.log('data_body : '+JSON.stringify(data_body))
                     const en_token = encryptString(data_body.TOKEN,'IDMC0mmandMustbeSetFor5ecr3t@3DP','R4h451A_3DP@4MaN')
                     const en_refresh_token = encryptString(data_body.REFRESH_TOKEN,'IDMC0mmandMustbeSetFor5ecr3t@3DP','R4h451A_3DP@4MaN')
                     handleSave('ot',en_token,false)
@@ -172,7 +172,15 @@ const Verification = () => {
                     handleSave('kode_gerai',data_body.KODE_GERAI,false)
                     handleSave('menu','horizontal',false)
                     dispatch(setIsAuthenticated());
-                    router.push('/utama');
+                    //console.log(parseFloat(data_body.IS_GERAI));
+                    if(parseFloat(data_body.IS_GERAI) === 1){
+                        //console.log('kondisi 1')
+                        router.push('/apps/sales/initial');
+                    }else{
+                        //console.log('kondisi 2')
+                        router.push('/utama');
+                    }
+                    
                     setLoadingButton(false)
                 }else if(code.toString().substring(0,1) === '4'){
                     if(code === 401 && msg.includes("Invalid")){

@@ -440,7 +440,6 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     }
     const showModal = (IDReport:string,KODE_KATEGORI:string,KODE_GERAI:string,KODE_BARANG:string,CONTENT:string,KODE_SUPPLIER:number,SUPPLIER:string,SINGKATAN:string,HPP:string,HPP_LAST:string,HPP_LAST_2:string,GROSS:string,SATUAN:string,VARIAN:string,BARCODE:string,IS_FIXED:string,IS_RETUR_SUPPLIER:string) => {
         setModal13(true)
-        console.log("OK")
         // Auto-select the matching option
         const matchedOption = options6.find(
             (opt) => opt.value === KODE_SUPPLIER
@@ -590,20 +589,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         })
     }
 
-    const CopyText = (Text:string) => {
-        navigator.clipboard.writeText(Text);
-        MySwal.fire({
-            title: "Text was copied!",
-            toast: true,
-            position: isRtl ? 'top-start' : 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            showCloseButton: true,
-            customClass: {
-                popup: `color-success`,
-            },
-        });
-    }
+    
     const Def_Column_MasterKategori = () => {
         var cols = [
                 {

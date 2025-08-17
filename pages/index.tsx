@@ -96,6 +96,13 @@ const LoginCover = () => {
            setType('password')
         }
     }
+    
+    const PressButtonLogin = (e: { key: string; }) => {
+        const button = document.getElementById("btn_login");
+        if (e.key === 'Enter') {
+           button.click();
+        }
+    }
     return (
         <>
         <AntiScrapedShieldComponent in_content={
@@ -143,7 +150,7 @@ const LoginCover = () => {
                                     <div className="mt-3">
                                         <label htmlFor="Password" className="text-center">{t('Password')}</label>
                                         <div className="relative text-white-dark">
-                                            <input onChange={e => { setPassword(e.currentTarget.value); } } value={Password} type={type} placeholder="Input Password" className="text-center form-input ps-10 placeholder:text-white-dark rounded-xl" />
+                                            <input onKeyDown={PressButtonLogin} onChange={e => { setPassword(e.currentTarget.value); } } value={Password} type={type} placeholder="Input Password" className="text-center form-input ps-10 placeholder:text-white-dark rounded-xl" />
                                             <span className="absolute -translate-y-1/2 start-4 top-1/2">
                                                 <IconLockDots fill={true} />
                                             </span>
@@ -152,7 +159,7 @@ const LoginCover = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <ButtonLogin url={`http://${host}:${port_login}/api/v2/LoginGoogleAuthenticator`} param={JSON.stringify({ "IN_USERNAME":Username,"IN_PASSWORD":Password,"IN_FROM":'POS',"IN_TOKEN":""})} idComponent={GetID()} idAlert={'alert_login'} isBot={getnavigator} />
+                                    <ButtonLogin url={`http://${host}:${port_login}/api/v2/LoginGoogleAuthenticator`} param={JSON.stringify({ "IN_USERNAME":Username,"IN_PASSWORD":Password,"IN_FROM":'POS',"IN_TOKEN":""})} idComponent={"btn_login"} idAlert={'alert_login'} isBot={getnavigator} />
                                     <div className="text-center dark:text-white">
                                         {/* {t('Download User Guide IDMConsoleV2')}&nbsp;
                                         <Link href={'/file/JUKLAK_IDMCONSOLEV2.rar'} className="underline transition text-primary hover:text-black dark:hover:text-white">

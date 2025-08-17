@@ -22,6 +22,7 @@ import { set } from "lodash";
 import IconLock from "../Icon/IconLock";
 import withReactContent from "sweetalert2-react-content";
 import IconBook from "../Icon/IconBook";
+import TextAreaComponent from "../form/TextAreaComponent";
 
 interface FormClosingProps {
     url: string,
@@ -54,6 +55,9 @@ const [data_rows, setData_rows] = useState([]);
     const [IN_DISKON, setIN_DISKON] = useState('')
     const [IN_NET_SALES, setIN_NET_SALES] = useState('')
     const [IN_UANG_FISIK, setIN_UANG_FISIK] = useState('')
+    const [IN_PENGELUARAN_BIAYA_MODAL, setIN_PENGELUARAN_BIAYA_MODAL] = useState('0')
+    const [IN_SISA_MODAL, setIN_SISA_MODAL] = useState('0')
+    const [IN_NOTE, setIN_NOTE] = useState('')
     const [LoadingButtonClosing,setLoadingButtonClosing] = useState(false)
     const [isDisabledClosing,setisDisabledClosing] = useState(false)   
     const [InputNik, setInputNik] = useState(''); 
@@ -90,6 +94,9 @@ const [data_rows, setData_rows] = useState([]);
     const FormInputDiskon = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_DISKON(val);};
     const FormInputNetSales = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_NET_SALES(val);};
     const FormInputUangFisik = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_UANG_FISIK(val);};
+    const FormInputPengeluaranBiayaModal = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_PENGELUARAN_BIAYA_MODAL(val);};
+    const FormInputSisaModal = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_SISA_MODAL(val);};
+    const FormInputNote = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_NOTE(val);};
 
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
@@ -309,7 +316,7 @@ const [data_rows, setData_rows] = useState([]);
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
-                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK}
+                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK,"PENGELUARAN_BIAYA_MODAL":IN_PENGELUARAN_BIAYA_MODAL,"IN_SISA_MODAL":IN_SISA_MODAL,"IN_NOTE":IN_NOTE}
                         const Token = GetToken()
                         const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
                         setLoadingButtonClosing(true)
@@ -536,31 +543,58 @@ const [data_rows, setData_rows] = useState([]);
                         <InputTextType   in_title={"Date"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputTanggalInitial} in_value={IN_TANGGAL} />
                         </div>
                         <div>
-                        <InputTextType   in_title={"Initial Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeInitial} in_value={IN_KODE_INITIAL} />
+                        <InputTextType   in_title={"Initial Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputKodeInitial} in_value={IN_KODE_INITIAL} />
                         </div>
                         <div>
-                        <InputTextType   in_title={"Gerai"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiInitial} in_value={IN_KODE_GERAI_INITIAL} />
+                        <InputTextType   in_title={"Gerai"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl "} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiInitial} in_value={IN_KODE_GERAI_INITIAL} />
                         </div>
                         <div>
-                        <InputTextType   in_title={"Nik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNik} in_value={IN_NIK} />
+                        <InputTextType   in_title={"Nik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputNik} in_value={IN_NIK} />
                         </div>
                         <div>
                         <InputTextType   in_title={"Nama"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNama} in_value={IN_NAMA} />
                         </div>
                         <div>
-                        <InputTextType   in_title={"Gross Sales"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputGrossSales} in_value={IN_GROSS_SALES} />
+                        <InputTextType   in_title={"Gross Sales"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputGrossSales} in_value={IN_GROSS_SALES} />
                         </div>
                         <div>
-                        <InputTextType   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputDiskon} in_value={IN_DISKON} />
+                        <InputTextType   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputDiskon} in_value={IN_DISKON} />
                         </div>
                         <div>
-                        <InputTextType   in_title={"Net Sales"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNetSales} in_value={IN_NET_SALES} />
+                        <InputTextType   in_title={"Net Sales"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputNetSales} in_value={IN_NET_SALES} />
                         </div>
-                        <div>
-                        <InputTextType   in_title={"Uang Fisik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputUangFisik} in_value={IN_UANG_FISIK} />
-                        </div>
+                        {
+                            IDReport === 'Closing Harian' ?
+                            <>
+                            <div>
+                            <InputTextType   in_title={"Pengeluaran Biaya Modal"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputPengeluaranBiayaModal} in_value={IN_PENGELUARAN_BIAYA_MODAL} />
+                            </div>
+                            <div>
+                            <InputTextType   in_title={"Sisa Uang Modal"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputSisaModal} in_value={IN_SISA_MODAL} />
+                            </div>
+                            <div>
+                            <InputTextType   in_title={"Uang Fisik"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputUangFisik} in_value={IN_UANG_FISIK} />
+                            </div>
+                            </>
+                            :
+                            ''
+                        }
+                        
                     </div>
-                    <div className="lg:mt-8 md:mt-8">
+                    {
+                        IDReport === 'Closing Harian' ?
+                        <>
+                        <div className="grid grid-cols-1 gap-3">
+                            <div>
+                            <TextAreaComponent   in_title={"Catatan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputNote} in_value={IN_NOTE} in_rows={4} in_cols={20} />
+                            </div>
+                        </div>
+                        </>
+                        :
+                        ''
+                    }
+                    
+                    <div className="lg:mt-2 md:mt-2">
                         {
                             IDReport === 'Closing Harian' ?
                             <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButtonClosing} isDisabled={isDisabledClosing} in_icon={<IconBook />} in_title_button={'Closing Harian'} HandleClick={ClosingHarian} />    

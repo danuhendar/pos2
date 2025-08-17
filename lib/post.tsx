@@ -55,28 +55,35 @@ export const PostsDownload = async (url: string, param: any, isLogin: boolean, T
     }
     
 
-    const res = fetch(url, {
+   const res = fetch(url, {
       method: 'POST',
       cache: "no-store",
       headers: myHeaders,
       body: param
   })
- 
-  const blob = (await res).blob()
- 
- 
 
-  // Create a download link for the blob
-  const downloadUrl = window.URL.createObjectURL(await blob);
-  const a = document.createElement('a');
-  a.href = downloadUrl;
-  a.download = NameFile+'.pdf'; // You can set filename here
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  window.URL.revokeObjectURL(downloadUrl);
+  if(!(await res).ok){
+    const error = await (await res).json();
+    return error
+  }else{
+   const blob = (await res).blob()
+   
+   
 
-  return true;
+   // Create a download link for the blob
+   const downloadUrl = window.URL.createObjectURL(await blob);
+   const a = document.createElement('a');
+   a.href = downloadUrl;
+   a.download = NameFile+'.pdf'; // You can set filename here
+   document.body.appendChild(a);
+   a.click();
+   a.remove();
+   window.URL.revokeObjectURL(downloadUrl);
+   return true;
+  }
+ 
+  
+  
 };
 
 

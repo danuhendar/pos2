@@ -15,6 +15,8 @@ import FileSaver from 'file-saver';
 import { Gets } from './get';
 import JsBarcode from 'jsbarcode';
 import QRCode from "qrcode";
+import withReactContent from 'sweetalert2-react-content';
+const MySwal = withReactContent(Swal);
 export const GenerateUniqNumber = () =>{
     const uniq_number = parseFloat(Math.floor(new Date().valueOf() * Math.random()).toString().substring(0,6));
     return uniq_number;
@@ -1235,4 +1237,18 @@ export function generateAlphanumeric(length: number,is_only_number:boolean): str
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
+}
+export function CopyText(Text:string,isRtl:boolean){
+    navigator.clipboard.writeText(Text);
+     MySwal.fire({
+        title: "Text copied to clipboard",
+        toast: true,
+        position: isRtl ? 'top-start' : 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        showCloseButton: true,
+        customClass: {
+            popup: `color-success`,
+        },
+    });
 }
