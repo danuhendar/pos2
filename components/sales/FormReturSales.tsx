@@ -471,7 +471,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
                         <>
                         <div className="grid gap-3 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-1 xs:grid-cols-1">
                             {
-                                IN_KODE_GERAI  !== '%' ?
+                                IN_KODE_GERAI  === '%' ?
                                 <div>
                                 <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
@@ -495,7 +495,6 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
                 {
                     isContentDataSales ?
                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPrinter />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Data Sales"} in_content={
-                    
                         <>
                         {
                             data_rows.length > 0 ?
