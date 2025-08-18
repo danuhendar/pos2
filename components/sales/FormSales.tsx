@@ -319,7 +319,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         if (e.key === 'Enter') {
             // Move focus to input 2
             input2Ref.current.focus();
-            GetMasterProdukByBarcode();
+            setTimeout(() => {
+                GetMasterProdukByBarcode();
+            },2000)
         }
     }
     const CopyText = (Text:string) => {
