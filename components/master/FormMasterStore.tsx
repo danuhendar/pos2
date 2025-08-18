@@ -54,7 +54,8 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const [IN_KATEGORI_STORE,setIN_KATEGORI_STORE] = useState('')
     const [isCheck_1,setisCheck_1] = useState(false)
     const [isCheck_2,setisCheck_2] = useState(false)
-    
+    const [IN_CHANNEL_TELEGRAM,setIN_CHANNEL_TELEGRAM] = useState('')
+
     useEffect(() => {
         const res_host = themeConfig.host
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
@@ -88,6 +89,11 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const FormISActive = (event: { target: { value: any; }; }) => {
         setCheckedISActive(!CheckedISActive);  
         console.log(!CheckedISActive)
+    };
+
+    const FormInputChannelTelegram = (event: { target: { value: any; }; }) => {
+        var val = event.target.value;
+        setIN_CHANNEL_TELEGRAM(val);
     };
 
     const FormInputSelectKategori = (event: { target: { value: any; }; }) => {
@@ -281,12 +287,13 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         
    
     }
-    const showModal = (IDReport:string,IN_KODE_CABANG:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string,IN_ALAMAT:string) => {
+    const showModal = (IDReport:string,IN_KODE_CABANG:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string,IN_ALAMAT:string,IN_CHANNEL_TELEGRAM:string) => {
         setModal13(true)
         setIN_BRANCH(IN_KODE_CABANG)
         setIN_STORE(IN_KODE_GERAI)
         setIN_CONTENT(IN_CONTENT)
         setIN_ALAMAT(IN_ALAMAT)
+        setIN_CHANNEL_TELEGRAM(IN_CHANNEL_TELEGRAM)
         const res_is_active = (IN_STATUS === 'AKTIF' ? true : false)
         setCheckedISActive(res_is_active)
         setTitle('Form : '+IDReport)
@@ -318,7 +325,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             if (result.isConfirmed) {
                 const InputNik = get_data_local_storage('nik')
                 const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterGerai`
-                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik,"IN_ALAMAT": IN_ALAMAT}
+                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik,"IN_ALAMAT": IN_ALAMAT,"IN_CHANNEL_TELEGRAM":IN_CHANNEL_TELEGRAM}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
                     const res_data = response;
@@ -547,10 +554,10 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     accessor: 'id',
                     title: 'ACTION',
                     sortable: true,
-                    render: ({ KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT }) => (
+                    render: ({ KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT,CHANNEL_TELEGRAM }) => (
                         <div className="flex flex-row gap-2">
                             <div className="mt-1">
-                                <a onClick={() => {showModal(' Edit '+IDReport,KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT)}} data-twe-toggle="tooltip" title="Edit Data">
+                                <a onClick={() => {showModal(' Edit '+IDReport,KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT,CHANNEL_TELEGRAM)}} data-twe-toggle="tooltip" title="Edit Data">
                                     <span className="text-warning"><IconPencil  /></span>
                                 </a>
                             </div>
@@ -609,6 +616,16 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     render: ({ ALAMAT }) => (
                         <div className="flex items-center gap-2">
                             <div className="font-semibold">{ALAMAT}</div>
+                        </div>
+                    ),
+                },
+                  {
+                    accessor: 'CHANNEL_TELEGRAM',
+                    title: 'CHANNEL_TELEGRAM',
+                    sortable: true,
+                    render: ({ CHANNEL_TELEGRAM }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{CHANNEL_TELEGRAM}</div>
                         </div>
                     ),
                 },
@@ -1025,6 +1042,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                                 
                                 <InputTextType   in_title={"Name"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
                                 <InputTextType   in_title={"Address"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputAlamat} in_value={IN_ALAMAT} />
+                                <InputTextType   in_title={"Channel Telegram"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputChannelTelegram} in_value={IN_CHANNEL_TELEGRAM} />
                                 <label>IS Active</label>
                                 <label className="relative w-12 h-6">
                                     <input checked={CheckedISActive} onChange={FormISActive} type="checkbox" className="absolute z-10 w-full h-full opacity-0 cursor-pointer custom_switch peer" id="custom_switch_checkbox1" />

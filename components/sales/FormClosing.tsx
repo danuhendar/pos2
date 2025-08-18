@@ -167,7 +167,7 @@ const [data_rows, setData_rows] = useState([]);
                 setIN_NAMA(data_body[0].NAMA)
                 setIN_GROSS_SALES(GetFormatCurrency(data_body[0].SALES))
                 const total_diskon = parseFloat(data_body[0].DISKON)+parseFloat(data_body[0].DISKON_MARKET_PLACE)
-                setIN_DISKON(GetFormatCurrency(""+total_diskon))
+                setIN_DISKON(GetFormatCurrency(""+(isNaN(total_diskon) ? 0 : total_diskon)))
                 setIN_NET_SALES(GetFormatCurrency(data_body[0].SALESNET))
                 setLoadingButton(false)
                 setisDisabled(false)

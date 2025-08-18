@@ -168,9 +168,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         const column_master_produk = Def_Column_Master_Produk()
         setData_columns_produk(column_master_produk)
         GetMasterProdukByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai,true)
-        console.log(ListBarcode)
     },[]);
-
     
     const FormInputKodeGeraiMutasi  = (value: any) => {
         var val = value.value; 
@@ -229,7 +227,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         
     };
     const FormInputKodeBarang = (value: any) => {var val = value.target.value;setIN_KODE_BARANG(val); };
-    const FormInputTotalBelanja = (value: any) => {var val = value.target.value;setIN_TOTAL_BELANJA(val); };
     const FormInputDiskonMarketPlace = (value: any) => {
         var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setDiskonMarketPlace(val_currency);
         const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
@@ -257,7 +254,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             MySwal.fire({
                 title: t("Payment must be greater than or equal to the Grand Total"),
                 toast: true,
-                position: isRtl ? 'top-start' : 'top-end',
+                position: 'top',
                 showConfirmButton: false,
                 timer: 5000,
                 showCloseButton: true,
@@ -283,7 +280,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             MySwal.fire({
                 title: t("Payment must be greater than or equal to the Grand Total"),
                 toast: true,
-                position: isRtl ? 'top-start' : 'top-end',
+                position: 'top',
                 showConfirmButton: false,
                 timer: 5000,
                 showCloseButton: true,
@@ -330,7 +327,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         MySwal.fire({
             title: "Text was copied!",
             toast: true,
-            position: isRtl ? 'top-start' : 'top-end',
+            position: 'top',
             showConfirmButton: false,
             timer: 3000,
             showCloseButton: true,
@@ -567,7 +564,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         MySwal.fire({
                         title: t("Data Item More Than 1, Check Item or Select Item Manually"),
                         toast: true,
-                        position: isRtl ? 'top-start' : 'top-end',
+                        position: 'top',
                         showConfirmButton: false,
                         timer: 5000,
                         showCloseButton: true,
@@ -579,7 +576,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                         MySwal.fire({
                         title: t("Data Empty"),
                         toast: true,
-                        position: isRtl ? 'top-start' : 'top-end',
+                        position: 'top',
                         showConfirmButton: false,
                         timer: 5000,
                         showCloseButton: true,
@@ -611,6 +608,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 });
             }
         }).catch((error) => {
+            console.log(error)
             Swal.fire({
                 title: t("Warning"),
                 text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
@@ -665,7 +663,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             MySwal.fire({
                                 title: t(""+parseFloat(code)+"-"+msg),
                                 toast: true,
-                                position: isRtl ? 'top-start' : 'top-end',
+                                position: 'top',
                                 showConfirmButton: false,
                                 timer: 5000,
                                 showCloseButton: true,
@@ -678,7 +676,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             MySwal.fire({
                                 title: t("Data initial for shift "+IN_SHIFT+" not found!"),
                                 toast: true,
-                                position: isRtl ? 'top-start' : 'top-end',
+                                position: 'top',
                                 showConfirmButton: false,
                                 timer: 5000,
                                 showCloseButton: true,
@@ -950,7 +948,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         MySwal.fire({
             title: t("Please, Input New Order!"),
             toast: true,
-            position: isRtl ? 'top-start' : 'top-end',
+            position: 'top',
             showConfirmButton: false,
             timer: 5000,
             showCloseButton: true,
@@ -958,6 +956,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 popup: `color-success`,
             },
         });
+
+        location.reload();
         
     }
 
@@ -1312,7 +1312,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             MySwal.fire({
                                                 title: t(""+parseFloat(code)+"-"+msg),
                                                 toast: true,
-                                                position: isRtl ? 'top-start' : 'top-end',
+                                                position: 'top',
                                                 showConfirmButton: false,
                                                 timer: 5000,
                                                 showCloseButton: true,
@@ -1325,7 +1325,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             MySwal.fire({
                                                 title: t("Data initial for shift "+IN_SHIFT+" not found!"),
                                                 toast: true,
-                                                position: isRtl ? 'top-start' : 'top-end',
+                                                position: 'top',
                                                 showConfirmButton: false,
                                                 timer: 5000,
                                                 showCloseButton: true,
@@ -1444,7 +1444,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         MySwal.fire({
                                             title: t(""+parseFloat(code)+"-"+msg),
                                             toast: true,
-                                            position: isRtl ? 'top-start' : 'top-end',
+                                            position: 'top',
                                             showConfirmButton: false,
                                             timer: 5000,
                                             showCloseButton: true,
@@ -1457,7 +1457,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         MySwal.fire({
                                             title: t("Data initial for shift "+IN_SHIFT+" not found!"),
                                             toast: true,
-                                            position: isRtl ? 'top-start' : 'top-end',
+                                            position: 'top',
                                             showConfirmButton: false,
                                             timer: 5000,
                                             showCloseButton: true,
@@ -1607,7 +1607,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         MySwal.fire({
                                             title: t(""+parseFloat(code)+"-"+msg),
                                             toast: true,
-                                            position: isRtl ? 'top-start' : 'top-end',
+                                            position: 'top',
                                             showConfirmButton: false,
                                             timer: 5000,
                                             showCloseButton: true,
@@ -1620,7 +1620,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         MySwal.fire({
                                             title: t("Data initial for shift "+IN_SHIFT+" not found!"),
                                             toast: true,
-                                            position: isRtl ? 'top-start' : 'top-end',
+                                            position: 'top',
                                             showConfirmButton: false,
                                             timer: 5000,
                                             showCloseButton: true,
@@ -1689,11 +1689,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 <>
                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={IDReport === 'Initial' ? <IconLogin /> : <IconShoppingCart />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={IDReport} in_content={
                         <>
-                        <div className="flex items-center p-3.5 rounded text-danger bg-danger-light dark:bg-danger-dark-light">
+                        {/* <div className="flex items-center p-3.5 rounded text-danger bg-danger-light dark:bg-danger-dark-light">
                             <span className="ltr:pr-2 rtl:pl-2">
                                 <strong className="ltr:mr-1 rtl:ml-1">Warning!</strong>{t('Note: Please check your data input, because process data input can\'t try again!')}
                             </span>
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
                             {
                                 IN_IS_GERAI === '0' ?
@@ -1765,8 +1765,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             {
                                 isEnabledContentSales ? 
                                 <>
-                                <div className="grid grid-cols-3 grid-rows-2 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
-                                    <div className="col-span-2 row-span-2">
+                                <div className="grid grid-cols-3 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
+                                    <div className="col-span-2">
                                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
                                         <>
                                         <div className="mt-3 datatables">
@@ -1819,122 +1819,122 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     />
                                     </div>
                                     {/* FORM INPUT ITEM  */}
-                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
-                                        <>
-                                        <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
-                                            <div className="col-span-2">
-                                            {/* <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} /> */}
-                                            <Autocomplete
-                                                options={ListBarcode}
-                                                clearOnEscape={true}
-                                                clearText="Clear"
-                                                onChange={(_event, value) => {
-                                                    // value is the selected option
-                                                    if (value) {
-                                                        FormInputItem({ target: { value } });
-                                                    }
-                                                }}
-                                                onKeyDown={KeyItem}    
-                                                value={IN_BARCODE} 
-                                                ref={input1Ref}           // The list of options
-                                                renderInput={(params) => (
-                                                   <TextField {...params} label="Pilih Item" variant="outlined" className="w-full text-xs rounded-full" placeholder={t("Type Item")}/>
-                                                )}
-                                                />
+                                    <div className="col-span-1">
+                                        <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl h-fit"} in_judul={"Input Item"} in_content={
+                                            <>
+                                            <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
+                                                <div className="col-span-2">
+                                                {/* <InputTextTypeKeyDown   in_title={"Item"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputItem} in_value={IN_BARCODE} in_ref={input1Ref} in_event_keydown={KeyItem} /> */}
+                                                <Autocomplete
+                                                    options={ListBarcode}
+                                                    clearOnEscape={true}
+                                                    clearText="Clear"
+                                                    ref={input1Ref}
+                                                    onChange={(_event, value) => {
+                                                        // value is the selected option
+                                                        if (value) {
+                                                            FormInputItem({ target: { value } });
+                                                        }
+                                                    }}
+                                                    onKeyDown={KeyItem}    
+                                                    value={IN_BARCODE} 
+                                                    
+                                                    renderInput={(params) => (
+                                                    <TextField {...params} label="Pilih Item" variant="outlined" className="w-full text-xs rounded-full" placeholder={t("Type Item")} autoFocus={true} />
+                                                    )}
+                                                    />
+                                                </div>
+                                                <div className="hidden sm:grid-cols-1">
+                                                <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
+                                                <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />    
+                                                </div>
+                                                <div className="hidden sm:grid-cols-1">
+                                                <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
+                                                </div>
+                                                <div className="hidden sm:col-span-1">
+                                                <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1 hidden"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs hidden"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
+                                                </div>
+                                                
+                                                <div className="sm:col-span-1">
+                                                <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyItem} />
+                                                </div>
+                                                <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
+                                                <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
                                             </div>
-                                            <div className="sm:grid-cols-1">
-                                            <InputTextType   in_title={"Kode Barang"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
-                                            <InputTextType   in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputDeskripsi} in_value={IN_DESKRIPSI} />    
-                                            </div>
-                                            <div className="sm:grid-cols-1">
-                                            <InputTextType   in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputSatuan} in_value={IN_SATUAN} />
-                                            </div>
-                                            <div className="sm:col-span-1">
-                                            <InputTextTypeKeyDown   in_title={"Qty"} in_classname_title={"mb-1 hidden"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs hidden"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyItem} />
-                                            </div>
-                                            
-                                            <div className="sm:col-span-1">
-                                            <InputTextTypeKeyDown   in_title={"Diskon"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskon} in_value={IN_DISKON} in_ref={input3Ref} in_event_keydown={KeyItem} />
-                                            </div>
-                                            <InputTextType   in_title={"HPP"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputHPP} in_value={IN_HPP} />
-                                            <InputTextType   in_title={"GROSS"} in_classname_title={""} in_classname_content={"w-full hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs hidden"} data_options={undefined} isDisabled={true} event={FormInputGross} in_value={IN_GROSS} />
-                                        </div>
-                                        <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
-                                        </div>
-                                    
-                                        </>
-                                    } />
-                                     
-                                    {/* INPUT PAYMENT */}
-                                    <div className="">
-                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl h-auto"} in_judul={"Input Payment"} in_content={
-                                        <>
-                                        <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
-                                            <div className="sm:grid-cols-1">
-                                            <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={null}/>
-                                            </div>
-                                            <div  className="sm:grid-cols-1">
-                                            <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={null} in_event_keydown={null}/>
-                                            </div>
-                                            <div  className="sm:grid-cols-1">
-                                            <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
-                                            </div>
-                                            <div  className="sm:grid-cols-1">
-                                            <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
-                                            </div>
-                                        </div>
-                                        <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
                                             <div>
-                                                <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Method")}</label></div>
-                                                <div className="mb-3">
-                                                    <div className={"w-full text-xs"}>
-                                                        <Select
-                                                            onChange={FormInputMetodePembayaran}
-                                                            id={"metode_pembayaran"}
-                                                            placeholder={t("Select Method")}
-                                                            options={OptionMetodePembayaran}
-                                                            isMulti={false}
-                                                            isSearchable={true}
-                                                            isClearable={false}
-                                                            value={selectedOption}
-                                                            //defaultValue={defaultOption}
-                                                        />
-                                                    </div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-warning w-full rounded-full text-end text-xs' : 'btn btn-outline-warning w-full rounded-full text-xs'} idComponent={"btn_list_item"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconBox />} in_title_button={'Master Produk'} HandleClick={ShowMasterProduk} />
+                                            </div>
+                                        
+                                            </>
+                                        } />
+                                        {/* INPUT PAYMENT */}
+                                        <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl h-fit mt-3"} in_judul={"Input Payment"} in_content={
+                                            <>
+                                            <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                                <div className="sm:grid-cols-1">
+                                                <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={null}/>
+                                                </div>
+                                                <div  className="sm:grid-cols-1">
+                                                <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={null} in_event_keydown={null}/>
+                                                </div>
+                                                <div  className="sm:grid-cols-1">
+                                                <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
+                                                </div>
+                                                <div  className="sm:grid-cols-1">
+                                                <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Payment via")}</label></div>
-                                                <div className="mb-3">
-                                                    <div className={"w-full text-xs"}>
-                                                        <Select
-                                                            onChange={FormInputBank}
-                                                            id={"payment_via"}
-                                                            placeholder={t("Select Via")}
-                                                            options={OptionBank}
-                                                            isMulti={false}
-                                                            isSearchable={true}
-                                                            isClearable={false}
-                                                            value={selectedBankOption}
-                                                            //defaultValue={defaultOption}
-                                                        />
+                                            <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                                <div>
+                                                    <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Method")}</label></div>
+                                                    <div className="mb-3">
+                                                        <div className={"w-full text-xs"}>
+                                                            <Select
+                                                                onChange={FormInputMetodePembayaran}
+                                                                id={"metode_pembayaran"}
+                                                                placeholder={t("Select Method")}
+                                                                options={OptionMetodePembayaran}
+                                                                isMulti={false}
+                                                                isSearchable={true}
+                                                                isClearable={false}
+                                                                value={selectedOption}
+                                                                //defaultValue={defaultOption}
+                                                            />
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div>
+                                                    <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Payment via")}</label></div>
+                                                    <div className="mb-3">
+                                                        <div className={"w-full text-xs"}>
+                                                            <Select
+                                                                onChange={FormInputBank}
+                                                                id={"payment_via"}
+                                                                placeholder={t("Select Via")}
+                                                                options={OptionBank}
+                                                                isMulti={false}
+                                                                isSearchable={true}
+                                                                isClearable={false}
+                                                                value={selectedBankOption}
+                                                                //defaultValue={defaultOption}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-span-2">
+                                                <InputTextType   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
+                                                </div>
                                             </div>
-                                            <div className="col-span-2">
-                                            <InputTextType   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
+                                            <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
+                                                <div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
+                                                </div>
+                                                {/* <div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GenerateReceiptStruk} />
+                                                </div> */}
                                             </div>
-                                        </div>
-                                        <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
-                                            <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
-                                            </div>
-                                            {/* <div>
-                                            <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GenerateReceiptStruk} />
-                                            </div> */}
-                                        </div>
-                                        </>
-                                    } />
+                                            </>
+                                        } />
                                     </div>
                                 </div>
                                 {/* OPEN MODAL MASTER PRODUK */}
