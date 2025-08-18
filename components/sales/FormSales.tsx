@@ -321,7 +321,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             input2Ref.current.focus();
             setTimeout(() => {
                 GetMasterProdukByBarcode();
-            },2000)
+            },500)
         }
     }
     const CopyText = (Text:string) => {
@@ -1832,9 +1832,12 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                     clearOnEscape={true}
                                                     clearText="Clear"
                                                     ref={input1Ref}
+                                                    inputValue={IN_BARCODE}
+                                                    onInputChange={(e, newInputValue) => setIN_BARCODE(newInputValue)}
                                                     onChange={(_event, value) => {
                                                         // value is the selected option
                                                         if (value) {
+                                                            //console.log('value_barcode : '+value);
                                                             FormInputItem({ target: { value } });
                                                         }
                                                     }}
