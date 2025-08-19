@@ -959,7 +959,10 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             },
         });
 
-        location.reload();
+        setTimeout(() => {
+           location.reload() 
+        },3000)
+        
         
     }
 
