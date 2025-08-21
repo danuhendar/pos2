@@ -107,6 +107,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const MySwal = withReactContent(Swal);
     const router = useRouter();
     const [modal13, setModal13] = useState(false);
+    const [modal14, setModal14] = useState(false);
     const [Title, setTitle] = useState('Master Produk');
     const [data_rows_produk, setData_rows_produk] = useState([]);
     const [data_columns_produk, setData_columns_produk] = useState([]);
@@ -137,6 +138,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const defaultOptionVia = { value: "", label: "-- Select Via --" }; // Your default
     const [selectedBankOption, setSelectedBankOption] = useState(defaultOptionVia);
     const [ListBarcode,setListBarcode] = useState([])
+    const [URL_GENERATE_STRUK,setURL_GENERATE_STRUK] = useState('')
+    const [IN_NO_STRUK,setIN_NO_STRUK] = useState('')
 
 
     useEffect(() => {
@@ -959,9 +962,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             },
         });
 
-        setTimeout(() => {
-           location.reload() 
-        },3000)
+        // setTimeout(() => {
+        //     location.reload() 
+        // },3000)
         
         
     }
@@ -1123,24 +1126,28 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
 
     const CloseModal = async () => {
-        setModal13(false);
-        input1Ref.current.focus();
-        try{
-            const text = await navigator.clipboard.readText();
-            if(text !== ''){
-                setIN_BARCODE(text);
-                setIN_DESKRIPSI('')
-                setIN_KODE_BARANG('')
-                setIN_SATUAN('')
-                setIN_QTY('')
-                setIN_HPP('')
-                setIN_GROSS('')
-                setIN_DISKON('')
-            }else{
-                setIN_BARCODE('');
+        if(modal13){
+            setModal13(false);
+            input1Ref.current.focus();
+            try{
+                const text = await navigator.clipboard.readText();
+                if(text !== ''){
+                    setIN_BARCODE(text);
+                    setIN_DESKRIPSI('')
+                    setIN_KODE_BARANG('')
+                    setIN_SATUAN('')
+                    setIN_QTY('')
+                    setIN_HPP('')
+                    setIN_GROSS('')
+                    setIN_DISKON('')
+                }else{
+                    setIN_BARCODE('');
+                }
+            }catch(Ex){
+                console.log(Ex)
             }
-        }catch(Ex){
-            console.log(Ex)
+        }else{
+            setModal14(false)
         }
     }
 
@@ -1299,7 +1306,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         customClass: 'sweet-alerts'
                                     });
                                     //console.log('res_no_struk :'+res_no_struk)
-                                    GenerateReceiptStruk(res_no_struk,(IN_NO_WHATSAPP === '' || IN_NO_WHATSAPP === null ? false : true))
+                                    //GenerateReceiptStruk(res_no_struk,(IN_NO_WHATSAPP === '' || IN_NO_WHATSAPP === null ? false : true))
+                                    const url_struk = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStrukForPreview/${res_no_struk}`
+                                    setIN_NO_STRUK(res_no_struk)
+                                    setURL_GENERATE_STRUK(url_struk)
+                                    setModal14(true)
                                     CreateNewOrder()
                                     setLoadingButtonPayment(false)
                                     setisDisabledButtonPayment(false)
@@ -1435,6 +1446,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 });
                                 setLoadingButtonSubmit(false)
                                 setisDisabledButtonSubmit(false)
+                                router.push('/apps/sales/pos_sales/')
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
                                     Swal.fire({
@@ -1694,11 +1706,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 <>
                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={IDReport === 'Initial' ? <IconLogin /> : <IconShoppingCart />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={IDReport} in_content={
                         <>
-                        {/* <div className="flex items-center p-3.5 rounded text-danger bg-danger-light dark:bg-danger-dark-light">
+                        <div className="flex items-center p-3.5 rounded text-warning bg-danger-light dark:bg-danger-dark-light">
                             <span className="ltr:pr-2 rtl:pl-2">
-                                <strong className="ltr:mr-1 rtl:ml-1">Warning!</strong>{t('Note: Please check your data input, because process data input can\'t try again!')}
+                                <strong className="ltr:mr-1 rtl:ml-1">Peringatan!</strong>{t('Note: mohon teliti dan pastikan kembali pada saat proses input sales!')}
                             </span>
-                        </div> */}
+                        </div>
                         <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
                             {
                                 IN_IS_GERAI === '0' ?
@@ -1846,9 +1858,20 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                     }}
                                                     onKeyDown={KeyItem}    
                                                     value={IN_BARCODE} 
-                                                    
+                                                    ListboxProps={{
+                                                        style: {
+                                                        maxHeight: 120, // 👈 about 3–4 items max visible
+                                                        },
+                                                    }}
                                                     renderInput={(params) => (
-                                                    <TextField {...params} label="Pilih Item" variant="outlined" className="w-full text-xs rounded-full" placeholder={t("Type Item")} autoFocus={true} />
+                                                    <TextField {...params} label="Pilih Item" variant="outlined" className="w-full text-xs rounded-full" placeholder={t("Type Item")} autoFocus={true} sx={{
+                                                            "& .MuiInputBase-input": {
+                                                            fontSize: "12px", // 👈 Change font size here
+                                                            },
+                                                            "& .MuiInputLabel-root": {
+                                                            fontSize: "12px", // Label font size
+                                                            },
+                                                        }} />
                                                     )}
                                                     />
                                                 </div>
@@ -1961,6 +1984,20 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
                                         </div>
                                     </div>
+                                } />
+                                {/* MODAL STRUK ONLINE */}
+                                <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 h-1/2 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal14} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={"Receipt/Struk Preview #"+IN_NO_STRUK} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                                        <div className="p-2">
+                                            <div className="mb-1">
+                                                    <iframe
+                                                        src={URL_GENERATE_STRUK} // 👈 your API endpoint
+                                                        title="Receipt/Struk Sales Preview"
+                                                        width="100%"
+                                                        height="470px"
+                                                        style={{ border: "none" }}
+                                                    />
+                                            </div>
+                                        </div>
                                 } />
                                 </>
                                 :

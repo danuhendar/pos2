@@ -61,6 +61,9 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const [data_rows_detail_transaksi_inventory, setData_rows_detail_transaksi_inventory] = useState([]);
     const [data_columns_detail_transaksi_inventory, setData_columns_detail_transaksi_inventory] = useState([]);
     const [modal13,setModal13] = useState(false);
+    const [modal14,setModal14] = useState(false);
+    const [URL_GENERATE_STRUK,setURL_GENERATE_STRUK] = useState('')
+    const [IN_NO_STRUK,setIN_NO_STRUK] = useState('')
 
     const receiptRef = useRef();
     const [dummyData, setDummyData] = useState({
@@ -235,46 +238,53 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         in_tanggal:string,
         in_send_wa:boolean
     ) => {
-        // let in_no_struk = "202508130004"
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
-        let param = {"IN_NO_STRUK": in_no_struk,"IN_SEND_WA":in_send_wa}
-        const Token = GetToken()
-        //console.log(JSON.stringify(param))
-        setLoadingButtonReprint(true)
-        const NameFile = 'receipt_'+in_tanggal.split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
-        PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
-                console.log(response)
-                if(response.code && response.code.toString().substring(0,1) === '4'){
-                    Swal.fire({
-                        title: t("Error"),
-                        text: response.msg || t("Failed to generate receipt"),
-                        icon: "error",
-                        padding: '2em',
-                        customClass: 'sweet-alerts'
-                    });
-                }else{
-                    Swal.fire({
-                        title: t("Success"),
-                        text: t("Struk Online Berhasil dibuat!"),
-                        icon: "success",
-                        padding: '2em',
-                        customClass: 'sweet-alerts'
-                    });
-                }
+        setIN_NO_STRUK('')
+        if(!in_send_wa){
+            setModal14(true)
+            const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStrukForPreview/${in_no_struk}`
+            setURL_GENERATE_STRUK(url)
+            setIN_NO_STRUK(in_no_struk)
+        }else{
+            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
+            let param = {"IN_NO_STRUK": in_no_struk,"IN_SEND_WA":in_send_wa}
+            const Token = GetToken()
+            //console.log(JSON.stringify(param))
+            setLoadingButtonReprint(true)
+            const NameFile = 'receipt_'+in_tanggal.split('-').join('').split(':').join('')+'_'+in_no_struk+'.pdf'; // file name
+            PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
+                    if(response.code && response.code.toString().substring(0,1) === '4'){
+                        Swal.fire({
+                            title: t("Error"),
+                            text: response.msg || t("Failed to generate receipt"),
+                            icon: "error",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    }else{
+                        Swal.fire({
+                            title: t("Success"),
+                            text: t("Struk Online Berhasil dibuat!"),
+                            icon: "success",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    }
+                    
                 
-            
-           setLoadingButtonReprint(false)
-        }).catch((error) => {
-            console.log(error)
-            Swal.fire({
-                title: t("Warning"),
-                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
-            });
             setLoadingButtonReprint(false)
-        });
+            }).catch((error) => {
+                console.log(error)
+                Swal.fire({
+                    title: t("Warning"),
+                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButtonReprint(false)
+            });
+        }
+        
     }
 
     const Def_Column_HistorySales = () => {
@@ -314,8 +324,6 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                  :
                                  <span className="text-danger">{'Void'}</span>
                             }
-                            
-                            {/* <div className="font-semibold">{NO_STRUK}</div> */}
                         </div>
                     ),
                 },
@@ -345,7 +353,12 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                     sortable: true,
                     render: ({ NO_STRUK }) => (
                         <div className="flex items-center gap-2">
-                            <div className="font-semibold">{NO_STRUK}</div>
+                            <div>
+                                <a onClick={()=> CopyText(NO_STRUK,isRtl)}><IconCopy className="text-primary"/></a>
+                            </div>
+                            <div className="font-semibold">
+                                {NO_STRUK}
+                            </div>
                         </div>
                     ),
                 },
@@ -454,6 +467,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         }
         let param = {}
         if(IDReport === 'History Sales'){
+            setIN_NO_STRUK('')
             url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistorySales`
             param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
         }else if(IDReport === 'History Inventory'){
@@ -640,7 +654,12 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         });
     }
     const CloseModal = () => {
-        setModal13(false)
+        if(modal13){
+            setModal13(false)
+        }else{
+            setModal14(false)
+        }
+        
     }
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -713,9 +732,21 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
                                     <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
                                 </div>
                             </div>
-                        } />
-                
-                
+                    } />
+                    {/* MODAL STRUK ONLINE */}
+                    <ModalComponent in_size_modal={`panel animate__animated my-7 w-1/3 h-1/2 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal14} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={"Receipt/Struk Preview #"+IN_NO_STRUK} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
+                            <div className="p-2">
+                                <div className="mb-1">
+                                        <iframe
+                                            src={URL_GENERATE_STRUK} // 👈 your API endpoint
+                                            title="Receipt/Struk Sales Preview"
+                                            width="100%"
+                                            height="470px"
+                                            style={{ border: "none" }}
+                                        />
+                                </div>
+                            </div>
+                    } />
                 </>
             } />
         </>
