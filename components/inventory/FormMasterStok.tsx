@@ -8,17 +8,18 @@ import { AddColumn, AddID, GetFormatCurrency, GetToken,  get_data_local_storage,
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
-import { Posts } from "@/lib/post";
+import { Posts, PostsDownload } from "@/lib/post";
 import ButtonAdd from "../button/ButtonAdd";
 import IconPlus from "../Icon/IconPlus";
 import IconRefresh from "../Icon/IconRefresh";
 import ComponentsDatatablesAdvanced from "../table/ComponentsDatatablesAdvanced";
 import withReactContent from "sweetalert2-react-content";
 import DropDownGlobal from "../dropdown/DropDownGlobal";
-import Image from "next/image";
 import IconBox from "../Icon/IconBox";
-import IconShoppingBag from "../Icon/IconShoppingBag";
 import IconCreditCard from "../Icon/IconCreditCard";
+import { Tooltip } from '@mantine/core';
+import IconDownload from "../Icon/IconDownload";
+
 interface FormMasterStokProps {
     url: string,
     command: string,
@@ -158,42 +159,67 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         });
     }
 
-    const GetPosMasterStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string) => {
+    const GetPosMasterStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string,in_export:boolean) => {
         setData_rows_Kategori([])
         setData_columns_Kategori([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMasterStok`
-        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai}
+        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export}
         const Token = GetToken()
         setLoadingButton(true)
-        Posts(url,JSON.stringify(param),false,Token).then((response) => {
-            const res_data = response;
-            var code = res_data.code;
-            var msg = res_data.msg;
-            if(parseFloat(code) === 200){
-                var data_body = res_data.data;
-                var rows = data_body[0].ROWS;
-                if(rows.length > 0){
-                    var res_rows = AddID(rows)
-                    setData_rows_Kategori(res_rows)
-                    var cols = Def_Column_MasterStok()
-                    setData_columns_Kategori(cols)
-                }else{
-                    MySwal.fire({
-                        title: t("Data Empty"),
-                        toast: true,
-                        position: isRtl ? 'top-start' : 'top-end',
-                        showConfirmButton: false,
-                        timer: 5000,
-                        showCloseButton: true,
-                        customClass: {
-                            popup: `color-warning`,
-                        },
+        if(in_export){
+            const Namafile = "Master_Stok_"+IN_KODE_GERAI+"_"+get_format_tanggal_jam()+".xlsx";
+            PostsDownload(url,JSON.stringify(param),false,Token,Namafile).then((response) => {
+                if(response){
+                    Swal.fire({
+                        title: t("Success"),
+                        text: t("Download Data Berhasil!"),
+                        icon: "success",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
                     });
                 }
                 setLoadingButton(false)
-            }else if(code.toString().substring(0,1) === '4'){
-                if(code === 401 && msg.includes("Invalid")){
-                    
+            });
+        }else{
+            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                const res_data = response;
+                var code = res_data.code;
+                var msg = res_data.msg;
+                if(parseFloat(code) === 200){
+                    var data_body = res_data.data;
+                    var rows = data_body[0].ROWS;
+                    if(rows.length > 0){
+                        var res_rows = AddID(rows)
+                        setData_rows_Kategori(res_rows)
+                        var cols = Def_Column_MasterStok()
+                        setData_columns_Kategori(cols)
+                    }else{
+                        MySwal.fire({
+                            title: t("Data Empty"),
+                            toast: true,
+                            position: isRtl ? 'top-start' : 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            showCloseButton: true,
+                            customClass: {
+                                popup: `color-warning`,
+                            },
+                        });
+                    }
+                    setLoadingButton(false)
+                }else if(code.toString().substring(0,1) === '4'){
+                    if(code === 401 && msg.includes("Invalid")){
+                        
+                    }else{
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: ""+parseFloat(code)+"-"+msg,
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    }
+                    setLoadingButton(false)
                 }else{
                     Swal.fire({
                         title: t("Warning"),
@@ -202,35 +228,27 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         padding: '2em',
                         customClass: 'sweet-alerts'
                     });
+                    setLoadingButton(false)
                 }
-                setLoadingButton(false)
-            }else{
+            }).catch((error) => {
                 Swal.fire({
                     title: t("Warning"),
-                    text: ""+parseFloat(code)+"-"+msg,
+                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
                     icon: "warning",
                     padding: '2em',
                     customClass: 'sweet-alerts'
                 });
                 setLoadingButton(false)
-            }
-        }).catch((error) => {
-            Swal.fire({
-                title: t("Warning"),
-                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
             });
-            setLoadingButton(false)
-        });
+        }
+        
     }
 
-      const GetPosMutasiStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string) => {
+      const GetPosMutasiStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string,in_export:boolean) => {
         setData_rows([])
         setData_columns([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMutasiStok`
-        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai}
+        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export}
         const Token = GetToken()
         setLoadingButton(true)
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -344,19 +362,23 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     title: 'BPB_DC',
                     sortable: true,
                     render: ({ BPB_DC }) => (
-                        <div className="flex items-center gap-2">
-                            <div className={`badge badge-outline-success text-md`}>{BPB_DC}</div>
-                        </div>
+                        <Tooltip label={'Bukti Penerimaan Barang dari DC'} position="top" withArrow>
+                            <div className="flex items-center gap-2">
+                                <div className={`badge badge-outline-success text-md`}>{BPB_DC}</div>
+                            </div>
+                        </Tooltip>
                     ),
                 },
-                 {
+                {
                     accessor: 'BPB_SUPPLIER',
                     title: 'BPB_SUP',
                     sortable: true,
                     render: ({ BPB_SUPPLIER }) => (
-                        <div className="flex items-center gap-2">
-                            <div className={`badge badge-outline-success text-md`}>{BPB_SUPPLIER}</div>
-                        </div>
+                        <Tooltip label={'Bukti Penerimaan Barang dari Supplier'} position="top" withArrow>
+                            <div className="flex items-center gap-2">
+                                <div className={`badge badge-outline-success text-md`}>{BPB_SUPPLIER}</div>
+                            </div>
+                        </Tooltip>
                     ),
                 },
                 {
@@ -563,20 +585,29 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
             if(IN_TAHUN === '' || IN_BULAN === '' || IN_KODE_GERAI === ''){
 
             }else{
-                GetPosMasterStok(IN_TAHUN, IN_BULAN, IN_KODE_GERAI)
+                GetPosMasterStok(IN_TAHUN, IN_BULAN, IN_KODE_GERAI,false)
             }
         }else{
             if(IN_TAHUN === '' || IN_BULAN === '' || IN_KODE_GERAI === ''){
 
             }else{
-                GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI)
+                GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,false)
             }
         }
     };
 
     const GetData = () => {
-        GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI)
-        GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI)
+        GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,false)
+        GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,false)
+    }
+
+    const ExportExcel = () => {
+        if(Tabs === 'master'){
+            GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,true)
+        }else{
+            GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,true)
+        }
+        
     }
 
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
@@ -597,7 +628,11 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         </div>
                         <div>
                         <label>&nbsp;</label>
-                        <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Refresh'} HandleClick={GetData} />
+                        <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-primary w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_master"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Refresh'} HandleClick={GetData} />
+                        </div>
+                        <div>
+                        <label>&nbsp;</label>
+                        <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_download"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={<IconDownload />} in_title_button={'Download Data'} HandleClick={ExportExcel} />
                         </div>
                     </div>
                     <div>
@@ -617,7 +652,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                                     className={`flex gap-2 border-b border-transparent p-4 hover:border-primary hover:text-primary ${Tabs === 'mutasi' ? '!border-primary text-primary' : ''}`}
                                 >
                                     <IconCreditCard />
-                                     {t('Inventory Transaction')}
+                                    {t('Inventory Transaction')}
                                 </button>
                             </li>
                         </ul>
@@ -626,34 +661,38 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     {
                         Tabs === 'master' ? 
                         <>
-                        
                         {
                             data_rows_Kategori.length > 0 ?
+                            <>
+                            <div>
+                                <h3 className="text-lg font-semibold mb-3 italic">*) Keterangan Kategori Transaksi</h3>
+                                <span className="badge bg-warning mb-1">AWAL : Saldo Awal dari Item</span><br />
+                                <span className="badge bg-success mb-1">BPB_DC : Bukti Penerimaan Barang dari DC</span><br />
+                                <span className="badge bg-success mb-1">BPB_SUP : Bukti Penerimaan Barang dari Supplier</span><br />
+                                <span className="badge bg-danger mb-1">SLS : Sales (Penjualan)</span><br />
+                                <span className="badge bg-danger mb-1">RUSAK : Item Rusak</span><br />
+                                <span className="badge bg-danger mb-1">HILANG : Item Hilang</span><br />
+                                <span className="badge bg-danger mb-1">TF_GERAI : Transfer Ttem antar Gerai</span><br />
+                                <span className="badge bg-danger mb-1">BAP : Berita Acara Pemusnahan (Pemusnahan Item Expired / tidak layak jual)</span><br />
+                                <span className="badge bg-success mb-1">RETSLS : Retur sales dari Customer ke Gerai</span><br />
+                                <span className="badge bg-danger mb-1">RETDC : Retur item dari Gerai ke DC (Distribution Centre)</span><br />
+                                <span className="badge bg-danger mb-1">RETSUP : Retur item dari Gerai ke Supplier</span><br />
+                                <span className="badge bg-success mb-1">VOID : Pembatalan transaksi Sales</span><br />
+                                <span className="badge bg-primary mb-1">AKHIR : Saldo Akhir dari Item</span>
+                            </div>
                             <ComponentsDatatablesAdvanced in_column_sort={'KODE_BARANG'} in_id={"dt1"} Datarow={data_rows_Kategori} DataColumns={data_columns_Kategori} />
+                            </>
                             :
                             ''
                         }
                         </>
                         : 
                         <>
-                        {/* <div className="flex flex-row items-start gap-3 mb-3">
-                            <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsTahun} isSearchable={true} isMulti={false} event={FormInputTahunMutasi} name_component={"Year"} idComponent={"tahunmutasi"} />
-                            </div>
-                            <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsBulan} isSearchable={true} isMulti={false} event={FormInputBulanMutasi} name_component={"Month"} idComponent={"bulanmutasi"} />
-                            </div>
-                            <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"geraimutasi"} />
-                            </div>
-                            <div>
-                            <label>&nbsp;</label>
-                            <ButtonAdd in_classname={!isDark ? 'btn btn-success w-full rounded-full text-end text-xs mt-3' : 'btn btn-outline-success w-full rounded-full text-xs mt-3'} idComponent={"btn_refresh_mutasi"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Refresh'} HandleClick={GetPosMutasiStok} />
-                            </div>
-                        </div> */}
                         {
                             data_rows.length > 0 ?
+                            <>
                             <ComponentsDatatablesAdvanced in_column_sort={'TANGGAL'} in_id={"dt2"} Datarow={data_rows} DataColumns={data_columns} />
+                            </>
                             :
                             ''
                         }
