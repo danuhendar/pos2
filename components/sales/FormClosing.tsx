@@ -316,7 +316,7 @@ const [data_rows, setData_rows] = useState([]);
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
                         const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
-                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK,"PENGELUARAN_BIAYA_MODAL":IN_PENGELUARAN_BIAYA_MODAL,"IN_SISA_MODAL":IN_SISA_MODAL,"IN_NOTE":IN_NOTE}
+                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK,"IN_PENGELUARAN_BIAYA_MODAL":IN_PENGELUARAN_BIAYA_MODAL,"IN_SISA_MODAL":IN_SISA_MODAL,"IN_NOTE":IN_NOTE}
                         const Token = GetToken()
                         const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
                         setLoadingButtonClosing(true)
