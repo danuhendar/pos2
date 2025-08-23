@@ -1306,7 +1306,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         customClass: 'sweet-alerts'
                                     });
                                     //console.log('res_no_struk :'+res_no_struk)
-                                    //GenerateReceiptStruk(res_no_struk,(IN_NO_WHATSAPP === '' || IN_NO_WHATSAPP === null ? false : true))
+                                    GenerateReceiptStruk(res_no_struk,(IN_NO_WHATSAPP === '' || IN_NO_WHATSAPP === null ? false : true))
                                     const url_struk = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStrukForPreview/${res_no_struk}`
                                     setIN_NO_STRUK(res_no_struk)
                                     setURL_GENERATE_STRUK(url_struk)
