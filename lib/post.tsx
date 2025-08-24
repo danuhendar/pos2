@@ -74,7 +74,7 @@ export const PostsDownload = async (url: string, param: any, isLogin: boolean, T
    const downloadUrl = window.URL.createObjectURL(await blob);
    const a = document.createElement('a');
    a.href = downloadUrl;
-   a.download = NameFile+'.pdf'; // You can set filename here
+   a.download = NameFile; // You can set filename here
    document.body.appendChild(a);
    a.click();
    a.remove();
