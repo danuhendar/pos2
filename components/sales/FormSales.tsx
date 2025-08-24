@@ -96,7 +96,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [TotalBelanja,setTotalBelanja] = useState('0')
     const [TotalPPN,setTotalPPN] = useState('0')
     const [BiayaOngkir,setBiayaOngkir] = useState('0')
-    const [DiskonMarketPlace,setDiskonMarketPlace] = useState('0')
+    const [DiskonMarketPlace,setDiskonMarketPlace] = useState('')
     const [TotalDiscount,setTotalDiscount] = useState('0')
     const [GrandTotal,setGrandTotal] = useState('0')
     const [IN_DISKON,setIN_DISKON] = useState('0')
@@ -951,7 +951,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             console.log('input1Ref not found')
         }
         MySwal.fire({
-            title: t("Please, Input New Order!"),
+            title: t("Silahkan melakukan input penjualan baru!"),
             toast: true,
             position: 'top',
             showConfirmButton: false,
@@ -961,12 +961,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 popup: `color-success`,
             },
         });
-
-        // setTimeout(() => {
-        //     location.reload() 
-        // },3000)
-        
-        
     }
 
     const AddList = (res_kode_barang:string,res_satuan:string,res_deskripsi:string,res_qty:string,res_hpp:string,res_gross:string,res_diskon:string) => {
@@ -1953,7 +1947,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2">
-                                                <InputTextType   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
+                                                <InputTextTypeKeyDown   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} in_ref={undefined} in_event_keydown={InsPosTransaksiSales} />
                                                 </div>
                                             </div>
                                             <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">

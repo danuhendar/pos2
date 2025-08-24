@@ -55,6 +55,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
     const [isCheck_1,setisCheck_1] = useState(false)
     const [isCheck_2,setisCheck_2] = useState(false)
     const [IN_CHANNEL_TELEGRAM,setIN_CHANNEL_TELEGRAM] = useState('')
+    const [IN_EMAIL_CLOSING,setIN_EMAIL_CLOSING] = useState('')
 
     useEffect(() => {
         const res_host = themeConfig.host
@@ -284,16 +285,15 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             setIN_CONTENT('')
             setTitle('Form : '+IDReport)
         }
-        
-   
     }
-    const showModal = (IDReport:string,IN_KODE_CABANG:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string,IN_ALAMAT:string,IN_CHANNEL_TELEGRAM:string) => {
+    const showModal = (IDReport:string,IN_KODE_CABANG:string,IN_KODE_GERAI:string,IN_CONTENT:string,IN_STATUS:string,IN_ALAMAT:string,IN_CHANNEL_TELEGRAM:string,IN_EMAIL_CLOSING:string) => {
         setModal13(true)
         setIN_BRANCH(IN_KODE_CABANG)
         setIN_STORE(IN_KODE_GERAI)
         setIN_CONTENT(IN_CONTENT)
         setIN_ALAMAT(IN_ALAMAT)
         setIN_CHANNEL_TELEGRAM(IN_CHANNEL_TELEGRAM)
+        setIN_EMAIL_CLOSING(IN_EMAIL_CLOSING)
         const res_is_active = (IN_STATUS === 'AKTIF' ? true : false)
         setCheckedISActive(res_is_active)
         setTitle('Form : '+IDReport)
@@ -325,7 +325,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             if (result.isConfirmed) {
                 const InputNik = get_data_local_storage('nik')
                 const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterGerai`
-                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik,"IN_ALAMAT": IN_ALAMAT,"IN_CHANNEL_TELEGRAM":IN_CHANNEL_TELEGRAM}
+                const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik,"IN_ALAMAT": IN_ALAMAT,"IN_CHANNEL_TELEGRAM":IN_CHANNEL_TELEGRAM,"IN_EMAIL_CLOSING":IN_EMAIL_CLOSING}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
                     const res_data = response;
@@ -457,8 +457,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     }else{
                        reject()
                     }
-                } 
-                
+                }
             }).catch((error) => {
                reject(error)
             });
@@ -554,10 +553,10 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     accessor: 'id',
                     title: 'ACTION',
                     sortable: true,
-                    render: ({ KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT,CHANNEL_TELEGRAM }) => (
+                    render: ({ KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT,CHANNEL_TELEGRAM,EMAIL_CLOSING }) => (
                         <div className="flex flex-row gap-2">
                             <div className="mt-1">
-                                <a onClick={() => {showModal(' Edit '+IDReport,KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT,CHANNEL_TELEGRAM)}} data-twe-toggle="tooltip" title="Edit Data">
+                                <a onClick={() => {showModal(' Edit '+IDReport,KODE_CABANG,KODE_GERAI,CONTENT,STATUS,ALAMAT,CHANNEL_TELEGRAM,EMAIL_CLOSING)}} data-twe-toggle="tooltip" title="Edit Data">
                                     <span className="text-warning"><IconPencil  /></span>
                                 </a>
                             </div>
@@ -619,13 +618,23 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                         </div>
                     ),
                 },
-                  {
+                {
                     accessor: 'CHANNEL_TELEGRAM',
                     title: 'CHANNEL_TELEGRAM',
                     sortable: true,
                     render: ({ CHANNEL_TELEGRAM }) => (
                         <div className="flex items-center gap-2">
                             <div className="font-semibold">{CHANNEL_TELEGRAM}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'EMAIL_CLOSING',
+                    title: 'EMAIL_CLOSING',
+                    sortable: true,
+                    render: ({ EMAIL_CLOSING }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{EMAIL_CLOSING}</div>
                         </div>
                     ),
                 },
