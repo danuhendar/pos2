@@ -10,7 +10,7 @@ const nextConfig = {
     },
     distDir: 'build',
     compress: true,
-    output:'standalone',
+    output:'export',
     headers: [
         { key: "Access-Control-Allow-Credentials", value: "true" },
         { key: "Access-Control-Allow-Origin", value: "*" }, // replace this your actual origin
