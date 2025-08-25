@@ -281,7 +281,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         const grand_total = parseFloat(GrandTotal.split(',').join(''))
         if(bayar < grand_total){
             MySwal.fire({
-                title: t("Payment must be greater than or equal to the Grand Total"),
+                title: t("Pembayaran harus lebih besar atau sama dengan Grand Total"),
                 toast: true,
                 position: 'top',
                 showConfirmButton: false,
