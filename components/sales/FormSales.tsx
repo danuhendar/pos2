@@ -1947,7 +1947,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                     </div>
                                                 </div>
                                                 <div className="col-span-2">
-                                                <InputTextType   in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
+                                                <InputTextType in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
                                                 </div>
                                             </div>
                                             <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
