@@ -251,35 +251,60 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export}
         const Token = GetToken()
         setLoadingButton(true)
-        Posts(url,JSON.stringify(param),false,Token).then((response) => {
-            const res_data = response;
-            var code = res_data.code;
-            var msg = res_data.msg;
-            if(parseFloat(code) === 200){
-                var data_body = res_data.data;
-                var rows = data_body[0].ROWS;
-                if(rows.length > 0){
-                    var res_rows = AddID(rows)
-                    setData_rows(res_rows)
-                    var cols = Def_Column_MutasiStok()
-                    setData_columns(cols)
-                }else{
-                    MySwal.fire({
-                        title: t("Data Empty"),
-                        toast: true,
-                        position: isRtl ? 'top-start' : 'top-end',
-                        showConfirmButton: false,
-                        timer: 5000,
-                        showCloseButton: true,
-                        customClass: {
-                            popup: `color-warning`,
-                        },
+        if(in_export){
+            const Namafile = "Mutasi_Stok_"+IN_KODE_GERAI+"_"+get_format_tanggal_jam()+".xlsx";
+            PostsDownload(url,JSON.stringify(param),false,Token,Namafile).then((response) => {
+                if(response){
+                    Swal.fire({
+                        title: t("Success"),
+                        text: t("Download Data Berhasil!"),
+                        icon: "success",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
                     });
                 }
                 setLoadingButton(false)
-            }else if(code.toString().substring(0,1) === '4'){
-                if(code === 401 && msg.includes("Invalid")){
-                    
+            });
+        }else{
+            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                const res_data = response;
+                var code = res_data.code;
+                var msg = res_data.msg;
+                if(parseFloat(code) === 200){
+                    var data_body = res_data.data;
+                    var rows = data_body[0].ROWS;
+                    if(rows.length > 0){
+                        var res_rows = AddID(rows)
+                        setData_rows(res_rows)
+                        var cols = Def_Column_MutasiStok()
+                        setData_columns(cols)
+                    }else{
+                        MySwal.fire({
+                            title: t("Data Empty"),
+                            toast: true,
+                            position: isRtl ? 'top-start' : 'top-end',
+                            showConfirmButton: false,
+                            timer: 5000,
+                            showCloseButton: true,
+                            customClass: {
+                                popup: `color-warning`,
+                            },
+                        });
+                    }
+                    setLoadingButton(false)
+                }else if(code.toString().substring(0,1) === '4'){
+                    if(code === 401 && msg.includes("Invalid")){
+                        
+                    }else{
+                        Swal.fire({
+                            title: t("Warning"),
+                            text: ""+parseFloat(code)+"-"+msg,
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    }
+                    setLoadingButton(false)
                 }else{
                     Swal.fire({
                         title: t("Warning"),
@@ -288,30 +313,21 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         padding: '2em',
                         customClass: 'sweet-alerts'
                     });
+                    setLoadingButton(false)
                 }
-                setLoadingButton(false)
-            }else{
+            }).catch((error) => {
+                console.log(error.toString())
                 Swal.fire({
                     title: t("Warning"),
-                    text: ""+parseFloat(code)+"-"+msg,
+                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
                     icon: "warning",
                     padding: '2em',
                     customClass: 'sweet-alerts'
                 });
                 setLoadingButton(false)
-            }
-        }).catch((error) => {
-            Swal.fire({
-                title: t("Warning"),
-                text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
             });
-            setLoadingButton(false)
-        });
+        }
     }
-    
 
     const Def_Column_MasterStok = () => {
         var cols = [
@@ -351,6 +367,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'SALDO_AWAL',
                     title: 'AWAL',
                     sortable: true,
+                    width: 90, // fixed width
                     render: ({ SALDO_AWAL }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-warning text-md`}>{SALDO_AWAL}</div>
@@ -361,6 +378,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'BPB_DC',
                     title: 'BPB_DC',
                     sortable: true,
+                    width: 100, // fixed width
                     render: ({ BPB_DC }) => (
                         <Tooltip label={'Bukti Penerimaan Barang dari DC'} position="top" withArrow>
                             <div className="flex items-center gap-2">
@@ -373,6 +391,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'BPB_SUPPLIER',
                     title: 'BPB_SUP',
                     sortable: true,
+                    width: 120, // fixed width
                     render: ({ BPB_SUPPLIER }) => (
                         <Tooltip label={'Bukti Penerimaan Barang dari Supplier'} position="top" withArrow>
                             <div className="flex items-center gap-2">
@@ -385,6 +404,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'SALES',
                     title: 'SLS',
                     sortable: true,
+                    width: 100, // fixed width
                     render: ({ SALES }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{SALES}</div>
@@ -395,6 +415,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RUSAK',
                     title: 'RUSAK',
                     sortable: true,
+                    width: 100, // fixed width
                     render: ({ RUSAK }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{RUSAK}</div>
@@ -405,6 +426,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'HILANG',
                     title: 'HILANG',
                     sortable: true,
+                    width: 100, // fixed width
                     render: ({ HILANG }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{HILANG}</div>
@@ -415,6 +437,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'TRANSFER_GERAI',
                     title: 'TF_GERAI',
                     sortable: true,
+                    width: 140, // fixed width
                     render: ({ TRANSFER_GERAI }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{TRANSFER_GERAI}</div>
@@ -435,6 +458,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RETUR_SALES',
                     title: 'RETSLS',
                     sortable: true,
+                    width: 120, // fixed width
                     render: ({ RETUR_SALES }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-success text-md`}>{RETUR_SALES}</div>
@@ -445,6 +469,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RETUR_DC',
                     title: 'RETDC',
                     sortable: true,
+                    width: 100, // fixed width
                     render: ({ RETUR_DC }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{RETUR_DC}</div>
@@ -455,6 +480,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RETUR_SUPPLIER',
                     title: 'RETSUP',
                     sortable: true,
+                    width: 120, // fixed width
                     render: ({ RETUR_SUPPLIER }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{RETUR_SUPPLIER}</div>
@@ -465,6 +491,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'VOID_SALES',
                     title: 'VOID',
                     sortable: true,
+                    width: 100, // fixed width
                     render: ({ VOID_SALES }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-success text-md`}>{VOID_SALES}</div>
@@ -474,6 +501,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 {
                     accessor: 'SALDO_AKHIR',
                     title: 'AKHIR',
+                    width: 120, // fixed width
                     sortable: true,
                     render: ({ SALDO_AKHIR }) => (
                         <div className="flex items-center gap-2">
@@ -570,15 +598,6 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
             ];
             return  cols;
     }
-    
-    const CloseModal = ()=>{
-        if(modal13){
-            setModal13(false)
-        }else{
-            setModal14(false)
-        }
-        
-    }
     const toggleTabs = (name: string) => {
         setTabs(name);
         if(name === 'master'){
@@ -665,20 +684,20 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                             data_rows_Kategori.length > 0 ?
                             <>
                             <div>
-                                <h3 className="text-lg font-semibold mb-3 italic">*) Keterangan Kategori Transaksi</h3>
-                                <span className="badge bg-warning mb-1">AWAL : Saldo Awal dari Item</span><br />
-                                <span className="badge bg-success mb-1">BPB_DC : Bukti Penerimaan Barang dari DC</span><br />
-                                <span className="badge bg-success mb-1">BPB_SUP : Bukti Penerimaan Barang dari Supplier</span><br />
-                                <span className="badge bg-danger mb-1">SLS : Sales (Penjualan)</span><br />
-                                <span className="badge bg-danger mb-1">RUSAK : Item Rusak</span><br />
-                                <span className="badge bg-danger mb-1">HILANG : Item Hilang</span><br />
-                                <span className="badge bg-danger mb-1">TF_GERAI : Transfer Ttem antar Gerai</span><br />
-                                <span className="badge bg-danger mb-1">BAP : Berita Acara Pemusnahan (Pemusnahan Item Expired / tidak layak jual)</span><br />
-                                <span className="badge bg-success mb-1">RETSLS : Retur sales dari Customer ke Gerai</span><br />
-                                <span className="badge bg-danger mb-1">RETDC : Retur item dari Gerai ke DC (Distribution Centre)</span><br />
-                                <span className="badge bg-danger mb-1">RETSUP : Retur item dari Gerai ke Supplier</span><br />
-                                <span className="badge bg-success mb-1">VOID : Pembatalan transaksi Sales</span><br />
-                                <span className="badge bg-primary mb-1">AKHIR : Saldo Akhir dari Item</span>
+                                <h3 className="mb-3 text-lg italic font-semibold">*) Keterangan Kategori Transaksi</h3>
+                                <span className="mb-1 badge bg-warning">AWAL : Saldo Awal dari Item</span><br />
+                                <span className="mb-1 badge bg-success">BPB_DC : Bukti Penerimaan Barang dari DC</span><br />
+                                <span className="mb-1 badge bg-success">BPB_SUP : Bukti Penerimaan Barang dari Supplier</span><br />
+                                <span className="mb-1 badge bg-danger">SLS : Sales (Penjualan)</span><br />
+                                <span className="mb-1 badge bg-danger">RUSAK : Item Rusak</span><br />
+                                <span className="mb-1 badge bg-danger">HILANG : Item Hilang</span><br />
+                                <span className="mb-1 badge bg-danger">TF_GERAI : Transfer Ttem antar Gerai</span><br />
+                                <span className="mb-1 badge bg-danger">BAP : Berita Acara Pemusnahan (Pemusnahan Item Expired / tidak layak jual)</span><br />
+                                <span className="mb-1 badge bg-success">RETSLS : Retur sales dari Customer ke Gerai</span><br />
+                                <span className="mb-1 badge bg-danger">RETDC : Retur item dari Gerai ke DC (Distribution Centre)</span><br />
+                                <span className="mb-1 badge bg-danger">RETSUP : Retur item dari Gerai ke Supplier</span><br />
+                                <span className="mb-1 badge bg-success">VOID : Pembatalan transaksi Sales</span><br />
+                                <span className="mb-1 badge bg-primary">AKHIR : Saldo Akhir dari Item</span>
                             </div>
                             <ComponentsDatatablesAdvanced in_column_sort={'KODE_BARANG'} in_id={"dt1"} Datarow={data_rows_Kategori} DataColumns={data_columns_Kategori} />
                             </>

@@ -47,6 +47,8 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const [options7,setOptions7] = useState([])
     const [optionsGeraiMutasi,setOptionsGeraiMutasi] = useState([])
     const [IN_KODE_TRANSAKSI,setIN_KODE_TRANSAKSI] = useState('')
+    const [IN_NO_SJ,setIN_NO_SJ] = useState('')
+    const [IN_NOMOR_DOKUMEN,setIN_NOMOR_DOKUMEN] = useState('')
     const [IN_KETERANGAN,setIN_KETERANGAN] = useState('')
     const [IN_ASAL,setIN_ASAL] = useState('')
     const [IN_TUJUAN,setIN_TUJUAN] = useState('')
@@ -81,13 +83,16 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
         const columns = Def_Column_Terima_Barang()
         setData_columns(columns)
         GetMasterCabang(res_host,res_PORT_LOGIN)
+        
     },[]);
 
    
     const FormInputKodeTransaksi = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KODE_TRANSAKSI(val);  };
+    const FormInputNomorSJ = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NO_SJ(val);  };
+    const FormInputNomorDokumen = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NOMOR_DOKUMEN(val);  };
     const FormInputKeterangan  = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KETERANGAN(val);  };
 
-    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_TUJUAN(val); GetMasterProdukByKodeProdukAndKodeGerai(val+"%") };
+    const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_TUJUAN(val); GetMasterProdukByKodeProdukAndKodeGerai(val+"%");    };
     const FormInputSupplier = (value: any) => {var val = value.value;setIN_ASAL(val);  };
     const FormInputDC = (value: any) => {var val = value.value;setIN_ASAL(val);  };
     const FormInputNikPembuat = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_NIK_PEMBUAT(val);  };
@@ -138,6 +143,8 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
             setisCheckBPBDC(false)
             setisCheckBPBSupplier(true)
         } 
+
+        setIN_NOMOR_DOKUMEN(IN_TUJUAN+'/INV/'+val+'/'+get_format_tanggal_jam().substring(0,10).replace(/-/g,'')+'/'+GenerateUniqNumber())
     }
 
     const GetMasterCabang = (in_host:string,in_port:number) => {
@@ -542,7 +549,8 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                         const date = new Date(date2)
                         const tahun = date.getFullYear()
                         const bulan = date.getMonth()
-                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":MetodeBPB,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_ASAL,"IN_TUJUAN":IN_TUJUAN,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows}
+                        console.log(IN_NOMOR_DOKUMEN)
+                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":MetodeBPB,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_ASAL,"IN_TUJUAN":IN_TUJUAN,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows,"IN_NO_SJ":IN_NO_SJ,"IN_NOMOR_DOKUMEN":IN_NOMOR_DOKUMEN}
                         console.log(JSON.stringify(param))
                         const Token = GetToken()
                         setLoadingButton(true)
@@ -643,7 +651,15 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                 <>
                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconBox />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={"Input Received Item"} in_content={
                         <>
-                        <InputTextType   in_title={"Auto Generate Code Transaction"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} />
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                {/* <InputTextType   in_title={"Auto Generate Code Transaction"} in_classname_title={"hidden"} in_classname_content={"hidden"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl hidden"} data_options={undefined} isDisabled={true} event={FormInputKodeTransaksi} in_value={IN_KODE_TRANSAKSI} /> */}
+                                <InputTextType   in_title={"Nomor Dokumen"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputNomorDokumen} in_value={IN_NOMOR_DOKUMEN} />
+                            </div>
+                            <div>
+                                <InputTextType   in_title={"Nomor Surat Jalan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputNomorSJ} in_value={IN_NO_SJ} />
+                            </div>
+                        </div>                        
                         <TextAreaComponent in_title={"Description"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} isDisabled={false} event={FormInputKeterangan} in_value={IN_KETERANGAN} in_rows={4} in_cols={30} />
                         <InputCheckBoxFilterType isCheck_1={isCheckBPBDC} isCheck_2={isCheckBPBSupplier}  event={FormInputSelectMetodeBPB} in_title={"Type BPB"} in_value_1={"1"} in_value_2={"11"} in_name_1={"BPB from Distribution Centre"} in_name_2={"BPB From Supplier"} in_name_component_1={"is_tipe_bpb"} in_name_component_2={"is_tipe_bpb"} />                
                         <div className="grid gap-3 lg:grid-cols-2 sm:grid-cols-1 md:grid-cols-2 ">
