@@ -538,7 +538,7 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                         const date = new Date(date2)
                         const tahun = date.getFullYear()
                         const bulan = date.getMonth()
-                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":IN_METODE_RETUR,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_TUJUAN,"IN_TUJUAN":IN_ASAL,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows}
+                        let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":IN_METODE_RETUR,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_TUJUAN,"IN_TUJUAN":IN_ASAL,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows,"IN_NO_SJ":"-","IN_NOMOR_DOKUMEN":"-"}
                         console.log(JSON.stringify(param))
                         const Token = GetToken()
                         setLoadingButton(true)
