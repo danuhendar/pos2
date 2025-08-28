@@ -586,6 +586,16 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     ),
                 },
                 {
+                    accessor: 'KETERANGAN',
+                    title: 'KETERANGAN',
+                    sortable: true,
+                    render: ({ KETERANGAN }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KETERANGAN}</div>
+                        </div>
+                    ),
+                },
+                {
                     accessor: 'OTORISATOR',
                     title: 'OTORISATOR',
                     sortable: true,

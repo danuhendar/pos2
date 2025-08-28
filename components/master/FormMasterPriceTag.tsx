@@ -71,7 +71,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
     const FormInputKategori = (value: any) => {
         var val = value.value;
         setIN_KATEGORI(val);
-        GetMasterProdukByKodeKategori()  
+        GetMasterProdukByKodeKategori(val)  
     };
     const FormInputKodeGerai = (value: any) => {var val = value.value;setIN_KODE_GERAI(val);};
     const FormInputSelectTipePriceTag = (event: { target: { value: any; }; }) => {
@@ -101,10 +101,10 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
         var val = value.value;setIN_KODE_BARANG(val);
     };
 
-    const GetMasterProdukByKodeKategori = () => {
+    const GetMasterProdukByKodeKategori = (val_kategori:string) => {
         setOptions8([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeKategori`
-        let param = {"IN_KODE_KATEGORI":IN_KATEGORI,"IN_KODE_GERAI":IN_KODE_GERAI}
+        let param = {"IN_KODE_KATEGORI":val_kategori,"IN_KODE_GERAI":IN_KODE_GERAI}
         const Token = GetToken()
          Posts(url,JSON.stringify(param),false,Token).then((response) => {
             const res_data = response;
@@ -301,7 +301,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
                             {
                                 ISCOMBO_GERAI ?
                                 <div>
-                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
                                 :
                                 <div>
@@ -309,7 +309,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
                                 </div>
                             }
                             <div>
-                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputKategori} name_component={"Category"} idComponent={"kategori"} />
+                            <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputKategori} name_component={"Category"} idComponent={"kategori"} />
                             </div>
                             {
                                 IN_TIPE === 1 ?
@@ -317,7 +317,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
                                 :
                                 <>
                                 <div>
-                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={FormInputProduk} name_component={"Product"} idComponent={"product"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={FormInputProduk} name_component={"Product"} idComponent={"product"} />
                                 </div>
                                 <div>
                                 <InputTextType   in_title={"Print Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputQtyCetak} in_value={""+IN_QTY_CETAK} />

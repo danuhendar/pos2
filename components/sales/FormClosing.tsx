@@ -322,7 +322,7 @@ const [data_rows, setData_rows] = useState([]);
                         setLoadingButtonClosing(true)
                         setisDisabledClosing(true)
                         PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
-                             if(response){
+                             if(response.ok){
                                 Swal.fire({
                                     title: t("Success"),
                                     text: t("Closing Harian Berhasil dilakukan, Silahkan Simpan SLIP TUTUP HARIAN ANDA!"),
@@ -340,6 +340,16 @@ const [data_rows, setData_rows] = useState([]);
                                 setIN_GROSS_SALES('')
                                 setIN_DISKON('')
                                 setIN_NET_SALES('')
+                            }else{
+                                Swal.fire({
+                                    title: t("Warning"),
+                                    text: response.code+"-"+response.msg,
+                                    icon: "error",
+                                    padding: '2em',
+                                    customClass: 'sweet-alerts'
+                                });
+                                setLoadingButtonClosing(false)
+                                setisDisabledClosing(false)
                             }
                             
                              
