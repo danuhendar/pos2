@@ -321,8 +321,10 @@ const [data_rows, setData_rows] = useState([]);
                         const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
                         setLoadingButtonClosing(true)
                         setisDisabledClosing(true)
+                        
                         PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
-                             if(response.ok){
+                             console.log(JSON.stringify(response))
+                             if(response){
                                 Swal.fire({
                                     title: t("Success"),
                                     text: t("Closing Harian Berhasil dilakukan, Silahkan Simpan SLIP TUTUP HARIAN ANDA!"),
