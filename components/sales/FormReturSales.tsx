@@ -87,6 +87,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
          
         const kode_gerai = get_data_local_storage('kode_gerai')
         if(kode_gerai === '%'){
+            setIN_KODE_GERAI('%')
             GetMasterGerai(res_host,res_PORT_LOGIN)
         }else{
             setIN_KODE_GERAI(kode_gerai)    

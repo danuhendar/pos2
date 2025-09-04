@@ -7,7 +7,7 @@ const themeConfig = {
     animation: 'animate__fadeInRight', // animate__fadeIn, animate__fadeInDown, animate__fadeInUp, animate__fadeInLeft, animate__fadeInRight, animate__slideInDown, animate__slideInLeft, animate__slideInRight, animate__zoomIn
     navbar: 'navbar-sticky', // navbar-sticky, navbar-floating, navbar-static
     semidark: false,
-    versi_app:'1.0.01-rc20',
+    versi_app:'1.0.01-rc21',
     host: '103.191.63.199',
     hostrnd: '103.161.184.203',
     host_ws: '103.161.184.203',
