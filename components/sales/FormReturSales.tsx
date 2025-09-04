@@ -47,6 +47,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
     const [options7,setOptions7] = useState([])
     const [IN_SHIFT,setIN_SHIFT] = useState('')
     const [IN_KODE_GERAI,setIN_KODE_GERAI] = useState('')
+    const [IN_IS_GERAI,setIN_IS_GERAI] = useState('')
     const curdate = get_format_tanggal_jam().substring(0,16);
     const [date2, setDate2] = useState<any>(curdate);
     const [IN_TANGGAL,setIN_TANGGAL] = useState('')
@@ -86,8 +87,9 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
         setIN_NAMA_PEMBUAT(InputNamaPemohon)
          
         const kode_gerai = get_data_local_storage('kode_gerai')
-        if(kode_gerai === '%'){
-            setIN_KODE_GERAI('%')
+        const is_gerai = get_data_local_storage('is_gerai')
+        setIN_IS_GERAI(is_gerai)
+        if(is_gerai === '0'){
             GetMasterGerai(res_host,res_PORT_LOGIN)
         }else{
             setIN_KODE_GERAI(kode_gerai)    
@@ -472,7 +474,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
                         <>
                         <div className="grid gap-3 lg:grid-cols-4 md:grid-cols-4 sm:grid-cols-1 xs:grid-cols-1">
                             {
-                                IN_KODE_GERAI  === '%' ?
+                                IN_IS_GERAI  === '0' ?
                                 <div>
                                 <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
