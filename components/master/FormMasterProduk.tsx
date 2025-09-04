@@ -954,13 +954,6 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         setIN_BARCODE(generate)
     }
 
-    // const csvConfig = mkConfig({fieldSeparator: ',',decimalSeparator: '.',useKeysAsHeaders: true,filename: (Tabs === 'produk' ? 'Master_produk_'+get_format_tanggal_jam() : 'Master_kategori_'+get_format_tanggal_jam()),fileExtension: 'csv'});
-    
-    // const handleExportCSV = () => {
-    //     const csv = generateCsv(csvConfig)(data_rows);
-    //     download(csvConfig)(csv);
-    // }
-
     const isRtl = useSelector((state: IRootState) => state.themeConfig.rtlClass) === 'rtl' ? true : false;
     const isDark = useSelector((state: IRootState) => state.themeConfig.theme === 'dark' || state.themeConfig.isDarkMode);
     return (
@@ -1044,8 +1037,8 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         <ModalComponent in_size_modal={`panel animate__animated my-7 w-2/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
                             <div className="p-2">
                                 <div className="mb-5">
-                                    {/* <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} /> */}
-                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={(opt: any) => setSelectedSupllier(opt)} name_component={"Supplier"} idComponent={"supplier"} />
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
+                                    {/* <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={(opt: any) => setSelectedSupllier(opt)} name_component={"Supplier"} idComponent={"supplier"} /> */}
                                     <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={FormInputKodeKategoriProduk} name_component={"Kategori"} idComponent={"kategori"} />                                                             
                                     <InputTextType   in_title={"Kode Barang"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
                                     <InputTextType   in_title={"Item"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
