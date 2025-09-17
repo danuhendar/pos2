@@ -19,10 +19,7 @@ interface DropDownGlobalProps{
 const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_classname_content,data_options,isSearchable,isMulti,event,name_component,idComponent,in_is_clear}) => {
     const { t, i18n } = useTranslation();
     const [selectedOption, setSelectedOption] = useState(data_options[0]);
-    useEffect(() => {
-        const el = document.getElementById(idComponent);
-        console.log(el);
-    }, []);
+    
     return (
         <>
             {
@@ -31,6 +28,7 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                 <div className={in_classname_title}><label htmlFor={GetID()}>{t(name_component)}</label></div>
                 <div className="mb-3">
                     <div className={in_classname_content}>
+                        {typeof window !== "undefined" && (
                         <Select
                             menuPortalTarget={document.body}
                             styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
@@ -42,6 +40,7 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                             isSearchable={isSearchable}
                             isClearable={in_is_clear}
                         />
+                        )}
                     </div>
                 </div>
                 </>
