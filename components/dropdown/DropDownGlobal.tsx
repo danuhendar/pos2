@@ -28,6 +28,8 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                 <div className="mb-3">
                     <div className={in_classname_content}>
                         <Select
+                            menuPortalTarget={document.body}
+                            styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                             onChange={event}
                             id={idComponent}
                             placeholder={t("Select "+name_component)}
