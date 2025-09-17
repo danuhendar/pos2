@@ -1,6 +1,6 @@
 'use client'
 import { GetID } from "@/lib/global";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import Select from 'react-select';
 
@@ -19,6 +19,10 @@ interface DropDownGlobalProps{
 const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_classname_content,data_options,isSearchable,isMulti,event,name_component,idComponent,in_is_clear}) => {
     const { t, i18n } = useTranslation();
     const [selectedOption, setSelectedOption] = useState(data_options[0]);
+    useEffect(() => {
+        const el = document.getElementById(idComponent);
+        console.log(el);
+    }, []);
     return (
         <>
             {
