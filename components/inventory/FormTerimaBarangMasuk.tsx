@@ -585,6 +585,8 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                                 setisCheck_2(false)
                                 setisCheckBPBDC(false)
                                 setisCheckBPBSupplier(false)
+                                setIN_NOMOR_DOKUMEN('')
+                                setIN_NO_SJ('')
                                 setMetodeBPB('')
                             }else if(code.toString().substring(0,1) === '4'){
                                 if(code === 401 && msg.includes("Invalid")){
@@ -716,9 +718,18 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                             <div className={IN_METODE === '' ? "hidden" : ""}>
                                 <InputTextTypeKeyDown in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyDownQty} />                        
                             </div>
-                            <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
-                            <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
-                            <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
+                            {
+                                IN_METODE === '1' ?
+                                <>
+                                <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
+                                <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
+                                <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
+                                </> 
+                                :
+                                ''
+
+                            }
+                            
                         </div>
                         <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Add'} HandleClick={AddList} />
                         <div className="mt-6 panel rounded-3xl">
