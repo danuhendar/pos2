@@ -537,7 +537,7 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiInventory`
                         const date = new Date(date2)
                         const tahun = date.getFullYear()
-                        const bulan = date.getMonth()
+                        const bulan = date.getMonth()+1
                         let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_JENIS":IN_METODE_RETUR,"IN_KETERANGAN":IN_KETERANGAN,"IN_ASAL":IN_TUJUAN,"IN_TUJUAN":IN_ASAL,"IN_TANGGAL":date2,"IN_TAHUN":tahun,"IN_BULAN":bulan,"IN_IS_STATUS":1,"IN_OTORISATOR":"POSAPP","IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_DETAIL":data_rows,"IN_NO_SJ":"-","IN_NOMOR_DOKUMEN":"-"}
                         console.log(JSON.stringify(param))
                         const Token = GetToken()
@@ -672,9 +672,16 @@ const FormRetur: React.FC<FormReturProps> = ({ url, jenis, IDReport }) => {
                             <div className={IN_METODE === '' ? "hidden" : ""}>
                                 <InputTextTypeKeyDown in_title={"Qty"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={false} event={FormInputQty} in_value={IN_QTY} in_ref={input2Ref} in_event_keydown={KeyDownQty} />                        
                             </div>
-                            <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
-                            <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
-                            <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
+                             {
+                                IN_METODE === '1' ?
+                                <>
+                                <InputTextType in_title={"Kode Barang"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanKodeBarang} in_value={IN_RESULT_SCAN_KODE_BARANG}/>
+                                <InputTextType in_title={"Deskripsi"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanDeskripsi} in_value={IN_RESULT_SCAN_DESKRIPSI}/>
+                                <InputTextType in_title={"Satuan"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputResultScanSatuan} in_value={IN_RESULT_SCAN_SATUAN}/>
+                                </>
+                                :
+                                ''
+                            }
                         </div>
                         <ButtonAdd in_classname={!isDark ? 'btn btn-primary w-full rounded-full text-end text-xs' : 'btn btn-outline-primary w-full rounded-full text-xs'} idComponent={"btn_reload"} isLoading={LoadingButton} isDisabled={isDisabled} in_icon={IconButton} in_title_button={'Add'} HandleClick={AddList} />
                         <div className="mt-6 panel rounded-3xl">
