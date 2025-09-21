@@ -14,9 +14,10 @@ interface DropDownGlobalProps{
     name_component:string,
     idComponent:string,
     in_is_clear:boolean,
+    in_selectedOption?:any
 }
 
-const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_classname_content,data_options,isSearchable,isMulti,event,name_component,idComponent,in_is_clear}) => {
+const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_classname_content,data_options,isSearchable,isMulti,event,name_component,idComponent,in_is_clear,in_selectedOption}) => {
     const { t, i18n } = useTranslation();
     const [selectedOption, setSelectedOption] = useState(data_options[0]);
     
@@ -39,6 +40,7 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                             isMulti={isMulti}
                             isSearchable={isSearchable}
                             isClearable={in_is_clear}
+                            value={in_selectedOption}
                         />
                         )}
                     </div>
@@ -53,6 +55,7 @@ const DropDownGlobal: React.FC<DropDownGlobalProps> = ({in_classname_title,in_cl
                     isMulti={isMulti}
                     isSearchable={isSearchable}
                     isClearable={in_is_clear}
+                    value={in_selectedOption}
                 />
             }
             

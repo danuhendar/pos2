@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Swal from 'sweetalert2';
 import { IRootState } from "@/store";
 import {  useSelector } from "react-redux";
-import { AddColumn, AddID, GetFormatCurrency, GetToken,  generateAlphanumeric,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
+import { AddColumn, AddID, GetFormatCurrency, GetID, GetToken,  generateAlphanumeric,  get_data_local_storage, get_dateTimeDiff_second, get_format_tanggal_jam, groupByMessageListeners, groupByValueAndCount, handleLogout, millisToMinutesAndSeconds, removeDuplicates, setTombolAmbilDataGagal, start, stop, textToBase64Barcode } from "@/lib/global";
 import { useTranslation } from "react-i18next";
 import themeConfig from "@/theme.config";
 import AntiScrapedShieldComponent from "../shield/AntiScrapedShieldComponent";
@@ -28,6 +28,9 @@ import DropDownGlobal from "../dropdown/DropDownGlobal";
 import Image from "next/image";
 import IconBox from "../Icon/IconBox";
 import IconShoppingBag from "../Icon/IconShoppingBag";
+import Select from 'react-select';
+import { set } from "lodash";
+import { parse } from "path";
 // import { generateCsv, download, mkConfig } from 'export-to-csv'; //or use your library of choice here// Install this package: npm install export-to-csv
 interface FormMasterProdukProps {
     url: string,
@@ -76,11 +79,15 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     const [options8,setOptions8] = useState([])
     const [OptionSatuan,setOptionSatuan] = useState([])
     const [Tabs,setTabs] = useState<string>('kategori');
-    const [isCheck_1,setisCheck_1] = useState(false)
-    const [isCheck_2,setisCheck_2] = useState(false)
-    const [isCheck_3,setisCheck_3] = useState(false)
-    const [isCheck_4,setisCheck_4] = useState(false)
+    const [isCheck1,setisCheck1] = useState(false)
+    const [isCheck2,setisCheck2] = useState(false)
+    const [isCheck3,setisCheck3] = useState(false)
+    const [isCheck4,setisCheck4] = useState(false)
     const [selectedSupllier, setSelectedSupllier] = useState<any>(null);
+    const [selectedKategori, setSelectedKategori] = useState<any>(null);
+    const [selectedSatuan, setSelectedSatuan] = useState<any>(null);
+    const [selectedKodeGerai, setSelectedKodeGerai] = useState<any>(null);
+
     const MySwal = withReactContent(Swal);
     
     
@@ -95,39 +102,38 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         GetMasterKategoriProduk(res_host,res_PORT_LOGIN)
         GetMasterSatuan(res_host,res_PORT_LOGIN)
     },[]);
-
    
-    const FormInputKodeGerai  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val);  };
+    const FormInputKodeGerai  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val);  setSelectedKodeGerai(value); };
     const FormInputKodeBarang = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KODE_BARANG(val);  };
     const FormInputContent = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_CONTENT(val);  };
-    const FormInputKodeKategoriProduk = (value: any) => {var val = value.value;setIN_KODE_KATEGORI(val);  };
-    const FormInputSupplier = (value: any) => {var val = value.value;setIN_KODE_SUPPLIER(val);  };
+    const FormInputKodeKategoriProduk = (value: any) => {var val = value.value;setIN_KODE_KATEGORI(val); setSelectedKategori(value); console.log('setSelectedKategori : '+JSON.stringify(value)); };
+    const FormInputSupplier = (value: any) => {var val = value.value;setIN_KODE_SUPPLIER(val); setSelectedSupllier(value);  };
     const FormInputSingkatan = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_SINGKATAN(val);  };
     const FormInputHPP = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_HPP(val);  };
     const FormInputHPPLast = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_HPP_LAST(val);  };
     const FormInputHPPLast_2 = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_HPP_LAST_2(val);  };
     const FormInputGross = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_GROSS(val);  };
-    const FormInputSatuan = (value: any) => {var val = value.value;setIN_SATUAN(val);  };
+    const FormInputSatuan = (value: any) => {var val = value.value;setIN_SATUAN(val);  setSelectedSatuan(value); };
     const FormInputVarian= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_VARIAN(val);  };
     const FormInputBarcode= (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_BARCODE(val);  };
     const FormInputIS_Fixed= (event: { target: { value: any; }; }) => {
         var val = event.target.value;setIN_IS_FIXED(val);
         if(val === '1'){
-            setisCheck_3(true)
-            setisCheck_4(false)
+            setisCheck3(true)
+            setisCheck4(false)
         }else if(val === '0'){
-            setisCheck_3(false)
-            setisCheck_4(true)
+            setisCheck3(false)
+            setisCheck4(true)
         }  
     };
     const FormInputIS_Retur_Supplier = (event: { target: { value: any; }; }) => {
         var val = event.target.value;setIN_IS_RETUR_SUPPLIER(val);
-        if(val === '1'){
-            setisCheck_1(true)
-            setisCheck_2(false)
-        }else if(val === '0'){
-            setisCheck_1(false)
-            setisCheck_2(true)
+        if(val === '1' || parseFloat(val) === 1){
+            setisCheck1(true)
+            setisCheck2(false)
+        }else if(val === '0' || parseFloat(val) === 0){
+            setisCheck1(false)
+            setisCheck2(true)
         }
     };
     const FormInputKodeKategori = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KODE_KATEGORI(val);  };
@@ -440,18 +446,18 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     }
     const showModal = (IDReport:string,KODE_KATEGORI:string,KODE_GERAI:string,KODE_BARANG:string,CONTENT:string,KODE_SUPPLIER:number,SUPPLIER:string,SINGKATAN:string,HPP:string,HPP_LAST:string,HPP_LAST_2:string,GROSS:string,SATUAN:string,VARIAN:string,BARCODE:string,IS_FIXED:string,IS_RETUR_SUPPLIER:string) => {
         setModal13(true)
-        // Auto-select the matching option
-        const matchedOption = options6.find(
-            (opt) => opt.value === KODE_SUPPLIER
-        );
-        console.log('KODE_SUPPLIER : '+KODE_SUPPLIER)
-        console.log('SUPPLIER : '+SUPPLIER)
-        console.log('matchedOption : '+JSON.stringify(matchedOption))
-        setSelectedSupllier(matchedOption)
+        const matched = options6.find((opt) => opt.value === KODE_SUPPLIER) || null;
+        setSelectedSupllier(matched);
         setIN_SUPPLIER(SUPPLIER)
-        
+
+        const matched_kategori = options8.find((opt) => opt.value === KODE_KATEGORI) || null;
+        setSelectedKategori(matched_kategori);
         setIN_KODE_KATEGORI(KODE_KATEGORI)
+        
+        const matched_gerai = options7.find((opt) => opt.value === KODE_GERAI) || null;
+        setSelectedKodeGerai(matched_gerai);
         setIN_KODE_GERAI(KODE_GERAI)
+        
         setIN_KODE_BARANG(KODE_BARANG)
         setIN_CONTENT(CONTENT)
         
@@ -460,10 +466,36 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         setIN_HPP_LAST(HPP_LAST)
         setIN_HPP_LAST_2(HPP_LAST_2)
         setIN_GROSS(GROSS)
+
+        const matched_satuan = OptionSatuan.find((opt) => opt.value === SATUAN) || null;
+        setSelectedSatuan(matched_satuan);
         setIN_SATUAN(SATUAN)
+
         setIN_VARIAN(VARIAN)
         setIN_BARCODE(BARCODE)
+        console.log('IS_FIXED : '+IS_FIXED)
+        if(IS_FIXED === '1' || parseFloat(IS_FIXED) === 1){
+            console.log('setisCheck1 true')
+            setisCheck3(true)
+            setisCheck4(false)
+        }else{
+            console.log('setisCheck2 true')
+            setisCheck3(false)
+            setisCheck4(true)
+        }
         setIN_IS_FIXED(IS_FIXED)
+
+        console.log('IS_RETUR_SUPPLIER : '+IS_RETUR_SUPPLIER)
+        if(IS_RETUR_SUPPLIER === '1' || parseFloat(IS_RETUR_SUPPLIER) === 1){
+            console.log('setisCheck_3 true')
+            setisCheck1(true)
+            setisCheck2(false)
+        }else{
+            console.log('setisCheck_4 true')
+            setisCheck1(false)
+            setisCheck2(true)
+        }
+        
         setIN_IS_RETUR_SUPPLIER(IS_RETUR_SUPPLIER)
         setTitle('Form : '+IDReport)
     
@@ -529,8 +561,23 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                 let param = {}
                 if(Tabs === 'produk'){
                     url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterProduk`
-                    param = {"IN_KODE_BARANG":res_kode_barang,"IN_KODE_KATEGORI":IN_KODE_KATEGORI,"IN_KODE_SUPPLIER":IN_KODE_SUPPLIER,"IN_CONTENT":IN_CONTENT,"IN_SINGKATAN":IN_SINGKATAN,"IN_HPP":IN_HPP,"IN_GROSS":IN_GROSS,"IN_IS_RETUR_SUPPLIER":IN_IS_RETUR_SUPPLIER,"IN_VARIAN":IN_VARIAN,"IN_SATUAN":IN_SATUAN,"IN_IS_FIXED":IN_IS_FIXED,"IN_IS_AKTIF":1,"IN_BARCODE":IN_BARCODE,"IN_OTORISATOR":InputNik,"IN_KODE_GERAI":IN_KODE_GERAI}
-                    //console.log(JSON.stringify(param))
+                    param = {
+                            "IN_KODE_BARANG":res_kode_barang,
+                            "IN_KODE_KATEGORI":(IDReport.includes('Edit') ? IN_KODE_KATEGORI : selectedKategori.value),
+                            "IN_KODE_SUPPLIER":(IDReport.includes('Edit') ? IN_KODE_SUPPLIER : selectedSupllier.value),
+                            "IN_CONTENT":IN_CONTENT,
+                            "IN_SINGKATAN":IN_SINGKATAN,
+                            "IN_HPP":IN_HPP,
+                            "IN_GROSS":IN_GROSS,
+                            "IN_IS_RETUR_SUPPLIER":IN_IS_RETUR_SUPPLIER,
+                            "IN_VARIAN":IN_VARIAN,
+                            "IN_SATUAN":(IDReport.includes('Edit') ? IN_SATUAN : selectedSatuan.value),
+                            "IN_IS_FIXED":IN_IS_FIXED,
+                            "IN_IS_AKTIF":1,
+                            "IN_BARCODE":IN_BARCODE,
+                            "IN_OTORISATOR":InputNik,
+                            "IN_KODE_GERAI":(IDReport.includes('Edit') ? IN_KODE_GERAI : selectedKodeGerai.value),
+                        }
                 }else{
                     url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterKategoriProduk`
                     param = {"IN_KODE_KATEGORI":res_kode_kategori,"IN_CONTENT":IN_CONTENT_KATEGORI}
@@ -550,10 +597,10 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                             customClass: 'sweet-alerts'
                         });
                         GetData(IN_HOST,IN_PORT)
-                        setisCheck_1(false)
-                        setisCheck_2(false)
-                        setisCheck_3(false)
-                        setisCheck_4(false)
+                        setisCheck1(false)
+                        setisCheck2(false)
+                        setisCheck3(false)
+                        setisCheck4(false)
                         CloseModal()
                     }else if(code.toString().substring(0,1) === '4'){
                         if(code === 401 && msg.includes("Invalid")){
@@ -1037,20 +1084,66 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                         <ModalComponent in_size_modal={`panel animate__animated my-7 w-2/3 overflow-hidden rounded-3xl border-0 p-0 text-black dark:text-white-dark ${isRtl ? 'animate__fadeInRight' : 'animate__fadeInLeft'}`} state_modal={modal13} event_close_modal={CloseModal} isRtl={isRtl} in_classname_title_modal={"text-sm font-bold"} in_title_modal={Title} isBC={false} TipeBC={""} progressbarData={""} data_rows_detail={null} data_columns_detail={null} loadingDetail={false} in_content_not_bc={
                             <div className="p-2">
                                 <div className="mb-5">
-                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} />
-                                    {/* <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={(opt: any) => setSelectedSupllier(opt)} name_component={"Supplier"} idComponent={"supplier"} /> */}
-                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} event={FormInputKodeKategoriProduk} name_component={"Kategori"} idComponent={"kategori"} />                                                             
+                                    {/* <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options6} isSearchable={true} isMulti={false} event={FormInputSupplier} name_component={"Supplier"} idComponent={"supplier"} /> */}
+                                    <DropDownGlobal 
+                                                in_is_clear={false}
+                                                in_classname_title={"mb-3"} 
+                                                in_classname_content={"w-full"} 
+                                                data_options={options6} 
+                                                isSearchable={true} 
+                                                isMulti={false} 
+                                                event={
+                                                    IDReport.includes('Edit') ?
+                                                    (opt: any) => setSelectedSupllier(opt)
+                                                    :
+                                                    FormInputSupplier
+                                                } 
+                                                in_selectedOption={
+                                                    selectedSupllier
+                                                } 
+                                                name_component={"Supplier"} 
+                                                idComponent={"supplier"} />
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options8} isSearchable={true} isMulti={false} 
+                                                    event={
+                                                        IDReport.includes('Edit') ?
+                                                        (opt: any) => setSelectedKategori(opt)
+                                                        :
+                                                        FormInputKodeKategoriProduk
+                                                    } 
+                                                    in_selectedOption={
+                                                        selectedKategori
+                                                    } 
+                                                    name_component={"Kategori"} 
+                                                    idComponent={"kategori"} />                                                             
                                     <InputTextType   in_title={"Kode Barang"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeBarang} in_value={IN_KODE_BARANG} />
                                     <InputTextType   in_title={"Item"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputContent} in_value={IN_CONTENT} />
                                     <InputTextType   in_title={"Singkatan"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputSingkatan} in_value={IN_SINGKATAN} />
                                     <InputTextType   in_title={"HPP"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputHPP} in_value={IN_HPP} />
                                     <InputTextType   in_title={"Gross"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputGross} in_value={IN_GROSS} />
                                     
+                                    <InputCheckBoxFilterType isCheck_1={isCheck3} isCheck_2={isCheck4}  event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
+                                    <InputCheckBoxFilterType isCheck_1={isCheck1} isCheck_2={isCheck2}  
+                                                            event={FormInputIS_Retur_Supplier} 
+                                                            in_title={"IS Retur Supplier"} 
+                                                            in_value_1={"1"} in_value_2={"0"} 
+                                                            in_name_1={"Yes"} in_name_2={"No"} 
+                                                            in_name_component_1={"is_retur_supplier"} 
+                                                            in_name_component_2={"is_retur_supplier"} />
                                     
-                                    <InputCheckBoxFilterType isCheck_1={isCheck_1} isCheck_2={isCheck_2}  event={FormInputIS_Retur_Supplier} in_title={"IS Retur Supplier"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_retur_supplier"} in_name_component_2={"is_retur_supplier"} />
                                     <InputTextType   in_title={"Varian"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={false} event={FormInputVarian} in_value={IN_VARIAN} />
-                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionSatuan} isSearchable={true} isMulti={false} event={FormInputSatuan} name_component={"Satuan"} idComponent={"satuan"} />
-                                    <InputCheckBoxFilterType isCheck_1={isCheck_3} isCheck_2={isCheck_4}  event={FormInputIS_Fixed} in_title={"IS Fixed Produk"} in_value_1={"1"} in_value_2={"0"} in_name_1={"Yes"} in_name_2={"No"} in_name_component_1={"is_fixed_produk"} in_name_component_2={"is_fixed_produk"} />
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={OptionSatuan} isSearchable={true} isMulti={false}
+                                                    event={
+                                                        IDReport.includes('Edit') ?
+                                                        (opt: any) => setSelectedSatuan(opt)
+                                                        :
+                                                        FormInputSatuan
+                                                    } 
+                                                    in_selectedOption={
+                                                        selectedSatuan
+                                                    }
+                                                    name_component={"Satuan"} 
+                                                    idComponent={"satuan"} />
+                                    
                                     {
 									    Title.includes("Form Add") ? 
                                         <div className="flex items-center gap-2 mb-3">
@@ -1060,7 +1153,18 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                                         :
                                         <InputTextType   in_title={"Barcode"} in_classname_title={"mb-3"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputBarcode} in_value={IN_BARCODE} />
                                     }
-                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Store Code"} idComponent={"kode_gerai"} />
+                                    <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={options7} isSearchable={true} isMulti={false} 
+                                                    event={
+                                                        IDReport.includes('Edit') ?
+                                                        (opt: any) => setSelectedKodeGerai(opt)
+                                                        :
+                                                        FormInputKodeGerai
+                                                    } 
+                                                    in_selectedOption={
+                                                        selectedKodeGerai
+                                                    }
+                                                    name_component={"Store Code"} 
+                                                    idComponent={"kode_gerai"} />
                                 </div>
                                 <div className="flex items-center justify-end gap-3 mt-8">
                                     <ButtonAdd in_classname={'btn btn-outline-danger rounded-full text-xs'} idComponent={"btn_close"} isLoading={false} isDisabled={isDisabled} in_icon={<IconXCircle />} in_title_button={'Cancel'} HandleClick={CloseModal} />
