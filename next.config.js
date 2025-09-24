@@ -6,7 +6,7 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     compiler: {
-        removeConsole: false,
+        removeConsole: true,
     },
     distDir: 'build',
     compress: true,

@@ -8,7 +8,7 @@ const themeConfig = {
     navbar: 'navbar-sticky', // navbar-sticky, navbar-floating, navbar-static
     semidark: false,
     versi_app:'1.0.01-rc26',
-    host: '127.0.0.1',
+    host: '103.161.184.203',
     hostrnd: '103.161.184.203',
     host_ws: '103.161.184.203',
     port_login:'5656',
