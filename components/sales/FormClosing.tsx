@@ -18,7 +18,7 @@ import CardComponent from "../form/CardComponent";
 import IconPrinter from "../Icon/IconPrinter";
 import IconPaperclip from "../Icon/IconPaperclip";
 import DatePicker from "../datepicker/DatePicker";
-import { set } from "lodash";
+import { reject, set } from "lodash";
 import IconLock from "../Icon/IconLock";
 import withReactContent from "sweetalert2-react-content";
 import IconBook from "../Icon/IconBook";
@@ -54,6 +54,7 @@ const [data_rows, setData_rows] = useState([]);
     const [IN_GROSS_SALES, setIN_GROSS_SALES] = useState('')
     const [IN_DISKON, setIN_DISKON] = useState('')
     const [IN_NET_SALES, setIN_NET_SALES] = useState('')
+    const [IN_HPP, setIN_HPP] = useState('0')
     const [IN_UANG_FISIK, setIN_UANG_FISIK] = useState('')
     const [IN_PENGELUARAN_BIAYA_MODAL, setIN_PENGELUARAN_BIAYA_MODAL] = useState('0')
     const [IN_SISA_MODAL, setIN_SISA_MODAL] = useState('0')
@@ -97,7 +98,7 @@ const [data_rows, setData_rows] = useState([]);
     const FormInputPengeluaranBiayaModal = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_PENGELUARAN_BIAYA_MODAL(val);};
     const FormInputSisaModal = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_SISA_MODAL(val);};
     const FormInputNote = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_NOTE(val);};
-
+    const FormInputSalesHPP = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_HPP(val);};
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
         let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
@@ -302,6 +303,75 @@ const [data_rows, setData_rows] = useState([]);
         });
         
     }
+
+    const InsJurnalClosingSales = () => {
+        return new Promise((resolve, reject) => {
+            const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsJurnalClosingSales`
+            const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_KODE_GERAI":IN_KODE_GERAI_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_OTORISATOR":"POSAPP","IN_SALES_GROSS":IN_GROSS_SALES.split(',').join(''),"IN_DISKON":IN_DISKON.split(',').join(''),"IN_SALES_NET":IN_NET_SALES.split(',').join(''),"IN_RETUR_PENJUALAN":0,"IN_HPP":IN_HPP.split(',').join(''),"IN_IS_MARKET_PLACE":true}
+            console.log(JSON.stringify(param))
+            const Token = GetToken()
+            setLoadingButtonClosing(true)
+            setisDisabledClosing(true)
+            Posts(url,JSON.stringify(param),false,Token).then((response) => {
+                const res_data = response;
+                var code = res_data.code;
+                var msg = res_data.msg;
+                if(parseFloat(code) === 200){
+                    Swal.fire({ 
+                        title: t("Success"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "success",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                    setLoadingButtonClosing(false)
+                    setisDisabledClosing(false)
+                    resolve('OK')
+                    
+                }else if(code.toString().substring(0,1) === '4'){
+                    if(code === 401 && msg.includes("Invalid")){
+                        
+                    }else{
+                        Swal.fire({     
+                            title: t("Warning"),
+                            text: ""+parseFloat(code)+"-"+msg,
+                            icon: "warning",
+                            padding: '2em',
+                            customClass: 'sweet-alerts'
+                        });
+                    }
+                    setLoadingButtonClosing(false)
+                    setisDisabledClosing(false)
+                }else{
+                    Swal.fire({
+                        title: t("Warning"),
+                        text: ""+parseFloat(code)+"-"+msg,
+                        icon: "warning",
+                        padding: '2em',
+                        customClass: 'sweet-alerts'
+                    });
+                    setLoadingButtonClosing(false)
+                    setisDisabledClosing(false)
+                }
+            }).catch((error) => {
+                console.log(error)
+                Swal.fire({     
+                    title: t("Warning"),
+                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButtonClosing(false)
+                setisDisabledClosing(false)
+            });
+        }).catch((error) => {
+            console.log(error)
+            reject(error)
+        });
+        
+    }
+
     const ClosingHarian = () => {
         Swal.fire({
                 icon: "question",
@@ -315,46 +385,63 @@ const [data_rows, setData_rows] = useState([]);
         }).then((result) => {
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
-                        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
-                        const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK,"IN_PENGELUARAN_BIAYA_MODAL":IN_PENGELUARAN_BIAYA_MODAL,"IN_SISA_MODAL":IN_SISA_MODAL,"IN_NOTE":IN_NOTE}
-                        const Token = GetToken()
-                        const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
-                        setLoadingButtonClosing(true)
-                        setisDisabledClosing(true)
-                        
-                        PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
-                             console.log(JSON.stringify(response))
-                             if(response){
-                                Swal.fire({
-                                    title: t("Success"),
-                                    text: t("Closing Harian Berhasil dilakukan, Silahkan Simpan SLIP TUTUP HARIAN ANDA!"),
-                                    icon: "success",
-                                    padding: '2em',
-                                    customClass: 'sweet-alerts'
+                        InsJurnalClosingSales().then((result) => {
+                            if(result === 'OK'){
+                                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
+                                const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK,"IN_PENGELUARAN_BIAYA_MODAL":IN_PENGELUARAN_BIAYA_MODAL,"IN_SISA_MODAL":IN_SISA_MODAL,"IN_NOTE":IN_NOTE}
+                                const Token = GetToken()
+                                const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
+                                setLoadingButtonClosing(true)
+                                setisDisabledClosing(true)
+                                
+                                PostsDownload(url,JSON.stringify(param),false,Token,NameFile).then((response) => {
+                                    console.log(JSON.stringify(response))
+                                    if(response){
+                                        Swal.fire({
+                                            title: t("Success"),
+                                            text: t("Closing Harian Berhasil dilakukan, Silahkan Simpan SLIP TUTUP HARIAN ANDA!"),
+                                            icon: "success",
+                                            padding: '2em',
+                                            customClass: 'sweet-alerts'
+                                        });
+                                        
+                                        setLoadingButtonClosing(false)
+                                        setisDisabledClosing(false)
+                                        setIN_TANGGAL('')
+                                        setIN_KODE_INITIAL('')
+                                        setIN_KODE_GERAI_INITIAL('')
+                                        setIN_NIK('')
+                                        setIN_NAMA('')
+                                        setIN_GROSS_SALES('')
+                                        setIN_DISKON('')
+                                        setIN_NET_SALES('')
+                                        setIN_HPP('')
+                                    }else{
+                                        Swal.fire({
+                                            title: t("Warning"),
+                                            text: response.code+"-"+response.msg,
+                                            icon: "error",
+                                            padding: '2em',
+                                            customClass: 'sweet-alerts'
+                                        });
+                                        setLoadingButtonClosing(false)
+                                        setisDisabledClosing(false)
+                                    }
+                                    
+                                    
+                                }).catch((error) => {
+                                    console.log(error)
+                                    Swal.fire({     
+                                        title: t("Warning"),
+                                        text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                                        icon: "warning",
+                                        padding: '2em',
+                                        customClass: 'sweet-alerts'
+                                    });
+                                    setLoadingButtonClosing(false)
+                                    setisDisabledClosing(false)
                                 });
-                                setLoadingButtonClosing(false)
-                                setisDisabledClosing(false)
-                                setIN_TANGGAL('')
-                                setIN_KODE_INITIAL('')
-                                setIN_KODE_GERAI_INITIAL('')
-                                setIN_NIK('')
-                                setIN_NAMA('')
-                                setIN_GROSS_SALES('')
-                                setIN_DISKON('')
-                                setIN_NET_SALES('')
-                            }else{
-                                Swal.fire({
-                                    title: t("Warning"),
-                                    text: response.code+"-"+response.msg,
-                                    icon: "error",
-                                    padding: '2em',
-                                    customClass: 'sweet-alerts'
-                                });
-                                setLoadingButtonClosing(false)
-                                setisDisabledClosing(false)
                             }
-                            
-                             
                         }).catch((error) => {
                             console.log(error)
                             Swal.fire({     
@@ -367,9 +454,19 @@ const [data_rows, setData_rows] = useState([]);
                             setLoadingButtonClosing(false)
                             setisDisabledClosing(false)
                         });
-                    }
-        });
-        
+            }
+        }).catch((error) => {
+                console.log(error)
+                Swal.fire({     
+                    title: t("Warning"),
+                    text: "401-Error : Hubungi administrator, untuk proses pengecekan lebih lanjut!",
+                    icon: "warning",
+                    padding: '2em',
+                    customClass: 'sweet-alerts'
+                });
+                setLoadingButtonClosing(false)
+                setisDisabledClosing(false)
+            });
     }
     
 
@@ -382,7 +479,6 @@ const [data_rows, setData_rows] = useState([]);
             setisDisabled(true)
             Posts(url,JSON.stringify(param),false,Token).then((response) => {
                 const res_data = response;
-                console.log(res_data)
                 var code = res_data.code;
                 var msg = res_data.msg;
                 if(parseFloat(code) === 200){
@@ -398,6 +494,7 @@ const [data_rows, setData_rows] = useState([]);
 
                         setIN_DISKON(GetFormatCurrency(""+total_diskon))
                         setIN_NET_SALES(GetFormatCurrency(data_body[0].SALESNET))
+                        setIN_HPP(GetFormatCurrency(data_body[0].SALES_HPP))
                         setisDisabledClosing(false)
                     }else{
                         Swal.fire({
@@ -578,6 +675,9 @@ const [data_rows, setData_rows] = useState([]);
                         {
                             IDReport === 'Closing Harian' ?
                             <>
+                            <div className="hidden">
+                            <InputTextType   in_title={"Sales HPP"} in_classname_title={"mb-1 invisible"} in_classname_content={"w-full invisible"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right invisible"} data_options={undefined} isDisabled={true} event={FormInputSalesHPP} in_value={IN_HPP} />
+                            </div>
                             <div>
                             <InputTextType   in_title={"Pengeluaran Biaya Modal"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right"} data_options={undefined} isDisabled={true} event={FormInputPengeluaranBiayaModal} in_value={IN_PENGELUARAN_BIAYA_MODAL} />
                             </div>
