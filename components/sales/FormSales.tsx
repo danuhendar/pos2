@@ -31,7 +31,7 @@ import IconSend from "../Icon/IconSend";
 import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
 import { Input } from "postcss";
 import IconDollarSignCircle from "../Icon/IconDollarSignCircle";
-import { set } from "lodash";
+import { head, set } from "lodash";
 import ModalComponent from "../modal/ModalComponent";
 import ComponentsDatatablesAdvanced from "../table/ComponentsDatatablesAdvanced";
 import IconXCircle from "../Icon/IconXCircle";
@@ -43,6 +43,8 @@ import IconPrinter from "../Icon/IconPrinter";
 import Select from 'react-select';
 import { Autocomplete, TextField } from "@mui/material";
 import { ref } from "yup";
+import IconMinus from "../Icon/IconMinus";
+import { parse } from "path";
 
 interface FormSalesProps {
     url: string,
@@ -140,6 +142,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const [ListBarcode,setListBarcode] = useState([])
     const [URL_GENERATE_STRUK,setURL_GENERATE_STRUK] = useState('')
     const [IN_NO_STRUK,setIN_NO_STRUK] = useState('')
+    const [value6, setValue6] = useState<any>(0);
+    
+    
 
 
     useEffect(() => {
@@ -172,6 +177,52 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setData_columns_produk(column_master_produk)
         GetMasterProdukByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai,true)
     },[]);
+
+    const formatRupiah = (value: number | string) =>
+        new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+    }).format(Number(value));
+    
+    const handleQtyChange = (kodeBarang: number, newQty: number) => {
+        setData_rows((prev) => {
+            const updated = prev.map((r) => {
+                if (r.KODE_BARANG === kodeBarang) {
+                const qty = Math.max(0, newQty);
+                const amount = qty * r.GROSS;
+                return {
+                    ...r,
+                    QTY: String(qty),
+                    PRICE: String(amount),
+                };
+                }
+                return r;
+            });
+
+            // hitung total amount setiap kali qty berubah
+            const total = updated.reduce(
+                (sum, r) => sum + Number(r.PRICE),
+                0
+            );
+            const diskon = updated.reduce(
+                (sum, r) => sum + Number(r.DISKON),
+                0
+            );
+            const diskon_marketplace = DiskonMarketPlace === '' ? 0 : parseFloat(DiskonMarketPlace.split(',').join(''));
+            const res_total_diskon = diskon
+            const res_shipping = BiayaOngkir === '' ? 0 : parseFloat(BiayaOngkir.split(',').join(''));
+            const res_total_belanja = total - res_total_diskon + res_shipping
+
+            setTotalBelanja(isNaN(res_total_belanja) ? '0' : GetFormatCurrency(res_total_belanja.toString()));
+            setGrandTotal(isNaN(total) ? '0' : GetFormatCurrency(total.toString()));
+            setTotalDiscount(res_total_diskon.toString() === '' ? '0' : GetFormatCurrency(res_total_diskon.toString()));
+            
+            return updated;
+        });
+        
+    };
+
     
     const FormInputKodeGeraiMutasi  = (value: any) => {
         var val = value.value; 
@@ -770,11 +821,21 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             recalculateTotals(updated); // recalculate after filtering
             return updated;
         });
-        setarr_input_item((prev) => {
-            const updated = prev.filter((item) => item.id !== idToRemove); 
-            return updated;
-        });
+        // setarr_input_item((prev) => {
+        //     const updated = prev.filter((item) => item.id !== idToRemove); 
+        //     return updated;
+        // });
     };    
+    const ActMinus = () => {
+        const val = value6 > 0 ? value6 - 1 : 0
+        console.log('val - : '+val)
+        setValue6(val);
+    }
+    const ActPlus = () => {
+        const val = value6 < 100 ? value6 + 1 : 100
+        console.log('val + : '+val)
+        setValue6(val);
+    }
     const Def_Column_Transaksi_Inventory = () => {
         var cols = [
                 {
@@ -790,7 +851,8 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 },
                 {
                     accessor: 'KODE_BARANG',
-                    title: 'CODE ITEM',
+                    title: 'CODE',
+                    width: 80, // fixed width
                 },
                 {
                     accessor: 'DESKRIPSI',
@@ -798,23 +860,56 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 },
                 {
                     accessor: 'SATUAN',
-                    title: 'SATUAN'
+                    title: 'SATUAN',
+                    width: 100, // fixed width
                 },
                 {
                     accessor: 'QTY',
                     title: 'QTY',
+                    center: true, // isi kolom juga rata tengah,
+                    width: 170, // fixed width
+                    render: ({ KODE_BARANG, QTY }) => {
+                        return (
+                        <div className="flex">
+                            <button
+                                type="button"
+                                className="flex items-center justify-center px-3 font-semibold text-white border border-r-0 bg-primary ltr:rounded-l-md rtl:rounded-r-md border-primary"
+                                onClick={() => handleQtyChange(KODE_BARANG, parseFloat(QTY) === 1 ? 1 : (parseFloat(QTY) - 1) )}
+                            >
+                            <IconMinus />
+                            </button>
+                            <input
+                                type="text"
+                                className="px-2 text-center rounded-none form-input"
+                                min="0"
+                                max="25"
+                                value={QTY}
+                                onChange={(e) => handleQtyChange(KODE_BARANG, Number(e.target.value))}
+                            />
+                            <button
+                                type="button"
+                                className="flex items-center justify-center px-3 font-semibold text-white border border-l-0 bg-primary ltr:rounded-r-md rtl:rounded-l-md border-primary"
+                                onClick={() => handleQtyChange(KODE_BARANG, parseFloat(QTY) === 200 ? 200 : (parseFloat(QTY) + 1))}
+                            >
+                            <IconPlus />
+                            </button>
+                        </div>
+                        );
+                    }
                 },
                 {
                     accessor: 'GROSS',
-                    title: 'GROSS'
+                    title: 'GROSS',
+                    render: ({ GROSS }) => <strong>{formatRupiah(GROSS)}</strong>,
                 },
                 {
                     accessor: 'DISKON',
-                    title: 'DISCOUNT',
+                    title: 'DISC.',
                 },
                 {
                     accessor: 'PRICE',
-                    title: 'AMOUNT'
+                    title: 'AMOUNT',
+                    render: ({ PRICE }) => <strong>{formatRupiah(PRICE)}</strong>,
                 },
                
             ];
@@ -983,14 +1078,15 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             if(objIndex === -1){
                 console.log('objIndex : '+objIndex+' belum ada di list')
                 if(res_kode_barang !== '' || res_satuan !== '' || res_deskripsi !== '' || res_qty !== '' || res_hpp !== '' || res_gross !== ''){
-                    const obj = {"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty,"DISKON":res_diskon,"PRICE":res_amount,"GROSS":res_gross}
-                    arr_input_item.push(obj)
-                    console.log(JSON.stringify(arr_input_item))
+                    const obj = {"id":GetID(),"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty,"DISKON":res_diskon,"PRICE":res_amount,"GROSS":res_gross}
+                    // langsung append ke state, tidak perlu if/else
+                    setData_rows((prev) => [...prev, obj]);
+                  
+                    //console.log(JSON.stringify(arr_input_item))
                 }else{
 
                 }
-                const res_rows = AddID(arr_input_item)
-                setData_rows(res_rows)
+             
                 //-- jika item sudah ada di list --//
             }else{
                 //-- update qty, diskon, price --//
@@ -1012,7 +1108,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
            
             //-- summary --//
             // Filter hanya data dengan PRICE valid
-            const valid_price = arr_input_item.filter(item => item.PRICE !== null && !isNaN(item.PRICE));
+            const valid_price = data_rows.filter(item => item.PRICE !== null && !isNaN(item.PRICE));
             // Hitung total harga (PRICE * QTY)
             const res_grand_total = valid_price.reduce((acc, item) => {
                 const price = parseFloat(item.PRICE);
@@ -1020,7 +1116,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             }, 0);
             //console.log('res_grand_total',res_grand_total)
             // Hitung total diskon
-            const valid_diskon = arr_input_item.filter(item => item.DISKON !== null && !isNaN(item.DISKON));
+            const valid_diskon = data_rows.filter(item => item.DISKON !== null && !isNaN(item.DISKON));
             // Hitung total harga (PRICE * QTY)
             const res_total_diskon = valid_diskon.reduce((acc, item) => {
                 const diskon = parseFloat(item.DISKON);
@@ -1281,7 +1377,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                             "IN_DETAIL":detail
                                         }
                             const Token = GetToken()
-                            //console.log(JSON.stringify(param))
+                            console.log(JSON.stringify(param))
                             setLoadingButtonPayment(true)
                             setisDisabledButtonPayment(true)
                             Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -1779,7 +1875,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 <div className="grid grid-cols-3 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
                                     <div className="col-span-2">
                                     <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
+                                        
                                         <>
+                                        {/* CONTENT TABLE SALES */}
                                         <div className="mt-3 datatables">
                                             <DataTable
                                                 noRecordsText="No results match your search query"
