@@ -178,6 +178,17 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         GetMasterProdukByKodeGerai(res_host,res_PORT_LOGIN,kode_gerai,true)
     },[]);
 
+    // ini dipanggil otomatis setiap kali data_rows berubah
+    useEffect(() => {
+        if (data_rows.length > 0) {
+            recalculateTotals(data_rows);
+        }else{
+            setTotalBelanja('0')
+            setTotalDiscount('0')
+            setGrandTotal('0')
+        }
+    }, [data_rows]);
+
     const formatRupiah = (value: number | string) =>
         new Intl.NumberFormat("id-ID", {
         style: "currency",
@@ -818,24 +829,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const deleteRow = (idToRemove: number) => {
         setData_rows((prev) => {
             const updated = prev.filter((row) => row.id !== idToRemove);
-            recalculateTotals(updated); // recalculate after filtering
+            //recalculateTotals(updated); // recalculate after filtering
             return updated;
         });
         // setarr_input_item((prev) => {
         //     const updated = prev.filter((item) => item.id !== idToRemove); 
         //     return updated;
         // });
-    };    
-    const ActMinus = () => {
-        const val = value6 > 0 ? value6 - 1 : 0
-        console.log('val - : '+val)
-        setValue6(val);
-    }
-    const ActPlus = () => {
-        const val = value6 < 100 ? value6 + 1 : 100
-        console.log('val + : '+val)
-        setValue6(val);
-    }
+    };
     const Def_Column_Transaksi_Inventory = () => {
         var cols = [
                 {
@@ -1080,9 +1081,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 if(res_kode_barang !== '' || res_satuan !== '' || res_deskripsi !== '' || res_qty !== '' || res_hpp !== '' || res_gross !== ''){
                     const obj = {"id":GetID(),"KODE_BARANG":res_kode_barang,"DESKRIPSI":res_deskripsi,"SATUAN":res_satuan,"QTY":res_qty,"DISKON":res_diskon,"PRICE":res_amount,"GROSS":res_gross}
                     // langsung append ke state, tidak perlu if/else
-                    setData_rows((prev) => [...prev, obj]);
-                  
-                    //console.log(JSON.stringify(arr_input_item))
+                    //setData_rows((prev) => [...prev, obj]);
+                    setData_rows(prev => {
+                        const updated = [...prev, obj];
+                        return updated;
+                    });
                 }else{
 
                 }
@@ -1090,22 +1093,35 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 //-- jika item sudah ada di list --//
             }else{
                 //-- update qty, diskon, price --//
-                data_rows[objIndex].id = GenerateUniqNumber();
-                data_rows[objIndex].KODE_BARANG = res_kode_barang;
-                data_rows[objIndex].DESKRIPSI = res_deskripsi;
-                data_rows[objIndex].SATUAN = res_satuan;
-
-              
-                
-                data_rows[objIndex].QTY = res_qty;
-                data_rows[objIndex].DISKON = res_diskon;
-                data_rows[objIndex].PRICE = res_amount;
-                data_rows[objIndex].GROSS = res_gross;
-                // var rows = data_rows;
-                // setData_rows(rows)
+                // data_rows[objIndex].id = GenerateUniqNumber();
+                // data_rows[objIndex].KODE_BARANG = res_kode_barang;
+                // data_rows[objIndex].DESKRIPSI = res_deskripsi;
+                // data_rows[objIndex].SATUAN = res_satuan;
+                // data_rows[objIndex].QTY = res_qty;
+                // data_rows[objIndex].DISKON = res_diskon;
+                // data_rows[objIndex].PRICE = res_amount;
+                // data_rows[objIndex].GROSS = res_gross;
+                setData_rows(prev => {
+                    const updated = prev.map((item, index) =>
+                    index === objIndex
+                        ? {
+                            ...item,
+                            id: GenerateUniqNumber(),
+                            KODE_BARANG: res_kode_barang,
+                            DESKRIPSI: res_deskripsi,
+                            SATUAN: res_satuan,
+                            QTY: res_qty,
+                            DISKON: res_diskon,
+                            PRICE: res_amount,
+                            GROSS: res_gross
+                        }
+                        : item
+                    );
+                    return updated;
+                });
             }
-
-           
+            //recalculateTotals(data_rows);
+            /*
             //-- summary --//
             // Filter hanya data dengan PRICE valid
             const valid_price = data_rows.filter(item => item.PRICE !== null && !isNaN(item.PRICE));
@@ -1125,10 +1141,14 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
             //console.log('res_total_diskon',res_total_diskon)
             const res_subtotal =  res_grand_total + res_total_diskon
             const res_grand_total_final = res_grand_total + parseFloat(BiayaOngkir.split(',').join(''))
-            //console.log('res_subtotal',res_subtotal)
+            console.log('res_subtotal : ',GetFormatCurrency(res_subtotal.toString()))
+            console.log('res_total_diskon : ',GetFormatCurrency(res_total_diskon.toString()))
+            console.log('res_grand_total_final : ',GetFormatCurrency(res_grand_total_final.toString()))
             setTotalBelanja(GetFormatCurrency(res_subtotal.toString()))
             setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
             setGrandTotal(GetFormatCurrency(res_grand_total_final.toString()))
+            */
+           
         }catch(Ex){
             Swal.fire({
                 title: t("Warning"),
