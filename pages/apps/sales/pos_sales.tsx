@@ -17,7 +17,7 @@ const Pos_Sales = () => {
     });
     return(
         <>
-            <div className="mb-5">
+            {/* <div className="mb-5">
             <ul className="flex space-x-2 rtl:space-x-reverse">
                  <li>{t('Sales')}</li>
                 <Link href="/apps/sales/pos_sales/" className="text-primary hover:underline">    
@@ -26,7 +26,7 @@ const Pos_Sales = () => {
                 </li>
                 </Link>
             </ul>
-            </div>
+            </div> */}
             <FormSales IDReport="Pos Sales" 
                                     url={``}
                                     jenis={'2'}

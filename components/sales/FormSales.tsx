@@ -45,6 +45,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { ref } from "yup";
 import IconMinus from "../Icon/IconMinus";
 import { parse } from "path";
+import IconMenuDatatables from "../Icon/Menu/IconMenuDatatables";
 
 interface FormSalesProps {
     url: string,
@@ -106,6 +107,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const input2Ref = useRef(null);
     const input3Ref = useRef(null);
     const input4Ref = useRef(null);
+    const input5Ref = useRef(null);
+    const input6Ref = useRef(null);
+    const input7Ref = useRef(null);
+    const input8Ref = useRef(null);
+    const input9Ref = useRef(null);
     const MySwal = withReactContent(Swal);
     const router = useRouter();
     const [modal13, setModal13] = useState(false);
@@ -293,7 +299,13 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     };
     const FormInputKodeBarang = (value: any) => {var val = value.target.value;setIN_KODE_BARANG(val); };
     const FormInputDiskonMarketPlace = (value: any) => {
-        var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setDiskonMarketPlace(val_currency);
+        var val = value.target.value;
+        if(val.length === 1 && val === '0'){
+            setDiskonMarketPlace('');
+        }else{
+            
+        }
+        const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number); setDiskonMarketPlace(val_currency);
         const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
                                         - parseFloat(TotalDiscount.split(',').join(''))
                                         - parseFloat((val === '' ? '0' : val.split(',').join('') ) )
@@ -302,40 +314,45 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
     const FormInputBiayaOngkir = (value: any) => {
         var val = value.target.value;
-        const validate_number = validateNumber(val);
-        const val_currency = GetFormatCurrency(validate_number);
-        //console.log(val_currency);
-        setBiayaOngkir(val_currency === '' ? '0' : val_currency);
-        const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
-                                        - parseFloat(TotalDiscount.split(',').join('')) 
-                                        - parseFloat(DiskonMarketPlace.split(',').join('')) 
-                                        + parseFloat(val.split(',').join(''))
-
-        setGrandTotal(isNaN(res_grand_total_final) ? '0' : GetFormatCurrency(res_grand_total_final.toString()));
-        //-- calculate bayar --//
-        const bayar = parseFloat(IN_BAYAR.split(',').join(''))
-        const grand_total = parseFloat(GrandTotal.split(',').join(''))
-        if(bayar < grand_total){
-            MySwal.fire({
-                title: t("Pembayaran harus lebih besar atau sama dengan Grand Total"),
-                toast: true,
-                position: 'top',
-                showConfirmButton: false,
-                timer: 5000,
-                showCloseButton: true,
-                customClass: {
-                    popup: `color-warning`,
-                },
-            });
-            setIN_KEMBALIAN('0');
-            setisDisabledButtonPayment(true)
-            return;
+        if(val.length === 1 && val === '0'){
+            setBiayaOngkir('0');
         }else{
-            const res_kembalian = bayar - grand_total;
-            //console.log('res_kembalian : '+res_kembalian)
-            setIN_KEMBALIAN(GetFormatCurrency(res_kembalian.toString()));
-            setisDisabledButtonPayment(false)
+            const validate_number = validateNumber(val);
+            const val_currency = GetFormatCurrency(validate_number);
+            //console.log(val_currency);
+            setBiayaOngkir(val_currency === '' ? '' : val_currency);
+            const res_grand_total_final = parseFloat(TotalBelanja.split(',').join('')) 
+                                            - (TotalDiscount === '' ? 0 : parseFloat(TotalDiscount.split(',').join(''))) 
+                                            - parseFloat(DiskonMarketPlace.split(',').join('')) 
+                                            + (val === '' ? 0 : parseFloat(val.split(',').join('')))
+
+            setGrandTotal(isNaN(res_grand_total_final) ? '0' : GetFormatCurrency(res_grand_total_final.toString()));
+            //-- calculate bayar --//
+            const bayar = parseFloat(IN_BAYAR.split(',').join(''))
+            const grand_total = parseFloat(GrandTotal.split(',').join(''))
+            if(bayar < grand_total){
+                MySwal.fire({
+                    title: t("Pembayaran harus lebih besar atau sama dengan Grand Total"),
+                    toast: true,
+                    position: 'top',
+                    showConfirmButton: false,
+                    timer: 5000,
+                    showCloseButton: true,
+                    customClass: {
+                        popup: `color-warning`,
+                    },
+                });
+                setIN_KEMBALIAN('0');
+                setisDisabledButtonPayment(true)
+                return;
+            }else{
+                const res_kembalian = bayar - grand_total;
+                //console.log('res_kembalian : '+res_kembalian)
+                setIN_KEMBALIAN(GetFormatCurrency(res_kembalian.toString()));
+                setisDisabledButtonPayment(false)
+            }
         }
+        
     }
     const FormInputBayar = (value: any) => {var val = value.target.value;const validate_number = validateNumber(val); const val_currency = GetFormatCurrency(validate_number);
         setIN_BAYAR(val_currency); 
@@ -379,6 +396,42 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     const FormInputNoWhatsApp = (value: any) => {var val = value.target.value;setIN_NO_WHATSAPP(val); };
     const SubmitPayment = () => {
         input4Ref.current.focus();
+    }
+    const EvtToShipping = (e: { key: string; }) => {
+        if(e.key === 'Enter'){
+            input5Ref.current.focus();
+        }else{
+
+        }
+    }
+    const EvtToPayment = (e: { key: string; }) => {
+        if(e.key === 'Enter'){
+            input6Ref.current.focus();
+        }else{
+
+        }
+    }
+    const EvtToMethod = (e: { key: string; }) => {
+        if(e.key === 'Enter'){
+            input7Ref.current.focus();
+        }else{
+            
+        }
+    }
+    const EvtToBank = (e: { key: string; }) => {
+        if(e.key === 'Enter'){
+            input8Ref.current.focus();
+        }
+    }
+    const EvtToWhatsApp = (e: { key: string; }) => {
+        if(e.key === 'Enter'){
+            input9Ref.current.focus();
+        }
+    }
+    const EvtToSubmit = (e: { key: string; }) => {
+        if(e.key === 'Enter'){
+            InsPosTransaksiSales()
+        }
     }
     const KeyItem = (e: { key: string; }) => {
         if (e.key === 'Enter') {
@@ -802,7 +855,6 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }   
 
     const recalculateTotals = (IN_DATA_ROWS:any) => {
-        
         //-- summary --//
         // Filter hanya data dengan PRICE valid
         const valid_price = IN_DATA_ROWS.filter((item: { PRICE: number; }) => item.PRICE !== null && !isNaN(item.PRICE));
@@ -820,7 +872,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         }, 0);
         //console.log('res_total_diskon : ',res_total_diskon)
         const res_subtotal =  res_grand_total + res_total_diskon
-        const res_grand_total_final = res_grand_total + parseFloat(BiayaOngkir.split(',').join(''))
+        const res_grand_total_final = res_grand_total + (BiayaOngkir === '' ? 0 : parseFloat(BiayaOngkir.split(',').join('')) )
         //console.log('res_subtotal : ',res_subtotal)
         setTotalBelanja(GetFormatCurrency(res_subtotal.toString()))
         setTotalDiscount(GetFormatCurrency(res_total_diskon.toString()))
@@ -857,7 +909,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 },
                 {
                     accessor: 'DESKRIPSI',
-                    title: 'DESCRIPTION'
+                    title: 'DESCRIPTION',
                 },
                 {
                     accessor: 'SATUAN',
@@ -1033,11 +1085,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setIN_TOTAL_BELANJA('')
         setIN_BAYAR('')
         setIN_KEMBALIAN('')
-        setBiayaOngkir('0')
+        setBiayaOngkir('')
         setIN_BANK('')
         setIN_METODE_PEMBAYARAN('')
         setIN_SHIFT('')
-        setDiskonMarketPlace('0')
+        setDiskonMarketPlace('')
         setIN_BARCODE('')
         setIN_GENERATE_KODE_TRANSAKSI_INVENTORY('')
         setIN_NO_WHATSAPP('')
@@ -1814,29 +1866,29 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         <>
             <AntiScrapedShieldComponent in_content={
                 <>
-                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={IDReport === 'Initial' ? <IconLogin /> : <IconShoppingCart />} in_style_card={"mt-6 panel rounded-3xl"} in_judul={IDReport} in_content={
+                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={IDReport === 'Initial' ? <IconLogin /> : <IconShoppingCart />} in_style_card={"panel rounded-3xl"} in_judul={IDReport} in_content={
                         <>
-                        <div className="flex items-center p-3.5 rounded text-warning bg-danger-light dark:bg-danger-dark-light">
+                        {/* <div className="flex items-center p-3.5 rounded text-warning bg-danger-light dark:bg-danger-dark-light">
                             <span className="ltr:pr-2 rtl:pl-2">
                                 <strong className="ltr:mr-1 rtl:ml-1">Peringatan!</strong>{t('Note: mohon teliti dan pastikan kembali pada saat proses input sales!')}
                             </span>
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-1 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-3">
                             {
                                 IN_IS_GERAI === '0' ?
                                 <>
                                 <div>
-                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1"} in_classname_content={"w-full"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
+                                <DropDownGlobal in_is_clear={false}in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full text-xs"} data_options={OptionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGeraiMutasi} name_component={"Gerai"} idComponent={"gerai"} />
                                 </div>
                                 <div>
-                                <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
+                                <InputTextType in_title={"Address"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full text-xs"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
                                 </div>
                                 {
                                     IDReport === 'Initial' ?
                                     ''
                                     :
                                     <div>
-                                        <InputTextType in_title={"Initial Code"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputInitialCode} in_value={IN_KODE_INITIAL} />
+                                        <InputTextType in_title={"Initial Code"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full text-xs"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs"} data_options={undefined} isDisabled={true} event={FormInputInitialCode} in_value={IN_KODE_INITIAL} />
                                     </div>
                                 }
                                
@@ -1844,10 +1896,10 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                 :
                                 <>
                                 <div>
-                                <InputTextType in_title={"Gerai"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiMutasi} in_value={IN_KODE_GERAI} />
+                                <InputTextType in_title={"Gerai"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs"} data_options={undefined} isDisabled={true} event={FormInputKodeGeraiMutasi} in_value={IN_KODE_GERAI} />
                                 </div>
                                 <div>
-                                <InputTextType in_title={"Address"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
+                                <InputTextType in_title={"Address"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-xs"} data_options={undefined} isDisabled={true} event={FormInputAlamat} in_value={IN_ALAMAT} />
                                 </div>
                                 {
                                     IDReport === 'Initial' ?
@@ -1892,10 +1944,9 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             {
                                 isEnabledContentSales ? 
                                 <>
-                                <div className="grid grid-cols-3 gap-3 mt-3 lg:grid-cols-3 md:grid-cols-2">
+                                <div className="grid grid-cols-3 gap-3 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 xs:grid-cols-2">
                                     <div className="col-span-2">
-                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl"} in_judul={"Input Item"} in_content={
-                                        
+                                    <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconMenuDatatables />} in_style_card={"panel rounded-3xl"} in_judul={"Data Item"} in_content={
                                         <>
                                         {/* CONTENT TABLE SALES */}
                                         <div className="mt-3 datatables">
@@ -1924,7 +1975,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                     </div>
                                                     <div className="flex items-center text-lg">
                                                         <div className="flex-1">Shipping :</div>
-                                                        <div className="w-[37%]">{BiayaOngkir}</div>
+                                                        <div className="w-[37%]">{BiayaOngkir === '' ? 0 : BiayaOngkir}</div>
                                                     </div>
                                                     <div className="flex items-center text-xl font-semibold">
                                                         <div className="flex-1">Grand Total :</div>
@@ -1948,7 +1999,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     />
                                     </div>
                                     {/* FORM INPUT ITEM  */}
-                                    <div className="col-span-1">
+                                    <div className="lg:col-span-1 md:col-span-2 sm:col-span-2 xs:col-span-2">
                                         <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconPlusCircle />} in_style_card={"panel rounded-3xl h-fit"} in_judul={"Input Item"} in_content={
                                             <>
                                             <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1 sm-grid-cols-1">
@@ -2013,23 +2064,23 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                         {/* INPUT PAYMENT */}
                                         <CardComponent in_style_font_judul={"text-md font-semibold dark:text-white-light"} in_icon={<IconCreditCard />} in_style_card={"panel rounded-3xl h-fit mt-3"} in_judul={"Input Payment"} in_content={
                                             <>
-                                            <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                            <div className="grid gap-1 lg:grid-cols-2 md:grid-cols-2">
                                                 <div className="sm:grid-cols-1">
-                                                <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={null}/>
+                                                <InputTextTypeKeyDown   in_title={"Discount Market Place"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputDiskonMarketPlace} in_value={DiskonMarketPlace} in_ref={input4Ref} in_event_keydown={EvtToShipping}/>
                                                 </div>
                                                 <div  className="sm:grid-cols-1">
-                                                <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={null} in_event_keydown={null}/>
+                                                <InputTextTypeKeyDown   in_title={"Shipping"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBiayaOngkir} in_value={BiayaOngkir} in_ref={input5Ref} in_event_keydown={EvtToPayment}/>
                                                 </div>
                                                 <div  className="sm:grid-cols-1">
-                                                <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={null} in_event_keydown={FormInputBayar}/>
+                                                <InputTextTypeKeyDown   in_title={"Payment"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputBayar} in_value={IN_BAYAR} in_ref={input6Ref} in_event_keydown={EvtToMethod}/>
                                                 </div>
                                                 <div  className="sm:grid-cols-1">
-                                                <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
+                                                <InputTextType   in_title={"Cashback"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-lg"} data_options={undefined} isDisabled={true} event={FormInputKembalian} in_value={IN_KEMBALIAN} />
                                                 </div>
                                             </div>
-                                            <div className="grid gap-3 lg:grid-cols-2 md:grid-cols-2">
+                                            <div className="grid gap-1 lg:grid-cols-2 md:grid-cols-2">
                                                 <div>
-                                                    <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Method")}</label></div>
+                                                    <div className={"mb-1 text-xs"}><label htmlFor={GetID()}>{t("Method")}</label></div>
                                                     <div className="mb-3">
                                                         <div className={"w-full text-xs"}>
                                                             <Select
@@ -2041,13 +2092,15 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                                 isSearchable={true}
                                                                 isClearable={false}
                                                                 value={selectedOption}
+                                                                ref={input7Ref}
+                                                                onKeyDown={EvtToBank}
                                                                 //defaultValue={defaultOption}
                                                             />
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <div className={"mb-1 mt-5 text-xs"}><label htmlFor={GetID()}>{t("Payment via")}</label></div>
+                                                    <div className={"mb-1 text-xs"}><label htmlFor={GetID()}>{t("Payment via")}</label></div>
                                                     <div className="mb-3">
                                                         <div className={"w-full text-xs"}>
                                                             <Select
@@ -2059,23 +2112,25 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                                                 isSearchable={true}
                                                                 isClearable={false}
                                                                 value={selectedBankOption}
+                                                                ref={input8Ref}
+                                                                onKeyDown={EvtToWhatsApp}
                                                                 //defaultValue={defaultOption}
                                                             />
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="col-span-2">
-                                                <InputTextType in_title={"No.WhatsApp (Ex. 6281216854443)"} in_classname_title={"mb-1"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} />
+                                                <div>
+                                                <InputTextTypeKeyDown in_title={"No.WhatsApp"} in_classname_title={"mb-1 text-xs"} in_classname_content={"w-full"} in_classname_sub_content={"form-input placeholder:text-white-dark disabled:bg-gray-200 rounded-3xl text-right text-xs"} data_options={undefined} isDisabled={false} event={FormInputNoWhatsApp} in_value={IN_NO_WHATSAPP} in_ref={input9Ref} in_event_keydown={EvtToSubmit} />
+                                                </div>
+                                                <div>
+                                                <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs mt-4.5' : 'btn btn-outline-danger w-full rounded-full text-xs mt-4.5'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
                                                 </div>
                                             </div>
-                                            <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
+                                            {/* <div className="grid gap-3 lg:grid-cols-1 md:grid-cols-1">
                                                 <div>
                                                 <ButtonAdd in_classname={!isDark ? 'btn btn-danger w-full rounded-full text-end text-xs' : 'btn btn-outline-danger w-full rounded-full text-xs'} idComponent={"btn_payment"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconDollarSignCircle />} in_title_button={'Payment'} HandleClick={InsPosTransaksiSales} />
                                                 </div>
-                                                {/* <div>
-                                                <ButtonAdd in_classname={!isDark ? 'btn btn-info w-full rounded-full text-end text-xs' : 'btn btn-outline-info w-full rounded-full text-xs'} idComponent={"btn_cetak_struk"} isLoading={LoadingButtonPayment} isDisabled={isDisabledButtonPayment} in_icon={<IconPrinter />} in_title_button={'Print Receipt'} HandleClick={GenerateReceiptStruk} />
-                                                </div> */}
-                                            </div>
+                                            </div> */}
                                             </>
                                         } />
                                     </div>

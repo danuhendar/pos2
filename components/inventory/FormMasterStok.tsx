@@ -357,6 +357,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'SATUAN',
                     title: 'SATUAN',
                     sortable: true,
+                    width: 97, // fixed width
                     render: ({ SATUAN }) => (
                         <div className="flex items-center gap-2">
                             <div className="font-semibold">{SATUAN}</div>
@@ -404,7 +405,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'SALES',
                     title: 'SLS',
                     sortable: true,
-                    width: 100, // fixed width
+                    width: 80, // fixed width
                     render: ({ SALES }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{SALES}</div>
@@ -415,7 +416,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RUSAK',
                     title: 'RUSAK',
                     sortable: true,
-                    width: 100, // fixed width
+                    width: 95, // fixed width
                     render: ({ RUSAK }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{RUSAK}</div>
@@ -426,7 +427,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'HILANG',
                     title: 'HILANG',
                     sortable: true,
-                    width: 100, // fixed width
+                    width: 98, // fixed width
                     render: ({ HILANG }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{HILANG}</div>
@@ -437,7 +438,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'TRANSFER_GERAI',
                     title: 'TF_GERAI',
                     sortable: true,
-                    width: 140, // fixed width
+                    width: 120, // fixed width
                     render: ({ TRANSFER_GERAI }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{TRANSFER_GERAI}</div>
@@ -458,7 +459,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RETUR_SALES',
                     title: 'RETSLS',
                     sortable: true,
-                    width: 120, // fixed width
+                    width: 110, // fixed width
                     render: ({ RETUR_SALES }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-success text-md`}>{RETUR_SALES}</div>
@@ -469,7 +470,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RETUR_DC',
                     title: 'RETDC',
                     sortable: true,
-                    width: 100, // fixed width
+                    width: 95, // fixed width
                     render: ({ RETUR_DC }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{RETUR_DC}</div>
@@ -480,7 +481,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'RETUR_SUPPLIER',
                     title: 'RETSUP',
                     sortable: true,
-                    width: 120, // fixed width
+                    width: 110, // fixed width
                     render: ({ RETUR_SUPPLIER }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-danger text-md`}>{RETUR_SUPPLIER}</div>
@@ -491,7 +492,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     accessor: 'VOID_SALES',
                     title: 'VOID',
                     sortable: true,
-                    width: 100, // fixed width
+                    width: 95, // fixed width
                     render: ({ VOID_SALES }) => (
                         <div className="flex items-center gap-2">
                             <div className={`badge badge-outline-success text-md`}>{VOID_SALES}</div>
@@ -501,7 +502,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                 {
                     accessor: 'SALDO_AKHIR',
                     title: 'AKHIR',
-                    width: 120, // fixed width
+                    width: 100, // fixed width
                     sortable: true,
                     render: ({ SALDO_AKHIR }) => (
                         <div className="flex items-center gap-2">
