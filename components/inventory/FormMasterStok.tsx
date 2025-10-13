@@ -45,11 +45,13 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
     const [Title,setTitle] = useState('')
     const [IN_TAHUN,setIN_TAHUN] = useState('')
     const [IN_BULAN,setIN_BULAN] = useState('')
+    const [IN_OPTION_REPORT,setIN_OPTIONS_REPORT] = useState(false)
     const [IN_KODE_GERAI,setIN_KODE_GERAI] = useState('')
 
     const [optionsTahun,setOptionsTahun] = useState([])
     const [optionsBulan,setOptionsBulan] = useState([])
     const [optionsGerai,setOptionsGerai] = useState([])
+    const [optionsReport,setOptionsReport] = useState([])
 
     const [IN_TAHUN_MUTASI,setIN_TAHUN_MUTASI] = useState('')
     const [IN_BULAN_MUTASI,setIN_BULAN_MUTASI] = useState('')
@@ -71,12 +73,14 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         GetTahun()
         GetBulan()
         GetMasterGerai(res_host,res_PORT_LOGIN)
+        GetOpsiReport()
     },[]);
-
+  
    
     const FormInputKodeGerai  = (value: any) => {var val = value.value;setIN_KODE_GERAI(val);  };
     const FormInputTahun = (value: any) => {var val = value.value;setIN_TAHUN(val);  }; 
     const FormInputBulan = (value: any) => {var val = value.value;setIN_BULAN(val);  }; 
+    const FormInputOptionsReport = (value: any) => {var val = value.value;setIN_OPTIONS_REPORT(val); };
 
     const FormInputKodeGeraiMutasi  = (value: any) => {var val = value.value;setIN_KODE_GERAI_MUTASI(val);  };
     const FormInputTahunMutasi = (value: any) => {var val = value.value;setIN_TAHUN_MUTASI(val);  }; 
@@ -105,6 +109,15 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         }
         setOptionsBulan(arr_)
         setOptionsBulanMutasi(arr_)
+    }
+    const GetOpsiReport = () =>{
+        var arr_ = []
+        const obj = {"label":"Summary","value":true};
+        arr_.push(obj)
+        const obj2 = {"label":"Detail","value":false};
+        arr_.push(obj2)
+        
+        setOptionsReport(arr_)
     }
 
     const GetMasterGerai = (in_host:string,in_port:number) => {
@@ -159,11 +172,11 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         });
     }
 
-    const GetPosMasterStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string,in_export:boolean) => {
+    const GetPosMasterStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string,in_export:boolean,in_summary:boolean) => {
         setData_rows_Kategori([])
         setData_columns_Kategori([])
         let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMasterStok`
-        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export}
+        let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export,"IN_SUMMARY":in_summary}
         const Token = GetToken()
         setLoadingButton(true)
         if(in_export){
@@ -191,7 +204,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     if(rows.length > 0){
                         var res_rows = AddID(rows)
                         setData_rows_Kategori(res_rows)
-                        var cols = Def_Column_MasterStok()
+                        var cols = Def_Column_MasterStok(in_summary)
                         setData_columns_Kategori(cols)
                     }else{
                         MySwal.fire({
@@ -329,8 +342,89 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
         }
     }
 
-    const Def_Column_MasterStok = () => {
-        var cols = [
+    const Def_Column_MasterStok = (in_summary:boolean) => {
+        var cols = []
+        if(in_summary){
+            cols = [
+                {
+                    accessor: 'KODE_BARANG',
+                    title: 'CODE',
+                    sortable: true,
+                    render: ({ KODE_BARANG }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{KODE_BARANG}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'DESKRIPSI',
+                    title: 'CONTENT',
+                    sortable: true,
+                    width: 120, // fixed width
+                    render: ({ DESKRIPSI }) => (
+                        
+                        <div className="flex items-center gap-2" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
+                            <div className="font-semibold">{DESKRIPSI}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SATUAN',
+                    title: 'SATUAN',
+                    sortable: true,
+                    width: 97, // fixed width
+                    render: ({ SATUAN }) => (
+                        <div className="flex items-center gap-2">
+                            <div className="font-semibold">{SATUAN}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SALDO_AWAL',
+                    title: 'AWAL',
+                    sortable: true,
+                    
+                    render: ({ SALDO_AWAL }) => (
+                        <div className="flex items-center gap-2">
+                            <div className={`badge badge-outline-warning text-md`}>{SALDO_AWAL}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'TRANSAKSI_MASUK',
+                    title: 'TRANSAKSI_MASUK',
+                    sortable: true,
+                    
+                    render: ({ TRANSAKSI_MASUK }) => (
+                        <div className="flex items-center gap-2">
+                            <div className={`badge badge-outline-success text-md`}>{TRANSAKSI_MASUK}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'TRANSAKSI_KELUAR',
+                    title: 'TRANSAKSI_KELUAR',
+                    sortable: true,
+                    
+                    render: ({ TRANSAKSI_KELUAR }) => (
+                        <div className="flex items-center gap-2">
+                            <div className={`badge badge-outline-danger text-md`}>{TRANSAKSI_KELUAR}</div>
+                        </div>
+                    ),
+                },
+                {
+                    accessor: 'SALDO_AKHIR',
+                    title: 'AKHIR',
+                    sortable: true,
+                    render: ({ SALDO_AKHIR }) => (
+                        <div className="flex items-center gap-2">
+                            <div className={`badge badge-outline-primary text-md`}>{SALDO_AKHIR}</div>
+                        </div>
+                    ),
+                }
+            ];
+        }else{
+            cols = [
                 {
                     accessor: 'KODE_BARANG',
                     title: 'CODE',
@@ -511,7 +605,9 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                     ),
                 }
             ];
-            return  cols;
+        }
+        
+        return  cols;
     }
 
     const Def_Column_MutasiStok = () => {
@@ -615,7 +711,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
             if(IN_TAHUN === '' || IN_BULAN === '' || IN_KODE_GERAI === ''){
 
             }else{
-                GetPosMasterStok(IN_TAHUN, IN_BULAN, IN_KODE_GERAI,false)
+                GetPosMasterStok(IN_TAHUN, IN_BULAN, IN_KODE_GERAI,false,IN_OPTION_REPORT === true ? true : false)
             }
         }else{
             if(IN_TAHUN === '' || IN_BULAN === '' || IN_KODE_GERAI === ''){
@@ -627,13 +723,13 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
     };
 
     const GetData = () => {
-        GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,false)
+        GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,false,IN_OPTION_REPORT === true ? true : false)
         GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,false)
     }
 
     const ExportExcel = () => {
         if(Tabs === 'master'){
-            GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,true)
+            GetPosMasterStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,true,IN_OPTION_REPORT === true ? true : false)
         }else{
             GetPosMutasiStok(IN_TAHUN,IN_BULAN,IN_KODE_GERAI,true)
         }
@@ -655,6 +751,9 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
                         </div>
                         <div>
                         <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsGerai} isSearchable={true} isMulti={false} event={FormInputKodeGerai} name_component={"Gerai"} idComponent={"gerai"} />
+                        </div>
+                        <div>
+                        <DropDownGlobal in_is_clear={false}in_classname_title={"mb-3"} in_classname_content={"w-full"} data_options={optionsReport} isSearchable={true} isMulti={false} event={FormInputOptionsReport} name_component={"Opsi Report"} idComponent={"opsi_report"} />
                         </div>
                         <div>
                         <label>&nbsp;</label>
