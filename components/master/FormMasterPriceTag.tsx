@@ -209,7 +209,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
 
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `https://${IN_HOST}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {

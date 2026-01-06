@@ -250,7 +250,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
 
     const GetMasterSupplier = (in_host:string,in_port:number) => {
         setOptions6([])
-        let url = `https://${IN_HOST}/api/v2/GetMasterSupplier`
+        let url = `https://${in_host}/api/v2/GetMasterSupplier`
         let param = {"IN_KODE_SUPPLIER":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {

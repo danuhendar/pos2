@@ -338,7 +338,7 @@ const FormMasterSupplier: React.FC<FormMasterSupplierProps> = ({ url, command, I
         let param = {}
         var cols = []
         if(IDReport === 'Master Supplier'){
-            url = `https://${IN_HOST}/api/v2/GetMasterSupplier`
+            url = `https://${in_host}/api/v2/GetMasterSupplier`
             param = {"IN_KODE_SUPPLIER":"%"}
             cols = Def_Column_MasterSupplier()
         }else{

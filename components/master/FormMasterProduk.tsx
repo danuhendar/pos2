@@ -897,7 +897,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         if(Tabs === 'produk'){
             setData_rows([])
             setData_columns([])
-            url = `https://${IN_HOST}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+            url = `https://${in_host}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
             param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":"G%"}
             cols = Def_Column_MasterProduk()
         }else{
