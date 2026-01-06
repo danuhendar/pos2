@@ -22,8 +22,6 @@ import InputTextTypeKeyDown from "../form/InputTypeTextKeyDown";
 import { DataTable } from "mantine-datatable";
 import IconSave from "../Icon/IconSave";
 import Flatpickr from "react-flatpickr";
-import "flatpickr/dist/flatpickr.css";
-import { set } from 'lodash';
 
 interface FormTerimaBarangMasukProps {
     url: string,
@@ -149,7 +147,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
 
     const GetMasterCabang = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+        let url = `https://${in_host}/api/v2/GetMasterCabang`
         let param = {"":""}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -201,7 +199,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
 
     const GetMasterProdukByKodeProdukAndKodeGerai = (in_kode_gerai:string) => {
         setoptionsItem([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+        let url = `https://${IN_HOST}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
         let param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":in_kode_gerai}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -252,7 +250,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
 
     const GetMasterSupplier = (in_host:string,in_port:number) => {
         setOptions6([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterSupplier`
+        let url = `https://${IN_HOST}/api/v2/GetMasterSupplier`
         let param = {"IN_KODE_SUPPLIER":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -303,7 +301,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptionsGerai([])
         setOptionsGeraiMutasi([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -353,7 +351,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     }
 
     const GetMasterProdukByBarcode = async () => {
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByBarcode`
+        let url = `https://${IN_HOST}/api/v2/GetMasterProdukByBarcode`
         let param = {"IN_BARCODE":IN_BARCODE,"IN_KODE_GERAI":IN_TUJUAN}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -506,7 +504,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
     }
 
     const GetGenerateKodeTransaksiInventory = () => {
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeTransaksiInventory`
+        let url = `https://${IN_HOST}/api/v2/GetGenerateKodeTransaksiInventory`
         let param = {}
         const Token = GetToken()
         return new Promise((resolve,reject)=>{
@@ -545,7 +543,7 @@ const FormTerimaBarangMasuk: React.FC<FormTerimaBarangMasukProps> = ({ url, jeni
                 if (result.isConfirmed) {
                     GetGenerateKodeTransaksiInventory().then((d)=>{
                         const kode_transaksi_inventory = d;
-                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiInventory`
+                        let url = `https://${IN_HOST}/api/v2/InsPosTransaksiInventory`
                         const date = new Date(date2)
                         const tahun = date.getFullYear()
                         const bulan = date.getMonth()

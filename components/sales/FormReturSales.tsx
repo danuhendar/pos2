@@ -134,7 +134,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
     
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -256,7 +256,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
     const GetDataTransaksiInventoryByNoStruk = () => {
         setData_rows([])
         setisContentDataSales(false);
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
+        let url = `https://${IN_HOST}/api/v2/GetDataTransaksiInventoryByNoStruk`
         let param = {"IN_NO_STRUK":IN_NO_STRUK,"IN_IS_STATUS":"1","IN_JENIS":parseFloat(jenis)}
         const Token = GetToken()
         setLoadingButton(true)
@@ -330,7 +330,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
         });
     }
     const GetGenerateKodeTransaksiInventory = () => {
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeTransaksiInventory`
+        let url = `https://${IN_HOST}/api/v2/GetGenerateKodeTransaksiInventory`
         let param = {}
         const Token = GetToken()
         return new Promise((resolve,reject)=>{
@@ -384,7 +384,7 @@ const FormReturSales: React.FC<FormReturSalesProps> = ({ url, jenis, IDReport })
                         }
                         detail.push(obj)
                     }
-                    let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosReturSales`
+                    let url = `https://${IN_HOST}/api/v2/InsPosReturSales`
                     let param = {"IN_KODE_TRANSAKSI":kode_transaksi_inventory,"IN_NO_STRUK":IN_NO_STRUK,"IN_KETERANGAN_RETUR":IN_KETERANGAN_RETUR,"IN_JENIS":parseFloat(jenis),"IN_DETAIL":detail,"IN_KODE_GERAI":IN_KODE_GERAI,"IN_TANGGAL":get_format_tanggal_jam(),"IN_NIK_PEMBUAT":IN_NIK_PEMBUAT,"IN_NAMA_PEMBUAT":IN_NAMA_PEMBUAT,"IN_OTORISATOR":themeConfig.versi_app}
                     console.log("param : "+JSON.stringify(param))
                     console.log("url : "+url)

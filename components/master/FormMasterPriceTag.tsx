@@ -103,7 +103,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
 
     const GetMasterProdukByKodeKategori = (val_kategori:string) => {
         setOptions8([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeKategori`
+        let url = `https://${IN_HOST}/api/v2/GetMasterProdukByKodeKategori`
         let param = {"IN_KODE_KATEGORI":val_kategori,"IN_KODE_GERAI":IN_KODE_GERAI}
         const Token = GetToken()
          Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -154,7 +154,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
     }
     
     const GetMasterKategoriProduk = (in_host:string,in_port:number) => {
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterKategoriProduk`
+        let url = `https://${IN_HOST}/api/v2/GetMasterKategoriProduk`
         let param = {"IN_KODE_KATEGORI":"%"}
         const Token = GetToken()
       
@@ -209,7 +209,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
 
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${IN_HOST}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -258,7 +258,7 @@ const FormMasterPriceTag: React.FC<FormMasterPriceTagProps  > = ({ url, command,
     }
 
     const GetMasterPricetag = () => {
-        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterPricetag`
+        const url = `https://${IN_HOST}/api/v2/GetMasterPricetag`
         const param = {"IN_KODE_KATEGORI":IN_KATEGORI,"IN_KODE_GERAI":IN_KODE_GERAI,"IN_TIPE":IN_TIPE,"IN_KODE_BARANG":IN_KODE_BARANG,"IN_QTY_CETAK":IN_QTY_CETAK}
         const Token = GetToken()
         const Namafile = `pricetag_${get_format_tanggal_jam_format_indo().split('-').join('').split(':').join('')}_${IN_KODE_GERAI}.pdf`

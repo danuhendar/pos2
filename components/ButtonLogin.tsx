@@ -29,49 +29,6 @@ const ButtonLogin: React.FC<ButtonLoginProps> = ({url,param,idComponent,idAlert,
     const port_login = useSelector((state: IRootState) => state.themeConfig.port_login);
     const isHuman = useSelector((state: IRootState) => state.themeConfig.isHuman);
     
-    const authRND = (in_nik:string) => {
-        //console.log('host_rnd : '+host_rnd)
-        let url_rnd = `http://${host}:${port_login}/`;
-        let param = JSON.stringify({"IN_USERNAME":in_nik})
-        Posts(url_rnd,param,true,'').then((response) => {
-            var res_data = response;
-            var code = res_data.code;
-            var msg = res_data.msg;
-            if(parseFloat(code) === 200){
-                const p_content = res_data.data
-                const data_token = p_content.TOKEN
-                const en_data_token = encryptString(data_token,'IDMC0mmandMustbeSetFor5ecr3t@3DP','R4h451A_3DP@4MaN');
-                handleSave('ot',en_data_token,false)
-                handleSave('rot',p_content.REFRESH_TOKEN,false)
-                handleSave('lmenu',JSON.stringify(p_content.MENU),false)
-                handleSave('nik',p_content.NIK,false)
-                handleSave('nama',p_content.NAMA,false)
-                handleSave('unit',p_content.UNIT,false)
-                handleSave('bagian',p_content.BAGIAN,false)
-                handleSave('id_periode',p_content.ID_PERIODE,false)
-                handleSave('is_gerai',p_content.IS_GERAI,false)
-                handleSave('kode_gerai',p_content.KODE_GERAI,false)
-                handleSave('menu','horizontal',false)
-                router.push('/utama');
-            }else{
-                Swal.fire({
-                    title: t("Warning"),
-                    text: "Error AuthService : "+code+"-"+msg,
-                    icon: "warning",
-                    padding: '2em',
-                    customClass: 'sweet-alerts'
-                });
-            }
-        }).catch((error) => {
-            Swal.fire({
-                title: t("Warning"),
-                text: "Error AuthService : "+error.toString(),
-                icon: "warning",
-                padding: '2em',
-                customClass: 'sweet-alerts'
-            });
-        });
-    }
     const auth = (url:string,param:string,token:string) => {
         const myExample = document.getElementById(idComponent);
         const parse_param = JSON.parse(param);

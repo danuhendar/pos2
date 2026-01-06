@@ -155,6 +155,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     useEffect(() => {
         const res_host = themeConfig.host
+        console.log('res_host : ',res_host)
         const res_PORT_LOGIN = parseFloat(themeConfig.port_login)
         setHOST(res_host)
         setPORT(res_PORT_LOGIN)
@@ -460,7 +461,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     const GetMasterPembayaran = (in_val:string) => {
         setOptionBank([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterPembayaran`
+        let url = `https://${IN_HOST}/api/v2/GetMasterPembayaran`
         let param = {"IN_KODE_KATEGORI":in_val,"IN_KODE_BAYAR":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -510,7 +511,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
     const GetMasterKategoriPembayaran = (in_host:string,in_port:number) => {
         setOptionMetodePembayaran([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterKategoriPembayaran`
+        let url = `https://${in_host}/api/v2/GetMasterKategoriPembayaran`
         let param = {"IN_KODE_KATEGORI":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -560,7 +561,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptionsGerai([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -609,7 +610,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
     const GetMasterGeraiByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string) => {
        
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGeraiByKodeGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGeraiByKodeGerai`
         let param = {"IN_KODE_GERAI":in_kode_gerai}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -652,7 +653,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         });
     }
     const GetMasterProdukByBarcode = () => {
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByBarcode`
+        let url = `https://${IN_HOST}/api/v2/GetMasterProdukByBarcode`
         let param = {"IN_BARCODE":IN_BARCODE,"IN_KODE_GERAI":IN_KODE_GERAI}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then(async (response) => {
@@ -740,7 +741,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
     const GetPosInitialByKodeGerai = (in_host:string,in_port:number,in_kode_gerai:string,in_nik:string) => {
         try{
-            let url = `http://${in_host}:${in_port}/api/v2/GetPosInitialByKodeGerai`
+            let url = `https://${in_host}/api/v2/GetPosInitialByKodeGerai`
             let param = {"IN_KODE_GERAI":in_kode_gerai,"IN_SHIFT":IN_SHIFT,"IN_TANGGAL":get_format_tanggal_jam().substring(0,10),"IN_NIK":in_nik}
             const Token = GetToken()
             setLoadingButton(true)
@@ -1216,10 +1217,11 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
         setData_rows_produk([])
         let url = ''
         if(is_for_barcode){
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+            url = `https://${IN_HOST === '' ? in_host : IN_HOST}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
         }else{
-            url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+            url = `https://${IN_HOST === '' ? in_host : IN_HOST}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
         }
+        console.log(url)
         
         let param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":in_kode_gerai}
         
@@ -1319,7 +1321,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
     }
 
     const GetGenerateKodeTransaksiInventory = () => {
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeTransaksiInventory`
+        let url = `https://${IN_HOST}/api/v2/GetGenerateKodeTransaksiInventory`
         let param = {}
         const Token = GetToken()
         return new Promise((resolve,reject)=>{
@@ -1347,7 +1349,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
 
     ) => {
         // let in_no_struk = "202508130004"
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
+        let url = `https://${IN_HOST}/api/v2/GenerateReceiptStruk`
         let param = {"IN_NO_STRUK": in_no_struk,"IN_SEND_WA":in_flag_send_wa}
         const Token = GetToken()
         //console.log(JSON.stringify(param))
@@ -1425,7 +1427,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             console.log(JSON.stringify(r))
                             setDummyData(r);
                             setIN_GENERATE_KODE_TRANSAKSI_INVENTORY(kode_transaksi_inventory.toString());
-                            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
+                            let url = `https://${IN_HOST}/api/v2/InsPosTransaksiSales`
                             let param = {
                                             "IN_KODE_INITIAL": IN_KODE_INITIAL,
                                             "IN_KODE_GERAI": IN_KODE_GERAI,
@@ -1469,7 +1471,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                                     });
                                     //console.log('res_no_struk :'+res_no_struk)
                                     //GenerateReceiptStruk(res_no_struk,(IN_NO_WHATSAPP === '' || IN_NO_WHATSAPP === null ? false : true))
-                                    const url_struk = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStrukForPreview/${res_no_struk}`
+                                    const url_struk = `https://${IN_HOST}/api/v2/GenerateReceiptStrukForPreview/${res_no_struk}`
                                     setIN_NO_STRUK(res_no_struk)
                                     setURL_GENERATE_STRUK(url_struk)
                                     setModal14(true)
@@ -1588,7 +1590,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                 try{
                      
                         
-                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosInitial`
+                        let url = `https://${IN_HOST}/api/v2/InsPosInitial`
                         let param = {"IN_KODE_INITIAL":"","IN_KODE_GERAI":IN_KODE_GERAI,"IN_MODAL":IN_UANG_MODAL.split(",").join(""),"IN_UANG_LACI":IN_UANG_LACI.split(",").join(""),"IN_NIK":IN_NIK_INITIAL,"IN_NAMA":IN_NAMA_INITIAL,"IN_SHIFT":IN_SHIFT_INITIAL}
                         const Token = GetToken()
                         console.log(JSON.stringify(param))
@@ -1731,7 +1733,7 @@ const FormSales: React.FC<FormSalesProps> = ({ url, jenis, IDReport }) => {
                             }
                             detail.push(obj)
                         }
-                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsPosTransaksiSales`
+                        let url = `https://${IN_HOST}/api/v2/InsPosTransaksiSales`
                         let param = {
                                         "IN_KODE_INITIAL": IN_KODE_INITIAL,
                                         "IN_KODE_GERAI": IN_KODE_GERAI,

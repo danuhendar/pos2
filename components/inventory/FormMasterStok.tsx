@@ -123,7 +123,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptionsGerai([])
         setOptionsGeraiMutasi([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -175,7 +175,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
     const GetPosMasterStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string,in_export:boolean,in_summary:boolean) => {
         setData_rows_Kategori([])
         setData_columns_Kategori([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMasterStok`
+        let url = `https://${IN_HOST}/api/v2/GetPosMasterStok`
         let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export,"IN_SUMMARY":in_summary}
         const Token = GetToken()
         setLoadingButton(true)
@@ -260,7 +260,7 @@ const FormMasterStok: React.FC<FormMasterStokProps> = ({ url, command, IDReport 
       const GetPosMutasiStok = (in_tahun:string,in_bulan:string,in_kode_gerai:string,in_export:boolean) => {
         setData_rows([])
         setData_columns([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosMutasiStok`
+        let url = `https://${IN_HOST}/api/v2/GetPosMutasiStok`
         let param = {"IN_TAHUN":in_tahun,"IN_BULAN":in_bulan,"IN_KODE_GERAI":in_kode_gerai,"IN_EXPORT":in_export}
         const Token = GetToken()
         setLoadingButton(true)

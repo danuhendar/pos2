@@ -7,10 +7,10 @@ const themeConfig = {
     animation: 'animate__fadeInRight', // animate__fadeIn, animate__fadeInDown, animate__fadeInUp, animate__fadeInLeft, animate__fadeInRight, animate__slideInDown, animate__slideInLeft, animate__slideInRight, animate__zoomIn
     navbar: 'navbar-sticky', // navbar-sticky, navbar-floating, navbar-static
     semidark: false,
-    versi_app:'1.0.03-rc3',
-    host: '103.191.63.199',
-    hostrnd: '103.191.63.199',
-    host_ws: '103.191.63.199',
+    versi_app:'1.1.01',
+    host: 'api.cemengkalanghadiningrat.my.id',
+    hostrnd: 'api.cemengkalanghadiningrat.my.id',
+    host_ws: 'api.cemengkalanghadiningrat.my.id',
     port_login:'5656',
     port_administrasi: '5656',
     port_listener: '7322',

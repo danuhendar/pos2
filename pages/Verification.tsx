@@ -145,7 +145,7 @@ const Verification = () => {
             });
             setLoadingButton(false);
         }else{
-            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/verify`
+            let url = `https://${IN_HOST}/api/v2/verify`
             const IN_USERNAME = get_data_local_storage('nik')
             let param = {"IN_USERNAME":IN_USERNAME,"IN_TOKEN":IN_CODE,"IN_FROM":"POS"}
             const Token = GetToken()

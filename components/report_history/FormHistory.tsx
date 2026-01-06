@@ -91,7 +91,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
     const FormInputKodeGerai = (value: any) => {var val = value.value;var sp = val.split('|');setIN_KODE_GERAI(sp[0]); setIN_NAMA_GERAI(sp[1]); setIN_ALAMAT(sp[2]);};
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -241,11 +241,11 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         setIN_NO_STRUK('')
         if(!in_send_wa){
             setModal14(true)
-            const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStrukForPreview/${in_no_struk}`
+            const url = `https://${IN_HOST}/api/v2/GenerateReceiptStrukForPreview/${in_no_struk}`
             setURL_GENERATE_STRUK(url)
             setIN_NO_STRUK(in_no_struk)
         }else{
-            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GenerateReceiptStruk`
+            let url = `https://${IN_HOST}/api/v2/GenerateReceiptStruk`
             let param = {"IN_NO_STRUK": in_no_struk,"IN_SEND_WA":in_send_wa}
             const Token = GetToken()
             //console.log(JSON.stringify(param))
@@ -468,10 +468,10 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         let param = {}
         if(IDReport === 'History Sales'){
             setIN_NO_STRUK('')
-            url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistorySales`
+            url = `https://${IN_HOST}/api/v2/GetHistorySales`
             param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
         }else if(IDReport === 'History Inventory'){
-            url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistoryInventory`
+            url = `https://${IN_HOST}/api/v2/GetHistoryInventory`
             param = {"IN_PERIODE_AWAL":in_periode_awal,"IN_PERIODE_AKHIR":in_periode_akhir,"IN_KODE_GERAI":IN_KODE_GERAI}
         }
         const Token = GetToken()
@@ -603,7 +603,7 @@ const FormHistory: React.FC<FormHistoryProps> = ({ url, command, IDReport }) => 
         setModal13(true)
         setTitle(in_title)
         setData_rows_detail_transaksi_inventory([])
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetHistoryInventoryDetail`
+        let url = `https://${IN_HOST}/api/v2/GetHistoryInventoryDetail`
         let param = {"IN_KODE_TRANSAKSI":in_kode_transaksi}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {

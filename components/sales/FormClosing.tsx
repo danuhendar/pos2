@@ -101,7 +101,7 @@ const [data_rows, setData_rows] = useState([]);
     const FormInputSalesHPP = (event: { target: { value: any; }; }) => {var val = event.target.value; setIN_HPP(val);};
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -150,7 +150,7 @@ const [data_rows, setData_rows] = useState([]);
     }
 
     const GetPosInitialByKodeGeraiTanggalShift = () => {
-        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosInitialByKodeGeraiTanggalShift`
+        const url = `https://${IN_HOST}/api/v2/GetPosInitialByKodeGeraiTanggalShift`
         const param = {"IN_TANGGAL":ConvertDateFormat(date2,false),"IN_SHIFT":IN_SHIFT,"IN_KODE_GERAI":IN_KODE_GERAI,"IN_NIK":InputNik}
         const Token = GetToken()
         setLoadingButton(true)
@@ -235,7 +235,7 @@ const [data_rows, setData_rows] = useState([]);
         }).then((result) => {
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
-                        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingShift`
+                        const url = `https://${IN_HOST}/api/v2/ClosingShift`
                         const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL}
                         const Token = GetToken()
                         setLoadingButtonClosing(true)
@@ -306,7 +306,7 @@ const [data_rows, setData_rows] = useState([]);
 
     const InsJurnalClosingSales = () => {
         return new Promise((resolve, reject) => {
-            const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsJurnalClosingSales`
+            const url = `https://${IN_HOST}/api/v2/InsJurnalClosingSales`
             const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_KODE_GERAI":IN_KODE_GERAI_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_OTORISATOR":"POSAPP","IN_SALES_GROSS":IN_GROSS_SALES.split(',').join(''),"IN_DISKON":IN_DISKON.split(',').join(''),"IN_SALES_NET":IN_NET_SALES.split(',').join(''),"IN_RETUR_PENJUALAN":0,"IN_HPP":IN_HPP.split(',').join(''),"IN_IS_MARKET_PLACE":true}
             console.log(JSON.stringify(param))
             const Token = GetToken()
@@ -387,7 +387,7 @@ const [data_rows, setData_rows] = useState([]);
                     if (result.isConfirmed) {
                         InsJurnalClosingSales().then((result) => {
                             if(result === 'OK'){
-                                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/ClosingHarian`
+                                const url = `https://${IN_HOST}/api/v2/ClosingHarian`
                                 const param = {"IN_KODE_INITIAL":IN_KODE_INITIAL,"IN_TANGGAL":IN_TANGGAL,"IN_UANG_FISIK":IN_UANG_FISIK,"IN_PENGELUARAN_BIAYA_MODAL":IN_PENGELUARAN_BIAYA_MODAL,"IN_SISA_MODAL":IN_SISA_MODAL,"IN_NOTE":IN_NOTE}
                                 const Token = GetToken()
                                 const NameFile = 'slip_closing_harian_'+get_format_tanggal_jam_format_indo()+"_"+IN_KODE_GERAI+".pdf"
@@ -472,7 +472,7 @@ const [data_rows, setData_rows] = useState([]);
 
     const GetPosInitialByKodeGerai = () => {
         try{
-            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetPosInitialByKodeGerai`
+            let url = `https://${IN_HOST}/api/v2/GetPosInitialByKodeGerai`
             let param = {"IN_KODE_GERAI":IN_KODE_GERAI,"IN_SHIFT":"-","IN_TANGGAL":ConvertDateFormat(date2,false)}
             const Token = GetToken()
             setLoadingButton(true)

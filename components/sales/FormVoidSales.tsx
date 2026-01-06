@@ -58,7 +58,7 @@ const FormVoidSales: React.FC<FormVoidSalesProps> = ({ url, jenis, IDReport }) =
     const FormInputKeteranganVOID = (event: { target: { value: any; }; }) => {var val = event.target.value;setIN_KETERANGAN_VOID(val);  };
     const GetDataTransaksiInventoryByNoStruk = () => {
         try{
-            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByNoStruk`
+            let url = `https://${IN_HOST}/api/v2/GetDataTransaksiInventoryByNoStruk`
             let param = {"IN_NO_STRUK":IN_KODE_TRANSAKSI,"IN_IS_STATUS":"1"}
             const Token = GetToken()
             Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -164,7 +164,7 @@ const FormVoidSales: React.FC<FormVoidSalesProps> = ({ url, jenis, IDReport }) =
     }
 
     const GetGenerateKodeTransaksiInventory = () => {
-        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeTransaksiInventory`
+        let url = `https://${IN_HOST}/api/v2/GetGenerateKodeTransaksiInventory`
         let param = {}
         const Token = GetToken()
         return new Promise((resolve,reject)=>{
@@ -203,7 +203,7 @@ const FormVoidSales: React.FC<FormVoidSalesProps> = ({ url, jenis, IDReport }) =
                 if (result.isConfirmed) {
                     GetGenerateKodeTransaksiInventory().then((d)=>{
                         const kode_transaksi_inventory = d;
-                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/VoidPosTransaksiSales`
+                        let url = `https://${IN_HOST}/api/v2/VoidPosTransaksiSales`
                         var tanggal_void = get_format_tanggal_jam()
                         var tahun = get_tahun()
                         var bulan = get_bulan()

@@ -88,7 +88,7 @@ const FormMasterSupplier: React.FC<FormMasterSupplierProps> = ({ url, command, I
             }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterSupplier`
+                const url = `https://${IN_HOST}/api/v2/DelMasterSupplier`
                 const param = {"IN_KODE_SUPPLIER":IN_KODE_SUPPLIER}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -172,7 +172,7 @@ const FormMasterSupplier: React.FC<FormMasterSupplierProps> = ({ url, command, I
                 let Token = GetToken()
                 if(Title.includes('Add')){
                     console.log('kondisi 1')
-                    const url_get_kode_supplier = `http://${IN_HOST}:${IN_PORT}/api/v2/GetKodeSupplier`
+                    const url_get_kode_supplier = `https://${IN_HOST}/api/v2/GetKodeSupplier`
                     const param = {}
                     await Posts(url_get_kode_supplier,JSON.stringify(param),false,Token).then((response) => {
                         const res_data = response;
@@ -188,7 +188,7 @@ const FormMasterSupplier: React.FC<FormMasterSupplierProps> = ({ url, command, I
                 }else{
                     res_kode_supplier = IN_KODE_SUPPLIER
                 }
-                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterSupplier`
+                const url = `https://${IN_HOST}/api/v2/InsMasterSupplier`
                 const param = {"IN_KODE_SUPPLIER":res_kode_supplier,"IN_CONTENT":IN_CONTENT,"IN_ALAMAT":IN_ALAMAT,"IN_NO_HP":IN_NO_HP,"IN_OTORISATOR":InputNik}
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
                     const res_data = response;
@@ -338,7 +338,7 @@ const FormMasterSupplier: React.FC<FormMasterSupplierProps> = ({ url, command, I
         let param = {}
         var cols = []
         if(IDReport === 'Master Supplier'){
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterSupplier`
+            url = `https://${IN_HOST}/api/v2/GetMasterSupplier`
             param = {"IN_KODE_SUPPLIER":"%"}
             cols = Def_Column_MasterSupplier()
         }else{

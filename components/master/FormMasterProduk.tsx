@@ -142,7 +142,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
 
     const GetMasterKategoriProduk = (in_host:string,in_port:number) => {
         setOptions8([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterKategoriProduk`
+        let url = `https://${in_host}/api/v2/GetMasterKategoriProduk`
         let param = {"IN_KODE_KATEGORI":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -192,7 +192,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
 
     const GetMasterSupplier = (in_host:string,in_port:number) => {
         setOptions6([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterSupplier`
+        let url = `https://${in_host}/api/v2/GetMasterSupplier`
         let param = {"IN_KODE_SUPPLIER":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -241,7 +241,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
     }
     const GetMasterGerai = (in_host:string,in_port:number) => {
         setOptions7([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+        let url = `https://${in_host}/api/v2/GetMasterGerai`
         let param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -291,7 +291,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
 
     const GetMasterSatuan = (in_host:string,in_port:number) => {
         setOptionSatuan([])
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterSatuan`
+        let url = `https://${in_host}/api/v2/GetMasterSatuan`
         let param = {"":""}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -355,10 +355,10 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                 let url = ''
                 let param = {}
                 if(Tabs === 'produk'){
-                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterProdukByKodeProduk`
+                    url = `https://${IN_HOST}/api/v2/DelMasterProdukByKodeProduk`
                     param = {"IN_KODE_BARANG":IN_KODE_BARANG}
                 }else{
-                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterKategori`
+                    url = `https://${IN_HOST}/api/v2/DelMasterKategori`
                     param = {"IN_KODE_KATEGORI":IN_KODE_BARANG}
                 }
               
@@ -520,7 +520,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                 let Token = GetToken()
                 if(Title.includes('Add')){
                     if(Tabs === 'produk'){
-                        const url_get_kode_supplier = `http://${IN_HOST}:${IN_PORT}/api/v2/GetKodeBarang`
+                        const url_get_kode_supplier = `https://${IN_HOST}/api/v2/GetKodeBarang`
                         const param = {}
                         await Posts(url_get_kode_supplier,JSON.stringify(param),false,Token).then((response) => {
                             const res_data = response;
@@ -534,7 +534,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                             }
                         });
                     }else{
-                        const url_get_kode_supplier = `http://${IN_HOST}:${IN_PORT}/api/v2/GetKodeKategori`
+                        const url_get_kode_supplier = `https://${IN_HOST}/api/v2/GetKodeKategori`
                         const param = {}
                         await Posts(url_get_kode_supplier,JSON.stringify(param),false,Token).then((response) => {
                             const res_data = response;
@@ -560,7 +560,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                 let url = ''
                 let param = {}
                 if(Tabs === 'produk'){
-                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterProduk`
+                    url = `https://${IN_HOST}/api/v2/InsMasterProduk`
                     param = {
                             "IN_KODE_BARANG":res_kode_barang,
                             "IN_KODE_KATEGORI":(IDReport.includes('Edit') ? IN_KODE_KATEGORI : selectedKategori.value),
@@ -579,7 +579,7 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
                             "IN_KODE_GERAI":(IDReport.includes('Edit') ? IN_KODE_GERAI : selectedKodeGerai.value),
                         }
                 }else{
-                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterKategoriProduk`
+                    url = `https://${IN_HOST}/api/v2/InsMasterKategoriProduk`
                     param = {"IN_KODE_KATEGORI":res_kode_kategori,"IN_CONTENT":IN_CONTENT_KATEGORI}
                     //console.log(JSON.stringify(param))
                 }
@@ -897,13 +897,13 @@ const FormMasterProduk: React.FC<FormMasterProdukProps> = ({ url, command, IDRep
         if(Tabs === 'produk'){
             setData_rows([])
             setData_columns([])
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
+            url = `https://${IN_HOST}/api/v2/GetMasterProdukByKodeProdukAndKodeGerai`
             param = {"IN_KODE_BARANG":"%","IN_KODE_GERAI":"G%"}
             cols = Def_Column_MasterProduk()
         }else{
             setData_rows_Kategori([])
             setData_columns_Kategori([])
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterKategoriProduk`
+            url = `https://${IN_HOST}/api/v2/GetMasterKategoriProduk`
             param = {"IN_KODE_KATEGORI":"%"}
             cols = Def_Column_MasterKategori()
         }

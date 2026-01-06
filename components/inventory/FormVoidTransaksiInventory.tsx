@@ -57,7 +57,7 @@ const FormVoidTransaksiInventory: React.FC<FormVoidTransaksiInventoryProps> = ({
     
     const GetDataTransaksiInventoryByKodeTransaksi = () => {
         try{
-            let url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetDataTransaksiInventoryByKodeTransaksi`
+            let url = `https://${IN_HOST}/api/v2/GetDataTransaksiInventoryByKodeTransaksi`
             let param = {"IN_KODE_TRANSAKSI":IN_KODE_TRANSAKSI}
             const Token = GetToken()
             Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -176,7 +176,7 @@ const FormVoidTransaksiInventory: React.FC<FormVoidTransaksiInventoryProps> = ({
               }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
-                        let url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelPosTransaksiInventory`
+                        let url = `https://${IN_HOST}/api/v2/DelPosTransaksiInventory`
                         let param = {"IN_KODE_TRANSAKSI":IN_KODE_TRANSAKSI}
                         console.log(JSON.stringify(param))
                         const Token = GetToken()

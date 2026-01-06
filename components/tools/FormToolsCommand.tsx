@@ -93,7 +93,7 @@ const FormToolsCommand: React.FC<FormToolsCommandProps> = ({ url, command, IDRep
     } 
     const get_toko = (IN_KDCAB:string) => {
         //-- GET LIST TOKO --//
-        const url = `http://${IN_HOST}:${IN_PORT}/store/v1/ViewCabang`;
+        const url = `https://${IN_HOST}/store/v1/ViewCabang`;
         const param = {kdcab:IN_KDCAB};
         setLoadingOptionToko(true)
         const Token = GetToken()

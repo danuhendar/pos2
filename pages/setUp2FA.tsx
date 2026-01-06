@@ -118,7 +118,7 @@ const SetUp2FA = () => {
     const SetUp2FA = (host:string,in_port_administrasi:string) => {
         setLoadingButton(true);
        
-        let url = `http://${host}:${in_port_administrasi}/api/v2/SetUp2FA`
+        let url = `https://${host}/api/v2/SetUp2FA`
         const IN_USERNAME = get_data_local_storage('nik')
         let param = {"IN_USERNAME":IN_USERNAME}
         const Token = GetToken()

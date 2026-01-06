@@ -125,7 +125,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
 	const FormSelectBranch = (value: any) => {var val = value.value;setIN_BRANCH(val);};
 	
 	const GetDataMasterCabangForCombo = (in_host:string,in_port:number) => {
-        let url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+        let url = `https://${in_host}/api/v2/GetMasterCabang`
         let param = {}
         const Token = GetToken()
         Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -193,13 +193,13 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                 let url = '';
                 let param = {}
                 if(IDReport === 'Master Store'){
-                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterGerai`
+                    url = `https://${IN_HOST}/api/v2/DelMasterGerai`
                     param = {"IN_KODE_GERAI":IN_KODE_GERAI}
                 }else if(IDReport === 'Master Branch'){
-                    url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterCabang`
+                    url = `https://${IN_HOST}/api/v2/DelMasterCabang`
                     param = {"IN_KODE_CABANG":IN_KODE_GERAI}
                 }else if(IDReport === 'Master Satuan'){
-                     url = `http://${IN_HOST}:${IN_PORT}/api/v2/DelMasterSatuan`
+                     url = `https://${IN_HOST}/api/v2/DelMasterSatuan`
                     param = {"IN_KODE_SATUAN":IN_KODE_GERAI}
                 }
              
@@ -324,7 +324,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 const InputNik = get_data_local_storage('nik')
-                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterGerai`
+                const url = `https://${IN_HOST}/api/v2/InsMasterGerai`
                 const param = {"IN_KODE_CABANG":IN_BRANCH,"IN_KODE_GERAI":IN_STORE,"IN_CONTENT":IN_CONTENT,"IN_IS_AKTIF":(CheckedISActive ? 1 : 0),"IN_OTORISATOR":InputNik,"IN_ALAMAT": IN_ALAMAT,"IN_CHANNEL_TELEGRAM":IN_CHANNEL_TELEGRAM,"IN_EMAIL_CLOSING":IN_EMAIL_CLOSING}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -390,7 +390,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 const InputNik = get_data_local_storage('nik')
-                const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterCabang`
+                const url = `https://${IN_HOST}/api/v2/InsMasterCabang`
                 const param = {"IN_KODE_CABANG":IN_KODE_CABANG,"IN_CONTENT":IN_CONTENT}
                 const Token = GetToken()
                 Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -441,7 +441,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         })
     }
     const GetGenerateKodeSatuan = () => {
-        const url = `http://${IN_HOST}:${IN_PORT}/api/v2/GetGenerateKodeSatuan`
+        const url = `https://${IN_HOST}/api/v2/GetGenerateKodeSatuan`
         const param = {}
         const Token = GetToken()
         return new Promise((resolve,reject)=>{
@@ -485,7 +485,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
                     }else{
                         res_kode_satuan = IN_KODE_SATUAN
                     }
-                    const url = `http://${IN_HOST}:${IN_PORT}/api/v2/InsMasterSatuan`
+                    const url = `https://${IN_HOST}/api/v2/InsMasterSatuan`
                     const param = {"IN_KODE_SATUAN":res_kode_satuan,"IN_CONTENT":IN_CONTENT}
                     const Token = GetToken()
                     Posts(url,JSON.stringify(param),false,Token).then((response) => {
@@ -773,7 +773,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         let param = {}
         var cols = []
         if(IDReport === 'Master Store'){
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterGerai`
+            url = `https://${in_host}/api/v2/GetMasterGerai`
             param = {"IN_KODE_CABANG":"%","IN_IS_AKTIF":"%"}
             cols = Def_Column_MasterGerai()
         }else{
@@ -846,7 +846,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         let param = {}
         var cols = []
         if(IDReport === 'Master Branch'){
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterCabang`
+            url = `https://${in_host}/api/v2/GetMasterCabang`
             param = {}
             cols = Def_Column_MasterCabang()
         }else{
@@ -918,7 +918,7 @@ const FormMasterStore: React.FC<FormMasterStoreProps> = ({ url, command, IDRepor
         let param = {}
         var cols = []
         if(IDReport === 'Master Satuan'){
-            url = `http://${in_host}:${in_port}/api/v2/GetMasterSatuan`
+            url = `https://${in_host}/api/v2/GetMasterSatuan`
             param = {}
             cols = Def_Column_MasterSatuan()
         }else{

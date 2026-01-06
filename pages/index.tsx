@@ -159,7 +159,7 @@ const LoginCover = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <ButtonLogin url={`http://${host}:${port_login}/api/v2/LoginGoogleAuthenticator`} param={JSON.stringify({ "IN_USERNAME":Username,"IN_PASSWORD":Password,"IN_FROM":'POS',"IN_TOKEN":""})} idComponent={"btn_login"} idAlert={'alert_login'} isBot={getnavigator} />
+                                    <ButtonLogin url={`https://${host}/api/v2/LoginGoogleAuthenticator`} param={JSON.stringify({ "IN_USERNAME":Username,"IN_PASSWORD":Password,"IN_FROM":'POS',"IN_TOKEN":""})} idComponent={"btn_login"} idAlert={'alert_login'} isBot={getnavigator} />
                                     <div className="text-center dark:text-white">
                                         {/* {t('Download User Guide IDMConsoleV2')}&nbsp;
                                         <Link href={'/file/JUKLAK_IDMCONSOLEV2.rar'} className="underline transition text-primary hover:text-black dark:hover:text-white">
